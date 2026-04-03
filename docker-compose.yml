@@ -1,0 +1,29 @@
+# ============================================================
+# FILE: docker-compose.yml
+# PURPOSE: Runs the PostgreSQL database in a Docker container
+#          This is used during development on your local machine
+# HOW TO START: docker-compose up -d
+# HOW TO STOP:  docker-compose down
+# ============================================================
+
+version: '3.8'
+
+services:
+
+  # PostgreSQL Database
+  database:
+    image: postgres:15                  # PostgreSQL version 15
+    container_name: sasi_erp_database   # Name of the container
+    restart: always                     # Auto restart if it crashes
+    environment:
+      POSTGRES_DB: sasi_erp             # Database name
+      POSTGRES_USER: sasi_erp_user      # Database username
+      POSTGRES_PASSWORD: sasi_erp_password  # Database password
+    ports:
+      - "5432:5432"                     # Port to connect from your machine
+    volumes:
+      - sasi_erp_data:/var/lib/postgresql/data  # Saves data permanently
+
+# Named volume - keeps your data even if container is stopped
+volumes:
+  sasi_erp_data:

@@ -1,0 +1,155 @@
+// ============================================================
+// FILE: pages/reports/InventoryReportPage.js
+// PURPOSE: Inventory report — stock levels, low stock,
+//          movement summary, top stock items.
+// ============================================================
+
+import React, { useState, useEffect } from 'react';
+import {
+    Box, Typography, Grid, Paper, Table, TableBody, TableCell,
+    TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
+} from '@mui/material';
+import {
+    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+    ResponsiveContainer, PieChart, Pie, Cell, Legend
+} from 'recharts';
+
+const API = 'http://127.0.0.1:8000/api/reports/inventory/';
+const PIE_COLORS = ['#1a237e','#2e7d32','#e65100','#6a1b9a','#00838f','#c62828'];
+
+function KpiCard({ title, value, color }) {
+    return (
+        <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, textAlign: 'center' }}>
+            <Typography variant="body2" color="text.secondary">{title}</Typography>
+            <Typography variant="h4" fontWeight="bold" color={color}>{value}</Typography>
+        </Paper>
+    );
+}
+
+function InventoryReportPage() {
+    const [data, setData]       = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError]     = useState('');
+
+    useEffect(() => {
+        fetch(API, { credentials: 'include' })
+            .then(r => r.json())
+            .then(d => { setData(d); setLoading(false); })
+            .catch(() => { setError('Failed to load report.'); setLoading(false); });
+    }, []);
+
+    if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}><CircularProgress /></Box>;
+    if (error)   return <Alert severity="error">{error}</Alert>;
+
+    return (
+        <Box>
+            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Inventory Report</Typography>
+            <Typography variant="body2" color="text.secondary" mb={3}>Stock levels, movements, and low stock analysis</Typography>
+
+            <Grid container spacing={3} mb={4}>
+                <Grid item xs={6} md={6}><KpiCard title="Total Stock Items" value={data.total_stock_items} color="#1a237e" /></Grid>
+                <Grid item xs={6} md={6}><KpiCard title="Low Stock Items" value={data.low_stock_count} color="#e53935" /></Grid>
+            </Grid>
+
+            <Grid container spacing={3} mb={4}>
+                {/* Stock by Item Type Pie */}
+                <Grid item xs={12} md={5}>
+                    <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
+                        <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Stock by Item Type</Typography>
+                        {data.stock_by_type.length === 0 ? (
+                            <Typography color="text.secondary" align="center" py={4}>No stock data yet</Typography>
+                        ) : (
+                            <ResponsiveContainer width="100%" height={240}>
+                                <PieChart>
+                                    <Pie data={data.stock_by_type} dataKey="total_items" nameKey="item_type"
+                                        cx="50%" cy="50%" outerRadius={80} label={({ item_type, total_items }) => `${item_type}: ${total_items}`}>
+                                        {data.stock_by_type.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
+                                    </Pie>
+                                    <Tooltip />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        )}
+                    </Paper>
+                </Grid>
+
+                {/* Movement Summary */}
+                <Grid item xs={12} md={7}>
+                    <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
+                        <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Stock Movements (Last 30 Days)</Typography>
+                        {data.movement_summary.length === 0 ? (
+                            <Typography color="text.secondary" align="center" py={4}>No movements in last 30 days</Typography>
+                        ) : (
+                            <ResponsiveContainer width="100%" height={240}>
+                                <BarChart data={data.movement_summary} layout="vertical">
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis type="number" />
+                                    <YAxis dataKey="movement_type" type="category" tick={{ fontSize: 11 }} width={110} />
+                                    <Tooltip />
+                                    <Bar dataKey="count" name="Count" fill="#1a237e" radius={[0,4,4,0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        )}
+                    </Paper>
+                </Grid>
+            </Grid>
+
+            {/* Low Stock Alert Table */}
+            {data.low_stock_items.length > 0 && (
+                <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, mb: 3 }}>
+                    <Typography variant="subtitle1" fontWeight="bold" color="#e53935" mb={2}>Low Stock Items (Qty ≤ 10)</Typography>
+                    <TableContainer>
+                        <Table size="small">
+                            <TableHead sx={{ backgroundColor: '#ffebee' }}>
+                                <TableRow>
+                                    <TableCell><strong>Item Code</strong></TableCell>
+                                    <TableCell><strong>Item Name</strong></TableCell>
+                                    <TableCell><strong>Warehouse</strong></TableCell>
+                                    <TableCell align="right"><strong>Current Qty</strong></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {data.low_stock_items.map((item, i) => (
+                                    <TableRow key={i} sx={{ backgroundColor: '#fff8f8' }}>
+                                        <TableCell><strong>{item.item_code}</strong></TableCell>
+                                        <TableCell>{item.item_name}</TableCell>
+                                        <TableCell>{item.warehouse}</TableCell>
+                                        <TableCell align="right" sx={{ color: '#e53935', fontWeight: 'bold' }}>{item.quantity}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Paper>
+            )}
+
+            {/* Top Stock Items */}
+            <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
+                <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Top 10 Items by Stock Quantity</Typography>
+                <TableContainer>
+                    <Table size="small">
+                        <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                            <TableRow>
+                                <TableCell><strong>Item Code</strong></TableCell>
+                                <TableCell><strong>Item Name</strong></TableCell>
+                                <TableCell><strong>Type</strong></TableCell>
+                                <TableCell align="right"><strong>Total Qty</strong></TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {data.top_stock_items.map((t, i) => (
+                                <TableRow key={i} hover>
+                                    <TableCell><strong>{t.item_code}</strong></TableCell>
+                                    <TableCell>{t.item_name}</TableCell>
+                                    <TableCell><Chip label={t.item_type} size="small" variant="outlined" /></TableCell>
+                                    <TableCell align="right">{t.total_qty.toFixed(2)}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Paper>
+        </Box>
+    );
+}
+
+export default InventoryReportPage;
