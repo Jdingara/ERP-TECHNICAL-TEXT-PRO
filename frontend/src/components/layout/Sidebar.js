@@ -55,6 +55,7 @@ const MENU_ITEMS = [
         { title: 'Order Journey',      path: '/sales/order-journey' },
         { title: 'Sales Orders',       path: '/sales/sales-orders' },
         { title: 'Create Sales Order', path: '/sales/create-sales-order' },
+        { title: 'Invoices (AR)',      path: '/sales/invoices' },
     ]},
     { title: 'Finance', icon: <AccountBalanceIcon />, children: [
         { title: 'Chart of Accounts', path: '/finance/chart-of-accounts' },

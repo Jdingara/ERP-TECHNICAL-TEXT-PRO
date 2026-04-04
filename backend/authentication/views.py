@@ -10,17 +10,20 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, date
+from django.db.models import Sum
 import json
+import calendar
 
 # Module model imports for dashboard
 from inventory.models import Stock
 from purchasing.models import PurchaseOrder
-from sales.models import SalesOrder
+from sales.models import SalesOrder, Invoice
 from production.models import WorkOrder
 from hr_payroll.models import Employee
 from medical_textile.models import CAPA, RegulatoryCompliance, ShelfLifeRecord
 from technical_textile.models import Sample, RDProject
+from finance.models import Account
 from .models import Role, UserProfile
 
 
@@ -147,6 +150,49 @@ def dashboard_summary_view(request):
             'reorder_level': '10',
         } for s in low_stock_qs]
 
+        # ── Invoice / AR summary ──────────────────────────────
+        total_invoiced  = float(Invoice.objects.aggregate(s=Sum('total_amount'))['s'] or 0)
+        total_paid_amt  = float(Invoice.objects.filter(status='paid').aggregate(s=Sum('total_amount'))['s'] or 0)
+        outstanding_ar  = float(Invoice.objects.exclude(status__in=['paid', 'draft']).aggregate(s=Sum('balance_due'))['s'] or 0)
+        overdue_invoices = Invoice.objects.filter(status='overdue').count()
+
+        # ── AR Aging buckets ──────────────────────────────────
+        unpaid_inv = Invoice.objects.exclude(status__in=['paid', 'draft'])
+        ar_current = float(unpaid_inv.filter(due_date__gte=today).aggregate(s=Sum('balance_due'))['s'] or 0)
+        ar_30      = float(unpaid_inv.filter(due_date__lt=today, due_date__gte=today - timedelta(days=30)).aggregate(s=Sum('balance_due'))['s'] or 0)
+        ar_60      = float(unpaid_inv.filter(due_date__lt=today - timedelta(days=30), due_date__gte=today - timedelta(days=60)).aggregate(s=Sum('balance_due'))['s'] or 0)
+        ar_90plus  = float(unpaid_inv.filter(due_date__lt=today - timedelta(days=60)).aggregate(s=Sum('balance_due'))['s'] or 0)
+
+        # ── Monthly revenue trend (last 6 months) ─────────────
+        monthly_revenue = []
+        for i in range(5, -1, -1):
+            mo, yr = today.month - i, today.year
+            while mo <= 0:
+                mo += 12
+                yr -= 1
+            m_start = date(yr, mo, 1)
+            m_end   = date(yr, mo, calendar.monthrange(yr, mo)[1])
+            rev = float(SalesOrder.objects.filter(
+                order_date__gte=m_start, order_date__lte=m_end,
+                status__in=['confirmed', 'partial', 'delivered']
+            ).aggregate(s=Sum('total_amount'))['s'] or 0)
+            cnt = SalesOrder.objects.filter(order_date__gte=m_start, order_date__lte=m_end).count()
+            monthly_revenue.append({'month': m_start.strftime('%b %y'), 'revenue': rev, 'orders': cnt})
+
+        # ── SO status breakdown ───────────────────────────────
+        so_status = {s: SalesOrder.objects.filter(status=s).count()
+                     for s in ['draft', 'confirmed', 'partial', 'delivered', 'cancelled']}
+
+        # ── P&L from finance (posted journal entries) ─────────
+        try:
+            income_accounts  = list(Account.objects.filter(account_category='income', is_active=True))
+            expense_accounts = list(Account.objects.filter(account_category='expense', is_active=True))
+            pl_income  = float(sum(a.get_balance() for a in income_accounts))
+            pl_expense = float(sum(a.get_balance() for a in expense_accounts))
+        except Exception:
+            pl_income, pl_expense = 0.0, 0.0
+        pl_net = pl_income - pl_expense
+
         return JsonResponse({
             'total_stock_items':    total_stock_items,
             'low_stock_count':      low_stock_count,
@@ -160,6 +206,22 @@ def dashboard_summary_view(request):
             'pending_samples':      pending_samples,
             'active_rd_projects':   active_rd,
             'low_stock_items':      low_stock_list,
+            # Finance / AR
+            'total_invoiced':       total_invoiced,
+            'total_paid':           total_paid_amt,
+            'outstanding_ar':       outstanding_ar,
+            'overdue_invoices':     overdue_invoices,
+            'ar_aging': {
+                'current':  ar_current,
+                'days_30':  ar_30,
+                'days_60':  ar_60,
+                'days_90p': ar_90plus,
+            },
+            'monthly_revenue':  monthly_revenue,
+            'so_status':        so_status,
+            'pl_income':        pl_income,
+            'pl_expense':       pl_expense,
+            'pl_net':           pl_net,
         })
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=500)

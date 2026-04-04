@@ -25,6 +25,7 @@ import CreateSalesOrderPage    from './pages/sales/CreateSalesOrderPage';
 import InquiryListPage         from './pages/sales/InquiryListPage';
 import QuotationPage           from './pages/sales/QuotationPage';
 import OrderJourneyPage        from './pages/sales/OrderJourneyPage';
+import SalesInvoicePage        from './pages/sales/SalesInvoicePage';
 import ChartOfAccountsPage     from './pages/finance/ChartOfAccountsPage';
 import JournalEntryListPage    from './pages/finance/JournalEntryListPage';
 import TrialBalancePage        from './pages/finance/TrialBalancePage';
@@ -165,6 +166,7 @@ function App() {
                                     <Route path="/sales/order-journey"      element={canSee('/sales/order-journey')      ? <OrderJourneyPage />     : <Navigate to="/dashboard" />} />
                                     <Route path="/sales/sales-orders"       element={canSee('/sales/sales-orders')       ? <SalesOrderListPage />   : <Navigate to="/dashboard" />} />
                                     <Route path="/sales/create-sales-order" element={canSee('/sales/create-sales-order') ? <CreateSalesOrderPage /> : <Navigate to="/dashboard" />} />
+                                    <Route path="/sales/invoices"           element={canSee('/sales/invoices')           ? <SalesInvoicePage />     : <Navigate to="/dashboard" />} />
 
                                     {/* Finance */}
                                     <Route path="/finance/chart-of-accounts" element={canSee('/finance/chart-of-accounts') ? <ChartOfAccountsPage />   : <Navigate to="/dashboard" />} />
