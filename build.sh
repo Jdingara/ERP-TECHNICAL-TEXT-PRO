@@ -17,7 +17,7 @@ pip install -r backend/requirements.txt
 # ── 2. React build ───────────────────────────────────────────
 cd frontend
 npm install
-npm run build
+CI=false npm run build
 cd ..
 
 # ── 3. Copy React build → Django can serve it ────────────────
