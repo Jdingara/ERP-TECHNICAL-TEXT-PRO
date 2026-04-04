@@ -14,7 +14,7 @@ import {
     ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
 
-const API = 'http://127.0.0.1:8000/api/reports/finance/';
+const API = '/api/reports/finance/';
 const PIE_COLORS = ['#1a237e','#2e7d32','#e65100','#6a1b9a','#c62828'];
 const CATEGORY_COLOR = { asset:'#1a237e', liability:'#c62828', equity:'#2e7d32', income:'#e65100', expense:'#6a1b9a' };
 

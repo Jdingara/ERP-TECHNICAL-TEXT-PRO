@@ -15,8 +15,8 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-const API         = 'http://127.0.0.1:8000/api/medical-textile/sterility/';
-const API_BATCHES = 'http://127.0.0.1:8000/api/production/batches/';
+const API         = '/api/medical-textile/sterility/';
+const API_BATCHES = '/api/production/batches/';
 
 const METHODS = ['eo_gas','gamma','steam','dry_heat','e_beam','other'];
 const RESULT_COLOR = { pass:'success', fail:'error', pending:'warning' };

@@ -27,7 +27,7 @@ function WarehouseListPage() {
     useEffect(() => { fetchWarehouses(); }, []);
 
     const fetchWarehouses = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/master-data/warehouses/', { credentials: 'include' });
+        const res = await fetch('/api/master-data/warehouses/', { credentials: 'include' });
         const data = await res.json();
         setWarehouses(data.warehouses || []);
     };
@@ -37,8 +37,8 @@ function WarehouseListPage() {
 
     const handleSave = async () => {
         const url = editingId
-            ? `http://127.0.0.1:8000/api/master-data/warehouses/${editingId}/`
-            : 'http://127.0.0.1:8000/api/master-data/warehouses/';
+            ? `/api/master-data/warehouses/${editingId}/`
+            : '/api/master-data/warehouses/';
         const method = editingId ? 'PUT' : 'POST';
         const res = await fetch(url, {
             method, headers: { 'Content-Type': 'application/json' },

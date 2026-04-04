@@ -14,7 +14,7 @@ import {
     ResponsiveContainer, LineChart, Line
 } from 'recharts';
 
-const API = 'http://127.0.0.1:8000/api/reports/sales/';
+const API = '/api/reports/sales/';
 const STATUS_COLOR = { draft:'default', confirmed:'primary', partial:'warning', delivered:'success', cancelled:'error' };
 
 function KpiCard({ title, value, subtitle, color }) {

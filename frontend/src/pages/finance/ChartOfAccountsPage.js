@@ -34,14 +34,14 @@ function ChartOfAccountsPage() {
     useEffect(() => { fetchAccounts(); }, [filterCategory]);
 
     const fetchAccounts = async () => {
-        const url = `http://127.0.0.1:8000/api/finance/accounts/?balance=1${filterCategory ? '&category=' + filterCategory : ''}`;
+        const url = `/api/finance/accounts/?balance=1${filterCategory ? '&category=' + filterCategory : ''}`;
         const res = await fetch(url, { credentials: 'include' });
         const data = await res.json();
         setAccounts(data.accounts || []);
     };
 
     const handleSave = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/finance/accounts/', {
+        const res = await fetch('/api/finance/accounts/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

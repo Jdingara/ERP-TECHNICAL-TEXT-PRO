@@ -13,7 +13,8 @@ urlpatterns = [
 
     # Journal Entries
     path('journal-entries/',                        views.journal_entry_list_and_create, name='journal-list'),
-    path('journal-entries/<int:entry_id>/post/',    views.journal_entry_post,           name='journal-post'),
+    path('journal-entries/<int:entry_id>/',         views.journal_entry_detail,          name='journal-detail'),
+    path('journal-entries/<int:entry_id>/post/',    views.journal_entry_post,            name='journal-post'),
 
     # Reports
     path('trial-balance/',                          views.trial_balance,                name='trial-balance'),

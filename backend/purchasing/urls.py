@@ -13,5 +13,6 @@ urlpatterns = [
 
     # Goods Receipt (GRN)
     path('grn/',                                    views.goods_receipt_list_and_create,    name='grn-list'),
+    path('grn/<int:grn_id>/',                       views.grn_detail,                      name='grn-detail'),
     path('grn/<int:grn_id>/confirm/',               views.goods_receipt_confirm,            name='grn-confirm'),
 ]

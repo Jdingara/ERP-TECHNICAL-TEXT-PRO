@@ -15,8 +15,8 @@ import AddIcon from '@mui/icons-material/Add';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-const API      = 'http://127.0.0.1:8000/api/technical-textile/rd-projects/';
-const API_CATS = 'http://127.0.0.1:8000/api/technical-textile/categories/';
+const API      = '/api/technical-textile/rd-projects/';
+const API_CATS = '/api/technical-textile/categories/';
 
 const STATUS_COLOR = {
     planning: 'default', in_progress: 'primary', testing: 'warning',

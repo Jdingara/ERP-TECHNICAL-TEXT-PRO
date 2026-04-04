@@ -63,6 +63,7 @@ INSTALLED_APPS = [
 # ============================================================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',      # Serves React build + static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',           # CORS must be before CommonMiddleware
     'django.middleware.common.CommonMiddleware',
@@ -70,6 +71,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'authentication.middleware.RolePermissionMiddleware',  # Role-based API blocking
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -136,7 +138,16 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',    # React development server
     'http://127.0.0.1:3000',
 ]
+# In production on Render, frontend is served by Django itself so no CORS needed
+CORS_ALLOW_ALL_ORIGINS = DEBUG   # Allow all only in dev mode
 CORS_ALLOW_CREDENTIALS = True
+
+# ── Session cookie settings ─────────────────────────────────
+IS_PRODUCTION = not DEBUG
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SECURE   = IS_PRODUCTION
+CSRF_COOKIE_SAMESITE    = 'Lax'
+CSRF_COOKIE_SECURE      = IS_PRODUCTION
 
 
 # ============================================================
@@ -165,6 +176,10 @@ USE_TZ = True
 # ============================================================
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# React frontend build — served by Django in production
+FRONTEND_BUILD_DIR = BASE_DIR / 'frontend_build'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'    # Uploaded files (documents, images)

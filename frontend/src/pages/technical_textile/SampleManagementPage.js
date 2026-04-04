@@ -15,9 +15,9 @@ import AddIcon from '@mui/icons-material/Add';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 
-const API       = 'http://127.0.0.1:8000/api/technical-textile/samples/';
-const API_ITEMS = 'http://127.0.0.1:8000/api/master-data/items/';
-const API_CUSTS = 'http://127.0.0.1:8000/api/master-data/customers/';
+const API       = '/api/technical-textile/samples/';
+const API_ITEMS = '/api/master-data/items/';
+const API_CUSTS = '/api/master-data/customers/';
 
 const STATUS_COLOR = {
     prepared: 'default', sent: 'primary', approved: 'success',

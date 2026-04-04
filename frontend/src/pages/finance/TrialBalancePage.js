@@ -22,7 +22,7 @@ function TrialBalancePage() {
     useEffect(() => { fetchTrialBalance(); }, []);
 
     const fetchTrialBalance = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/finance/trial-balance/', { credentials: 'include' });
+        const res = await fetch('/api/finance/trial-balance/', { credentials: 'include' });
         const data = await res.json();
         setTrialBalance(data.trial_balance || []);
         setTotalDebit(data.total_debit || 0);

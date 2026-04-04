@@ -44,25 +44,25 @@ function StockMovementPage() {
     }, []);
 
     const fetchMovements = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/inventory/movements/', { credentials: 'include' });
+        const res = await fetch('/api/inventory/movements/', { credentials: 'include' });
         const data = await res.json();
         setMovements(data.movements || []);
     };
 
     const fetchItems = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/master-data/items/', { credentials: 'include' });
+        const res = await fetch('/api/master-data/items/', { credentials: 'include' });
         const data = await res.json();
         setItems(data.items || []);
     };
 
     const fetchWarehouses = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/master-data/warehouses/', { credentials: 'include' });
+        const res = await fetch('/api/master-data/warehouses/', { credentials: 'include' });
         const data = await res.json();
         setWarehouses(data.warehouses || []);
     };
 
     const handleSave = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/inventory/movements/', {
+        const res = await fetch('/api/inventory/movements/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

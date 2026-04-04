@@ -36,19 +36,19 @@ function AttendancePage() {
     useEffect(() => { fetchAttendance(); fetchEmployees(); }, [dateFilter]);
 
     const fetchAttendance = async () => {
-        const res = await fetch(`http://127.0.0.1:8000/api/hr/attendance/?date=${dateFilter}`, { credentials: 'include' });
+        const res = await fetch(`/api/hr/attendance/?date=${dateFilter}`, { credentials: 'include' });
         const data = await res.json();
         setAttendance(data.attendance || []);
     };
 
     const fetchEmployees = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/hr/employees/', { credentials: 'include' });
+        const res = await fetch('/api/hr/employees/', { credentials: 'include' });
         const data = await res.json();
         setEmployees(data.employees || []);
     };
 
     const handleSave = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/hr/attendance/', {
+        const res = await fetch('/api/hr/attendance/', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             credentials: 'include', body: JSON.stringify(formData),
         });

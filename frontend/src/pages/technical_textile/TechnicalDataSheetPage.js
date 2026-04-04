@@ -16,9 +16,9 @@ import AddIcon from '@mui/icons-material/Add';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-const API       = 'http://127.0.0.1:8000/api/technical-textile/data-sheets/';
-const API_ITEMS = 'http://127.0.0.1:8000/api/master-data/items/';
-const API_SPECS = 'http://127.0.0.1:8000/api/technical-textile/specs/';
+const API       = '/api/technical-textile/data-sheets/';
+const API_ITEMS = '/api/master-data/items/';
+const API_SPECS = '/api/technical-textile/specs/';
 
 const STATUS_COLOR = { draft: 'default', issued: 'success', revised: 'warning' };
 const EMPTY = { item_id: '', spec_id: '', issue_date: '', revision_number: 'R0', prepared_by: '', approved_by: '', notes: '' };

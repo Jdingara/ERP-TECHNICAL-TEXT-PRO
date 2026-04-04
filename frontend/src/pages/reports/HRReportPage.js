@@ -14,7 +14,7 @@ import {
     ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
 
-const API = 'http://127.0.0.1:8000/api/reports/hr/';
+const API = '/api/reports/hr/';
 const PIE_COLORS = ['#1a237e','#2e7d32','#e65100','#6a1b9a','#00838f','#c62828'];
 const ATTENDANCE_COLOR = { present: '#2e7d32', absent: '#c62828', half_day: '#e65100', leave: '#6a1b9a' };
 

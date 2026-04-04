@@ -13,6 +13,7 @@ urlpatterns = [
 
     # Work Orders
     path('work-orders/',                            views.work_order_list_and_create,   name='wo-list'),
+    path('work-orders/<int:wo_id>/',                views.work_order_detail,            name='wo-detail'),
     path('work-orders/<int:wo_id>/complete/',       views.work_order_complete,          name='wo-complete'),
 
     # Batch Tracking
@@ -20,4 +21,8 @@ urlpatterns = [
 
     # Quality Check
     path('quality-checks/',                         views.quality_check_list_and_create, name='qc-list'),
+
+    # Machines
+    path('machines/',                               views.machine_list_and_create,      name='machine-list'),
+    path('machines/<int:machine_id>/',              views.machine_detail,               name='machine-detail'),
 ]

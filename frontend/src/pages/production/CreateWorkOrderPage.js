@@ -43,13 +43,13 @@ function CreateWorkOrderPage() {
     }, []);
 
     const fetchBoms = async () => {
-        const res  = await fetch('http://127.0.0.1:8000/api/production/bom/', { credentials: 'include' });
+        const res  = await fetch('/api/production/bom/', { credentials: 'include' });
         const data = await res.json();
         setBoms(data.boms || []);
     };
 
     const fetchWarehouses = async () => {
-        const res  = await fetch('http://127.0.0.1:8000/api/master-data/warehouses/', { credentials: 'include' });
+        const res  = await fetch('/api/master-data/warehouses/', { credentials: 'include' });
         const data = await res.json();
         setWarehouses(data.warehouses || []);
     };
@@ -59,7 +59,7 @@ function CreateWorkOrderPage() {
         setFormData(prev => ({ ...prev, bom_id: bomId }));
         if (!bomId) { setBomDetail(null); setSelectedBom(null); return; }
 
-        const res  = await fetch(`http://127.0.0.1:8000/api/production/boms/${bomId}/`, { credentials: 'include' });
+        const res  = await fetch(`/api/production/boms/${bomId}/`, { credentials: 'include' });
         const data = await res.json();
         if (res.ok) {
             setBomDetail(data);
@@ -82,7 +82,7 @@ function CreateWorkOrderPage() {
         }
 
         setSaving(true);
-        const res = await fetch('http://127.0.0.1:8000/api/production/work-orders/', {
+        const res = await fetch('/api/production/work-orders/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

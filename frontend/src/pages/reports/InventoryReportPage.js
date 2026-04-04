@@ -14,7 +14,7 @@ import {
     ResponsiveContainer, PieChart, Pie, Cell, Legend
 } from 'recharts';
 
-const API = 'http://127.0.0.1:8000/api/reports/inventory/';
+const API = '/api/reports/inventory/';
 const PIE_COLORS = ['#1a237e','#2e7d32','#e65100','#6a1b9a','#00838f','#c62828'];
 
 function KpiCard({ title, value, color }) {

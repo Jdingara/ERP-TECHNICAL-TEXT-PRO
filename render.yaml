@@ -1,0 +1,45 @@
+# ============================================================
+# render.yaml — Render.com deployment blueprint
+# Defines: web service + PostgreSQL database
+# ============================================================
+
+databases:
+  - name: sasi-erp-db
+    databaseName: sasi_erp
+    user: sasi_erp_user
+    plan: free
+
+services:
+  - type: web
+    name: sasi-erp
+    plan: free
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "cd backend && gunicorn core.wsgi:application --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true          # Render auto-generates a secure key
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: DB_NAME
+        fromDatabase:
+          name: sasi-erp-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: sasi-erp-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: sasi-erp-db
+          property: password
+      - key: DB_HOST
+        fromDatabase:
+          name: sasi-erp-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: sasi-erp-db
+          property: port

@@ -16,9 +16,9 @@ import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const API_SPECS = 'http://127.0.0.1:8000/api/technical-textile/specs/';
-const API_CATS  = 'http://127.0.0.1:8000/api/technical-textile/categories/';
-const API_ITEMS = 'http://127.0.0.1:8000/api/master-data/items/';
+const API_SPECS = '/api/technical-textile/specs/';
+const API_CATS  = '/api/technical-textile/categories/';
+const API_ITEMS = '/api/master-data/items/';
 
 const STATUS_COLOR = { draft: 'default', approved: 'success', archived: 'warning' };
 

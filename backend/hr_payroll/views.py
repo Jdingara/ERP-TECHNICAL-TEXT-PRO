@@ -293,6 +293,24 @@ def salary_list_and_process(request):
 
 
 @csrf_exempt
+def salary_detail(request, salary_id):
+    """ GET = salary details | DELETE = delete draft salary """
+    try:
+        salary = SalaryRecord.objects.select_related('employee', 'employee__department').get(id=salary_id)
+    except SalaryRecord.DoesNotExist:
+        return JsonResponse({'message': 'Salary record not found.'}, status=404)
+
+    if request.method == 'GET':
+        return JsonResponse({'salary': salary_to_dict(salary)})
+
+    if request.method == 'DELETE':
+        if salary.status == 'paid':
+            return JsonResponse({'message': 'Cannot delete a paid salary record. It is a financial record.'}, status=400)
+        salary.delete()
+        return JsonResponse({'message': 'Salary record deleted.'})
+
+
+@csrf_exempt
 def salary_mark_paid(request, salary_id):
     """ Mark salary as paid """
     try:

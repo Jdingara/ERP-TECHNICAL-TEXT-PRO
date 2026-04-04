@@ -1,16 +1,21 @@
 // ============================================================
 // FILE: pages/sales/SalesOrderListPage.js
 // PURPOSE: Shows all sales orders with status.
-//          User can confirm, deliver or create new orders.
+//          User can confirm, deliver, print or delete orders.
 // ============================================================
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Box, Typography, Button, Table, TableBody, TableCell,
-    TableContainer, TableHead, TableRow, Paper, Chip, Alert
+    TableContainer, TableHead, TableRow, Paper, Chip, Alert,
+    IconButton, Tooltip, Stack,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon        from '@mui/icons-material/Add';
+import PrintIcon      from '@mui/icons-material/Print';
+import DeleteIcon     from '@mui/icons-material/Delete';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { useNavigate } from 'react-router-dom';
+import { printSalesOrder, printDeliveryChallan } from '../../utils/printUtils';
 
 const STATUS_COLORS = {
     draft:      'default',
@@ -20,8 +25,10 @@ const STATUS_COLORS = {
     cancelled:  'error',
 };
 
+const canDelete = (so) => so.status === 'draft';
+
 function SalesOrderListPage() {
-    const [orders, setOrders]   = useState([]);
+    const [orders,  setOrders]  = useState([]);
     const [message, setMessage] = useState('');
     const [msgType, setMsgType] = useState('success');
     const navigate = useNavigate();
@@ -29,13 +36,20 @@ function SalesOrderListPage() {
     useEffect(() => { fetchOrders(); }, []);
 
     const fetchOrders = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/sales/orders/', { credentials: 'include' });
+        const res  = await fetch('/api/sales/orders/', { credentials: 'include' });
         const data = await res.json();
         setOrders(data.sales_orders || []);
     };
 
+    // Fetch SO with lines for printing
+    const fetchDetail = async (soId) => {
+        const res  = await fetch(`/api/sales/orders/${soId}/`, { credentials: 'include' });
+        const data = await res.json();
+        return data.sales_order || null;
+    };
+
     const handleConfirm = async (soId) => {
-        const res = await fetch(`http://127.0.0.1:8000/api/sales/orders/${soId}/`, {
+        const res = await fetch(`/api/sales/orders/${soId}/`, {
             method: 'PUT', headers: { 'Content-Type': 'application/json' },
             credentials: 'include', body: JSON.stringify({ status: 'confirmed' }),
         });
@@ -43,12 +57,33 @@ function SalesOrderListPage() {
     };
 
     const handleDeliver = async (soId) => {
-        const res = await fetch(`http://127.0.0.1:8000/api/sales/orders/${soId}/deliver/`, {
+        const res  = await fetch(`/api/sales/orders/${soId}/deliver/`, {
             method: 'POST', credentials: 'include',
         });
         const data = await res.json();
         if (res.ok) { setMessage('Delivery confirmed. Stock reduced.'); setMsgType('success'); fetchOrders(); }
         else { setMessage(data.message); setMsgType('error'); }
+    };
+
+    const handleDelete = async (so) => {
+        if (!canDelete(so)) return;
+        if (!window.confirm(`Delete sales order ${so.so_number}?`)) return;
+        const res  = await fetch(`/api/sales/orders/${so.id}/`, {
+            method: 'DELETE', credentials: 'include',
+        });
+        const data = await res.json();
+        if (res.ok) { setMessage('Sales order deleted.'); setMsgType('success'); fetchOrders(); }
+        else { setMessage(data.message || 'Delete failed.'); setMsgType('error'); }
+    };
+
+    const handlePrintSO = async (so) => {
+        const detail = await fetchDetail(so.id);
+        if (detail) printSalesOrder(detail);
+    };
+
+    const handlePrintChallan = async (so) => {
+        const detail = await fetchDetail(so.id);
+        if (detail) printDeliveryChallan(detail);
     };
 
     return (
@@ -101,19 +136,40 @@ function SalesOrderListPage() {
                                     <TableCell>
                                         <Chip label={so.status} color={STATUS_COLORS[so.status]} size="small" />
                                     </TableCell>
-                                    <TableCell sx={{ display: 'flex', gap: 1 }}>
-                                        {so.status === 'draft' && (
-                                            <Button size="small" variant="outlined"
-                                                onClick={() => handleConfirm(so.id)}>
-                                                Confirm
-                                            </Button>
-                                        )}
-                                        {so.status === 'confirmed' && (
-                                            <Button size="small" variant="contained" color="success"
-                                                onClick={() => handleDeliver(so.id)}>
-                                                Deliver
-                                            </Button>
-                                        )}
+                                    <TableCell>
+                                        <Stack direction="row" spacing={0.5} alignItems="center">
+                                            {so.status === 'draft' && (
+                                                <Button size="small" variant="outlined"
+                                                    onClick={() => handleConfirm(so.id)}>
+                                                    Confirm
+                                                </Button>
+                                            )}
+                                            {so.status === 'confirmed' && (
+                                                <Button size="small" variant="contained" color="success"
+                                                    onClick={() => handleDeliver(so.id)}>
+                                                    Deliver
+                                                </Button>
+                                            )}
+                                            <Tooltip title="Print Sales Order">
+                                                <IconButton size="small" onClick={() => handlePrintSO(so)}>
+                                                    <PrintIcon fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            {so.status === 'delivered' && (
+                                                <Tooltip title="Print Delivery Challan">
+                                                    <IconButton size="small" color="primary" onClick={() => handlePrintChallan(so)}>
+                                                        <LocalShippingIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            )}
+                                            {canDelete(so) && (
+                                                <Tooltip title="Delete Draft">
+                                                    <IconButton size="small" color="error" onClick={() => handleDelete(so)}>
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            )}
+                                        </Stack>
                                     </TableCell>
                                 </TableRow>
                             ))

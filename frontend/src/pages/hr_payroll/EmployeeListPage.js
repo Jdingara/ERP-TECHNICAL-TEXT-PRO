@@ -44,13 +44,13 @@ function EmployeeListPage() {
     useEffect(() => { fetchEmployees(); fetchDepartments(); }, []);
 
     const fetchEmployees = async (search = '') => {
-        const res = await fetch(`http://127.0.0.1:8000/api/hr/employees/?search=${search}`, { credentials: 'include' });
+        const res = await fetch(`/api/hr/employees/?search=${search}`, { credentials: 'include' });
         const data = await res.json();
         setEmployees(data.employees || []);
     };
 
     const fetchDepartments = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/hr/departments/', { credentials: 'include' });
+        const res = await fetch('/api/hr/departments/', { credentials: 'include' });
         const data = await res.json();
         setDepartments(data.departments || []);
     };
@@ -64,7 +64,7 @@ function EmployeeListPage() {
     };
 
     const handleSave = async () => {
-        const url    = editingId ? `http://127.0.0.1:8000/api/hr/employees/${editingId}/` : 'http://127.0.0.1:8000/api/hr/employees/';
+        const url    = editingId ? `/api/hr/employees/${editingId}/` : '/api/hr/employees/';
         const method = editingId ? 'PUT' : 'POST';
         const cleanedData = { ...formData, department_id: formData.department_id || null };
         const res = await fetch(url, {

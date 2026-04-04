@@ -41,7 +41,7 @@ function SupplierListPage() {
     useEffect(() => { fetchSuppliers(); }, []);
 
     const fetchSuppliers = async (search = '') => {
-        const res = await fetch(`http://127.0.0.1:8000/api/master-data/suppliers/?search=${search}`, { credentials: 'include' });
+        const res = await fetch(`/api/master-data/suppliers/?search=${search}`, { credentials: 'include' });
         const data = await res.json();
         setSuppliers(data.suppliers || []);
     };
@@ -58,8 +58,8 @@ function SupplierListPage() {
 
     const handleSave = async () => {
         const url = editingId
-            ? `http://127.0.0.1:8000/api/master-data/suppliers/${editingId}/`
-            : 'http://127.0.0.1:8000/api/master-data/suppliers/';
+            ? `/api/master-data/suppliers/${editingId}/`
+            : '/api/master-data/suppliers/';
         const method = editingId ? 'PUT' : 'POST';
         const res = await fetch(url, {
             method, headers: { 'Content-Type': 'application/json' },

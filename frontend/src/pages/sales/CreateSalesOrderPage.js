@@ -48,19 +48,19 @@ function CreateSalesOrderPage() {
     };
 
     const fetchCustomers = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/master-data/customers/', { credentials: 'include' });
+        const res = await fetch('/api/master-data/customers/', { credentials: 'include' });
         const data = await res.json();
         setCustomers(data.customers || []);
     };
 
     const fetchWarehouses = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/master-data/warehouses/', { credentials: 'include' });
+        const res = await fetch('/api/master-data/warehouses/', { credentials: 'include' });
         const data = await res.json();
         setWarehouses(data.warehouses || []);
     };
 
     const fetchItems = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/master-data/items/', { credentials: 'include' });
+        const res = await fetch('/api/master-data/items/', { credentials: 'include' });
         const data = await res.json();
         setItems(data.items || []);
     };
@@ -101,7 +101,7 @@ function CreateSalesOrderPage() {
             })),
         };
 
-        const res = await fetch('http://127.0.0.1:8000/api/sales/orders/', {
+        const res = await fetch('/api/sales/orders/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

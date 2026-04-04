@@ -10,6 +10,7 @@ __pycache__/
 *.log
 media/
 staticfiles/
+backend/frontend_build/
 
 # ── Node / React ─────────────────────────────────────────
 node_modules/

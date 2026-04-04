@@ -55,19 +55,19 @@ function CreatePurchaseOrderPage() {
     };
 
     const fetchSuppliers = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/master-data/suppliers/', { credentials: 'include' });
+        const res = await fetch('/api/master-data/suppliers/', { credentials: 'include' });
         const data = await res.json();
         setSuppliers(data.suppliers || []);
     };
 
     const fetchWarehouses = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/master-data/warehouses/', { credentials: 'include' });
+        const res = await fetch('/api/master-data/warehouses/', { credentials: 'include' });
         const data = await res.json();
         setWarehouses(data.warehouses || []);
     };
 
     const fetchItems = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/master-data/items/', { credentials: 'include' });
+        const res = await fetch('/api/master-data/items/', { credentials: 'include' });
         const data = await res.json();
         setItems(data.items || []);
     };
@@ -115,7 +115,7 @@ function CreatePurchaseOrderPage() {
             })),
         };
 
-        const res = await fetch('http://127.0.0.1:8000/api/purchasing/purchase-orders/', {
+        const res = await fetch('/api/purchasing/purchase-orders/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

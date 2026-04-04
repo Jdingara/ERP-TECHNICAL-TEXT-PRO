@@ -76,7 +76,7 @@ function DashboardPage() {
     const fetchDashboard = async () => {
         setLoading(true);
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/authentication/dashboard-summary/', {
+            const res = await fetch('/api/authentication/dashboard-summary/', {
                 credentials: 'include'
             });
             const json = await res.json();

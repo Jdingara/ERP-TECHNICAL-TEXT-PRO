@@ -17,7 +17,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-const API = 'http://127.0.0.1:8000/api/medical-textile/capa/';
+const API = '/api/medical-textile/capa/';
 
 const STATUS_COLOR = { open:'error', in_progress:'warning', closed:'success', overdue:'error' };
 const SOURCES = ['customer_complaint','internal_audit','external_audit','product_failure','supplier_issue','process_deviation','other'];

@@ -51,19 +51,19 @@ function ItemListPage() {
     }, []);
 
     const fetchItems = async (search = '') => {
-        const res = await fetch(`http://127.0.0.1:8000/api/master-data/items/?search=${search}`, { credentials: 'include' });
+        const res = await fetch(`/api/master-data/items/?search=${search}`, { credentials: 'include' });
         const data = await res.json();
         setItems(data.items || []);
     };
 
     const fetchCategories = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/master-data/categories/', { credentials: 'include' });
+        const res = await fetch('/api/master-data/categories/', { credentials: 'include' });
         const data = await res.json();
         setCategories(data.categories || []);
     };
 
     const fetchUnits = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/master-data/units/', { credentials: 'include' });
+        const res = await fetch('/api/master-data/units/', { credentials: 'include' });
         const data = await res.json();
         setUnits(data.units || []);
     };
@@ -94,8 +94,8 @@ function ItemListPage() {
 
     const handleSave = async () => {
         const url = editingId
-            ? `http://127.0.0.1:8000/api/master-data/items/${editingId}/`
-            : 'http://127.0.0.1:8000/api/master-data/items/';
+            ? `/api/master-data/items/${editingId}/`
+            : '/api/master-data/items/';
         const method = editingId ? 'PUT' : 'POST';
 
         // Convert empty strings to null for ID fields (database requires null not "")

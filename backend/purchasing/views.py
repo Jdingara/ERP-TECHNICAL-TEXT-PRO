@@ -35,18 +35,23 @@ def po_line_to_dict(line):
 
 def po_to_dict(po, include_lines=False):
     data = {
-        'id':               po.id,
-        'po_number':        po.po_number,
-        'supplier_id':      po.supplier_id,
-        'supplier_name':    po.supplier.supplier_name,
-        'warehouse_id':     po.warehouse_id,
-        'warehouse_name':   po.warehouse.name,
-        'order_date':       str(po.order_date),
-        'expected_date':    str(po.expected_date) if po.expected_date else '',
-        'status':           po.status,
-        'notes':            po.notes,
-        'total_amount':     str(po.total_amount),
-        'created_at':       po.created_at.strftime('%Y-%m-%d'),
+        'id':                   po.id,
+        'po_number':            po.po_number,
+        'supplier_id':          po.supplier_id,
+        'supplier_name':        po.supplier.supplier_name,
+        'supplier_address':     ', '.join(filter(None, [po.supplier.address, po.supplier.city, po.supplier.state])),
+        'supplier_phone':       po.supplier.phone,
+        'supplier_gstin':       po.supplier.gstin,
+        'supplier_contact':     po.supplier.contact_person,
+        'warehouse_id':         po.warehouse_id,
+        'warehouse_name':       po.warehouse.name,
+        'delivery_address':     po.warehouse.address,
+        'order_date':           str(po.order_date),
+        'expected_date':        str(po.expected_date) if po.expected_date else '',
+        'status':               po.status,
+        'notes':                po.notes,
+        'total_amount':         str(po.total_amount),
+        'created_at':           po.created_at.strftime('%Y-%m-%d'),
     }
     if include_lines:
         data['lines'] = [po_line_to_dict(l) for l in po.lines.select_related('item', 'item__unit_of_measure').all()]
@@ -59,6 +64,8 @@ def grn_to_dict(grn, include_lines=False):
         'po_number':                grn.purchase_order.po_number,
         'purchase_order_id':        grn.purchase_order_id,
         'supplier_name':            grn.purchase_order.supplier.supplier_name,
+        'supplier_address':         ', '.join(filter(None, [grn.purchase_order.supplier.address, grn.purchase_order.supplier.city, grn.purchase_order.supplier.state])),
+        'warehouse_name':           grn.purchase_order.warehouse.name,
         'receipt_date':             str(grn.receipt_date),
         'supplier_invoice_number':  grn.supplier_invoice_number,
         'status':                   grn.status,
@@ -140,12 +147,23 @@ def purchase_order_detail(request, po_id):
 
     if request.method == 'PUT':
         data = json.loads(request.body)
+        # Lock: received PO cannot be edited
+        if po.status == 'received':
+            return JsonResponse({'message': 'Cannot edit a received purchase order. GRN has been confirmed.'}, status=400)
         if 'status' in data:
             po.status = data['status']
         if 'notes' in data:
             po.notes = data['notes']
+        if 'expected_date' in data:
+            po.expected_date = data['expected_date'] or None
         po.save()
         return JsonResponse({'message': 'Purchase order updated.', 'purchase_order': po_to_dict(po)})
+
+    if request.method == 'DELETE':
+        if po.status != 'draft':
+            return JsonResponse({'message': f'Only draft purchase orders can be deleted. This PO is {po.status}.'}, status=400)
+        po.delete()
+        return JsonResponse({'message': 'Purchase order deleted.'})
 
 
 # ============================================================
@@ -248,3 +266,23 @@ def goods_receipt_confirm(request, grn_id):
         return JsonResponse({'message': 'GRN confirmed. Stock updated successfully.'})
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=400)
+
+
+@csrf_exempt
+def grn_detail(request, grn_id):
+    """ GET = get GRN with lines | DELETE = delete draft GRN """
+    try:
+        grn = GoodsReceipt.objects.select_related(
+            'purchase_order__supplier', 'purchase_order__warehouse'
+        ).get(id=grn_id)
+    except GoodsReceipt.DoesNotExist:
+        return JsonResponse({'message': 'GRN not found.'}, status=404)
+
+    if request.method == 'GET':
+        return JsonResponse({'grn': grn_to_dict(grn, include_lines=True)})
+
+    if request.method == 'DELETE':
+        if grn.status == 'confirmed':
+            return JsonResponse({'message': 'Cannot delete a confirmed GRN. Stock has already been updated.'}, status=400)
+        grn.delete()
+        return JsonResponse({'message': 'GRN deleted.'})

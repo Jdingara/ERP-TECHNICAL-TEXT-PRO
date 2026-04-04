@@ -1,173 +1,218 @@
 // ============================================================
 // FILE: src/App.js
-// PURPOSE: Root of the React application.
-//          Controls routing - which page shows at which URL.
-//          Handles login state - shows Login or ERP based on auth.
+// PURPOSE: Root — routing, auth state, permissions.
 // ============================================================
 
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-// Layout
 import MainLayout from './components/layout/MainLayout';
 
 // Pages
-import LoginPage from './pages/authentication/LoginPage';
-import DashboardPage from './pages/dashboard/DashboardPage';
-import ItemListPage from './pages/master_data/ItemListPage';
-import SupplierListPage from './pages/master_data/SupplierListPage';
-import CustomerListPage from './pages/master_data/CustomerListPage';
-import WarehouseListPage from './pages/master_data/WarehouseListPage';
-import StockListPage from './pages/inventory/StockListPage';
-import StockMovementPage from './pages/inventory/StockMovementPage';
-import PurchaseOrderListPage from './pages/purchasing/PurchaseOrderListPage';
+import LoginPage               from './pages/authentication/LoginPage';
+import DashboardPage           from './pages/dashboard/DashboardPage';
+import ItemListPage            from './pages/master_data/ItemListPage';
+import SupplierListPage        from './pages/master_data/SupplierListPage';
+import CustomerListPage        from './pages/master_data/CustomerListPage';
+import WarehouseListPage       from './pages/master_data/WarehouseListPage';
+import StockListPage           from './pages/inventory/StockListPage';
+import StockMovementPage       from './pages/inventory/StockMovementPage';
+import PurchaseOrderListPage   from './pages/purchasing/PurchaseOrderListPage';
 import CreatePurchaseOrderPage from './pages/purchasing/CreatePurchaseOrderPage';
-import SalesOrderListPage from './pages/sales/SalesOrderListPage';
-import CreateSalesOrderPage from './pages/sales/CreateSalesOrderPage';
-import ChartOfAccountsPage from './pages/finance/ChartOfAccountsPage';
-import JournalEntryListPage from './pages/finance/JournalEntryListPage';
-import TrialBalancePage from './pages/finance/TrialBalancePage';
-import EmployeeListPage from './pages/hr_payroll/EmployeeListPage';
-import AttendancePage from './pages/hr_payroll/AttendancePage';
-import SalaryPage from './pages/hr_payroll/SalaryPage';
-import BOMListPage from './pages/production/BOMListPage';
-import WorkOrderListPage from './pages/production/WorkOrderListPage';
-import CreateWorkOrderPage from './pages/production/CreateWorkOrderPage';
-import ProductCategoriesPage from './pages/technical_textile/ProductCategoriesPage';
-import PerformanceSpecsPage from './pages/technical_textile/PerformanceSpecsPage';
-import SampleManagementPage from './pages/technical_textile/SampleManagementPage';
-import TechnicalDataSheetPage from './pages/technical_textile/TechnicalDataSheetPage';
-import TestingLabPage from './pages/technical_textile/TestingLabPage';
-import RDProjectsPage from './pages/technical_textile/RDProjectsPage';
+import GoodsReceiptPage        from './pages/purchasing/GoodsReceiptPage';
+import SalesOrderListPage      from './pages/sales/SalesOrderListPage';
+import CreateSalesOrderPage    from './pages/sales/CreateSalesOrderPage';
+import InquiryListPage         from './pages/sales/InquiryListPage';
+import QuotationPage           from './pages/sales/QuotationPage';
+import OrderJourneyPage        from './pages/sales/OrderJourneyPage';
+import ChartOfAccountsPage     from './pages/finance/ChartOfAccountsPage';
+import JournalEntryListPage    from './pages/finance/JournalEntryListPage';
+import TrialBalancePage        from './pages/finance/TrialBalancePage';
+import EmployeeListPage        from './pages/hr_payroll/EmployeeListPage';
+import AttendancePage          from './pages/hr_payroll/AttendancePage';
+import SalaryPage              from './pages/hr_payroll/SalaryPage';
+import BOMListPage             from './pages/production/BOMListPage';
+import WorkOrderListPage       from './pages/production/WorkOrderListPage';
+import CreateWorkOrderPage     from './pages/production/CreateWorkOrderPage';
+import MachineListPage         from './pages/production/MachineListPage';
+import QualityCheckPage        from './pages/production/QualityCheckPage';
+import BatchListPage           from './pages/production/BatchListPage';
+import ProductCategoriesPage   from './pages/technical_textile/ProductCategoriesPage';
+import PerformanceSpecsPage    from './pages/technical_textile/PerformanceSpecsPage';
+import SampleManagementPage    from './pages/technical_textile/SampleManagementPage';
+import TechnicalDataSheetPage  from './pages/technical_textile/TechnicalDataSheetPage';
+import TestingLabPage          from './pages/technical_textile/TestingLabPage';
+import RDProjectsPage          from './pages/technical_textile/RDProjectsPage';
 import RegulatoryCompliancePage from './pages/medical_textile/RegulatoryCompliancePage';
-import BatchTraceabilityPage from './pages/medical_textile/BatchTraceabilityPage';
-import SterilityRecordsPage from './pages/medical_textile/SterilityRecordsPage';
-import CAPAManagementPage from './pages/medical_textile/CAPAManagementPage';
-import AuditTrailPage from './pages/medical_textile/AuditTrailPage';
-import ShelfLifeTrackingPage from './pages/medical_textile/ShelfLifeTrackingPage';
-import ProductionReportPage from './pages/reports/ProductionReportPage';
-import InventoryReportPage from './pages/reports/InventoryReportPage';
-import SalesReportPage from './pages/reports/SalesReportPage';
-import FinanceReportPage from './pages/reports/FinanceReportPage';
-import HRReportPage from './pages/reports/HRReportPage';
+import BatchTraceabilityPage   from './pages/medical_textile/BatchTraceabilityPage';
+import SterilityRecordsPage    from './pages/medical_textile/SterilityRecordsPage';
+import CAPAManagementPage      from './pages/medical_textile/CAPAManagementPage';
+import AuditTrailPage          from './pages/medical_textile/AuditTrailPage';
+import ShelfLifeTrackingPage   from './pages/medical_textile/ShelfLifeTrackingPage';
+import ProductionReportPage    from './pages/reports/ProductionReportPage';
+import InventoryReportPage     from './pages/reports/InventoryReportPage';
+import SalesReportPage         from './pages/reports/SalesReportPage';
+import FinanceReportPage       from './pages/reports/FinanceReportPage';
+import HRReportPage            from './pages/reports/HRReportPage';
+import SettingsPage            from './pages/settings/SettingsPage';
+import AdminPage               from './pages/admin/AdminPage';
 
 function App() {
-    // Stores the logged-in user. null = not logged in.
-    const [currentUser, setCurrentUser] = useState(null);
+    const [currentUser,    setCurrentUser]    = useState(null);
+    const [permissions,    setPermissions]    = useState('all'); // 'all' | []
+    const [isAdmin,        setIsAdmin]        = useState(false);
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-    // On app load - check if user was already logged in
+    // Fetch permissions from backend for a logged-in user
+    const fetchPermissions = async (savedUser) => {
+        // Apply localStorage data immediately — no waiting for network
+        if (savedUser?.is_staff) {
+            setIsAdmin(true);
+            setPermissions('all');
+            return; // staff always has full access — no need for API call
+        }
+
+        // Only non-staff users need to fetch their role permissions
+        try {
+            const res = await fetch('/api/authentication/my-permissions/', {
+                credentials: 'include',
+            });
+            // Only update if response is valid — ignore errors (401, 500 etc.)
+            if (!res.ok) {
+                setPermissions('all'); // fail open
+                return;
+            }
+            const data = await res.json();
+            setIsAdmin(data.is_admin || false);
+            setPermissions(data.permissions === 'all' ? 'all' : (data.permissions || 'all'));
+        } catch {
+            setPermissions('all'); // network error — fail open, never empty sidebar
+        }
+    };
+
     useEffect(() => {
         const savedUser = localStorage.getItem('sasi_erp_user');
         if (savedUser) {
-            setCurrentUser(JSON.parse(savedUser));
+            const user = JSON.parse(savedUser);
+            setCurrentUser(user);
+            fetchPermissions(user);
         }
         setIsCheckingAuth(false);
     }, []);
 
-    // Called when login succeeds
-    const handleLoginSuccess = (user) => {
+    const handleLoginSuccess = async (user) => {
         setCurrentUser(user);
+        fetchPermissions(user);
     };
 
-    // Called when user clicks logout
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        // Call Django logout to clear the server session
+        try {
+            await fetch('/api/authentication/logout/', {
+                method: 'POST',
+                credentials: 'include',
+            });
+        } catch { /* ignore network errors on logout */ }
         localStorage.removeItem('sasi_erp_user');
         setCurrentUser(null);
+        setPermissions('all');
+        setIsAdmin(false);
     };
 
-    // Show nothing while checking auth
+    const canSee = (path) => isAdmin || permissions === 'all' || (Array.isArray(permissions) && permissions.includes(path));
+
     if (isCheckingAuth) return null;
 
     return (
         <BrowserRouter>
             <Routes>
-
-                {/* Login Page - accessible without login */}
-                <Route
-                    path="/login"
-                    element={
-                        currentUser
-                            ? <Navigate to="/dashboard" replace />
-                            : <LoginPage onLoginSuccess={handleLoginSuccess} />
-                    }
+                <Route path="/login"
+                    element={currentUser ? <Navigate to="/dashboard" replace /> : <LoginPage onLoginSuccess={handleLoginSuccess} />}
                 />
 
-                {/* All ERP pages - require login */}
-                <Route
-                    path="/*"
+                <Route path="/*"
                     element={
-                        currentUser
-                            ? (
-                                <MainLayout currentUser={currentUser} onLogout={handleLogout}>
-                                    <Routes>
-                                        <Route path="/dashboard" element={<DashboardPage />} />
+                        currentUser ? (
+                            <MainLayout currentUser={currentUser} onLogout={handleLogout}
+                                permissions={permissions} isAdmin={isAdmin}>
+                                <Routes>
+                                    <Route path="/dashboard" element={<DashboardPage />} />
 
-                                        {/* Master Data pages */}
-                                        <Route path="/master-data/items" element={<ItemListPage />} />
-                                        <Route path="/master-data/suppliers" element={<SupplierListPage />} />
-                                        <Route path="/master-data/customers" element={<CustomerListPage />} />
-                                        <Route path="/master-data/warehouses" element={<WarehouseListPage />} />
+                                    {/* Settings — available to all users */}
+                                    <Route path="/settings" element={<SettingsPage />} />
 
-                                        {/* Inventory pages */}
-                                        <Route path="/inventory/stock-list" element={<StockListPage />} />
-                                        <Route path="/inventory/stock-movement" element={<StockMovementPage />} />
+                                    {/* Admin — staff only */}
+                                    <Route path="/admin" element={<AdminPage currentUser={currentUser} />} />
 
-                                        {/* Purchasing pages */}
-                                        <Route path="/purchasing/purchase-orders" element={<PurchaseOrderListPage />} />
-                                        <Route path="/purchasing/create-purchase-order" element={<CreatePurchaseOrderPage />} />
+                                    {/* Master Data */}
+                                    <Route path="/master-data/items"      element={canSee('/master-data/items')      ? <ItemListPage />      : <Navigate to="/dashboard" />} />
+                                    <Route path="/master-data/suppliers"  element={canSee('/master-data/suppliers')  ? <SupplierListPage />  : <Navigate to="/dashboard" />} />
+                                    <Route path="/master-data/customers"  element={canSee('/master-data/customers')  ? <CustomerListPage />  : <Navigate to="/dashboard" />} />
+                                    <Route path="/master-data/warehouses" element={canSee('/master-data/warehouses') ? <WarehouseListPage /> : <Navigate to="/dashboard" />} />
 
-                                        {/* Sales pages */}
-                                        <Route path="/sales/sales-orders" element={<SalesOrderListPage />} />
-                                        <Route path="/sales/create-sales-order" element={<CreateSalesOrderPage />} />
+                                    {/* Inventory */}
+                                    <Route path="/inventory/stock-list"     element={canSee('/inventory/stock-list')     ? <StockListPage />     : <Navigate to="/dashboard" />} />
+                                    <Route path="/inventory/stock-movement" element={canSee('/inventory/stock-movement') ? <StockMovementPage /> : <Navigate to="/dashboard" />} />
 
-                                        {/* Finance pages */}
-                                        <Route path="/finance/chart-of-accounts" element={<ChartOfAccountsPage />} />
-                                        <Route path="/finance/journal-entries" element={<JournalEntryListPage />} />
-                                        <Route path="/finance/trial-balance" element={<TrialBalancePage />} />
+                                    {/* Purchasing */}
+                                    <Route path="/purchasing/purchase-orders"        element={canSee('/purchasing/purchase-orders')        ? <PurchaseOrderListPage />   : <Navigate to="/dashboard" />} />
+                                    <Route path="/purchasing/create-purchase-order"  element={canSee('/purchasing/create-purchase-order')  ? <CreatePurchaseOrderPage /> : <Navigate to="/dashboard" />} />
+                                    <Route path="/purchasing/goods-receipt"          element={canSee('/purchasing/goods-receipt')          ? <GoodsReceiptPage />        : <Navigate to="/dashboard" />} />
 
-                                        {/* HR & Payroll pages */}
-                                        <Route path="/hr-payroll/employees" element={<EmployeeListPage />} />
-                                        <Route path="/hr-payroll/attendance" element={<AttendancePage />} />
-                                        <Route path="/hr-payroll/salary" element={<SalaryPage />} />
+                                    {/* Sales */}
+                                    <Route path="/sales/inquiries"          element={canSee('/sales/inquiries')          ? <InquiryListPage />      : <Navigate to="/dashboard" />} />
+                                    <Route path="/sales/quotations"         element={canSee('/sales/quotations')         ? <QuotationPage />        : <Navigate to="/dashboard" />} />
+                                    <Route path="/sales/order-journey"      element={canSee('/sales/order-journey')      ? <OrderJourneyPage />     : <Navigate to="/dashboard" />} />
+                                    <Route path="/sales/sales-orders"       element={canSee('/sales/sales-orders')       ? <SalesOrderListPage />   : <Navigate to="/dashboard" />} />
+                                    <Route path="/sales/create-sales-order" element={canSee('/sales/create-sales-order') ? <CreateSalesOrderPage /> : <Navigate to="/dashboard" />} />
 
-                                        {/* Production pages */}
-                                        <Route path="/production/bill-of-materials" element={<BOMListPage />} />
-                                        <Route path="/production/work-orders" element={<WorkOrderListPage />} />
-                                        <Route path="/production/create-work-order" element={<CreateWorkOrderPage />} />
+                                    {/* Finance */}
+                                    <Route path="/finance/chart-of-accounts" element={canSee('/finance/chart-of-accounts') ? <ChartOfAccountsPage />   : <Navigate to="/dashboard" />} />
+                                    <Route path="/finance/journal-entries"   element={canSee('/finance/journal-entries')   ? <JournalEntryListPage /> : <Navigate to="/dashboard" />} />
+                                    <Route path="/finance/trial-balance"     element={canSee('/finance/trial-balance')     ? <TrialBalancePage />      : <Navigate to="/dashboard" />} />
 
-                                        {/* Technical Textile pages */}
-                                        <Route path="/technical-textile/product-categories" element={<ProductCategoriesPage />} />
-                                        <Route path="/technical-textile/performance-specs" element={<PerformanceSpecsPage />} />
-                                        <Route path="/technical-textile/samples" element={<SampleManagementPage />} />
-                                        <Route path="/technical-textile/data-sheets" element={<TechnicalDataSheetPage />} />
-                                        <Route path="/technical-textile/testing-lab" element={<TestingLabPage />} />
-                                        <Route path="/technical-textile/rd-projects" element={<RDProjectsPage />} />
+                                    {/* HR & Payroll */}
+                                    <Route path="/hr-payroll/employees"  element={canSee('/hr-payroll/employees')  ? <EmployeeListPage /> : <Navigate to="/dashboard" />} />
+                                    <Route path="/hr-payroll/attendance" element={canSee('/hr-payroll/attendance') ? <AttendancePage />   : <Navigate to="/dashboard" />} />
+                                    <Route path="/hr-payroll/salary"     element={canSee('/hr-payroll/salary')     ? <SalaryPage />       : <Navigate to="/dashboard" />} />
 
-                                        {/* Medical Textile pages */}
-                                        <Route path="/medical-textile/compliance" element={<RegulatoryCompliancePage />} />
-                                        <Route path="/medical-textile/batch-traceability" element={<BatchTraceabilityPage />} />
-                                        <Route path="/medical-textile/sterility" element={<SterilityRecordsPage />} />
-                                        <Route path="/medical-textile/capa" element={<CAPAManagementPage />} />
-                                        <Route path="/medical-textile/audit-trail" element={<AuditTrailPage />} />
-                                        <Route path="/medical-textile/shelf-life" element={<ShelfLifeTrackingPage />} />
+                                    {/* Production */}
+                                    <Route path="/production/bill-of-materials" element={canSee('/production/bill-of-materials') ? <BOMListPage />          : <Navigate to="/dashboard" />} />
+                                    <Route path="/production/work-orders"       element={canSee('/production/work-orders')       ? <WorkOrderListPage />    : <Navigate to="/dashboard" />} />
+                                    <Route path="/production/create-work-order" element={canSee('/production/create-work-order') ? <CreateWorkOrderPage /> : <Navigate to="/dashboard" />} />
+                                    <Route path="/production/machines"          element={canSee('/production/machines')          ? <MachineListPage />      : <Navigate to="/dashboard" />} />
+                                    <Route path="/production/quality-checks"    element={canSee('/production/quality-checks')    ? <QualityCheckPage />     : <Navigate to="/dashboard" />} />
+                                    <Route path="/production/batches"           element={canSee('/production/batches')           ? <BatchListPage />        : <Navigate to="/dashboard" />} />
 
-                                        {/* Reports pages */}
-                                        <Route path="/reports/production" element={<ProductionReportPage />} />
-                                        <Route path="/reports/inventory" element={<InventoryReportPage />} />
-                                        <Route path="/reports/sales" element={<SalesReportPage />} />
-                                        <Route path="/reports/finance" element={<FinanceReportPage />} />
-                                        <Route path="/reports/hr" element={<HRReportPage />} />
+                                    {/* Technical Textile */}
+                                    <Route path="/technical-textile/product-categories" element={canSee('/technical-textile/product-categories') ? <ProductCategoriesPage />  : <Navigate to="/dashboard" />} />
+                                    <Route path="/technical-textile/performance-specs"  element={canSee('/technical-textile/performance-specs')  ? <PerformanceSpecsPage />   : <Navigate to="/dashboard" />} />
+                                    <Route path="/technical-textile/samples"            element={canSee('/technical-textile/samples')            ? <SampleManagementPage />   : <Navigate to="/dashboard" />} />
+                                    <Route path="/technical-textile/data-sheets"        element={canSee('/technical-textile/data-sheets')        ? <TechnicalDataSheetPage /> : <Navigate to="/dashboard" />} />
+                                    <Route path="/technical-textile/testing-lab"        element={canSee('/technical-textile/testing-lab')        ? <TestingLabPage />         : <Navigate to="/dashboard" />} />
+                                    <Route path="/technical-textile/rd-projects"        element={canSee('/technical-textile/rd-projects')        ? <RDProjectsPage />         : <Navigate to="/dashboard" />} />
 
-                                        {/* More pages will be added here as we build them */}
-                                        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                                    </Routes>
-                                </MainLayout>
-                            )
-                            : <Navigate to="/login" replace />
+                                    {/* Medical Textile */}
+                                    <Route path="/medical-textile/compliance"         element={canSee('/medical-textile/compliance')         ? <RegulatoryCompliancePage /> : <Navigate to="/dashboard" />} />
+                                    <Route path="/medical-textile/batch-traceability" element={canSee('/medical-textile/batch-traceability') ? <BatchTraceabilityPage />   : <Navigate to="/dashboard" />} />
+                                    <Route path="/medical-textile/sterility"          element={canSee('/medical-textile/sterility')          ? <SterilityRecordsPage />    : <Navigate to="/dashboard" />} />
+                                    <Route path="/medical-textile/capa"              element={canSee('/medical-textile/capa')              ? <CAPAManagementPage />      : <Navigate to="/dashboard" />} />
+                                    <Route path="/medical-textile/audit-trail"        element={canSee('/medical-textile/audit-trail')        ? <AuditTrailPage />          : <Navigate to="/dashboard" />} />
+                                    <Route path="/medical-textile/shelf-life"         element={canSee('/medical-textile/shelf-life')         ? <ShelfLifeTrackingPage />   : <Navigate to="/dashboard" />} />
+
+                                    {/* Reports */}
+                                    <Route path="/reports/production" element={canSee('/reports/production') ? <ProductionReportPage /> : <Navigate to="/dashboard" />} />
+                                    <Route path="/reports/inventory"  element={canSee('/reports/inventory')  ? <InventoryReportPage />  : <Navigate to="/dashboard" />} />
+                                    <Route path="/reports/sales"      element={canSee('/reports/sales')      ? <SalesReportPage />      : <Navigate to="/dashboard" />} />
+                                    <Route path="/reports/finance"    element={canSee('/reports/finance')    ? <FinanceReportPage />    : <Navigate to="/dashboard" />} />
+                                    <Route path="/reports/hr"         element={canSee('/reports/hr')         ? <HRReportPage />         : <Navigate to="/dashboard" />} />
+
+                                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                                </Routes>
+                            </MainLayout>
+                        ) : <Navigate to="/login" replace />
                     }
                 />
-
             </Routes>
         </BrowserRouter>
     );

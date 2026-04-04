@@ -5,7 +5,10 @@
 # ============================================================
 
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
+from django.views.generic import TemplateView
+from django.conf import settings
+import os
 
 urlpatterns = [
     # Django admin panel
@@ -44,11 +47,26 @@ urlpatterns = [
     # Reports module
     path('api/reports/', include('reports.urls')),
 
-    # More modules will be added here as we build them:
-    # path('api/inventory/',     include('inventory.urls')),
-    # path('api/purchasing/',    include('purchasing.urls')),
-    # path('api/sales/',         include('sales.urls')),
-    # path('api/finance/',       include('finance.urls')),
-    # path('api/hr-payroll/',    include('hr_payroll.urls')),
-    # path('api/production/',    include('production.urls')),
+    # Dashboard API
+    path('api/dashboard/', include('dashboard.urls')),
 ]
+
+# ── Serve React frontend in production ───────────────────────
+# When deployed on Render, Django serves the React build.
+# Any URL that is NOT /api/ or /admin/ goes to React's index.html
+# React Router then handles the navigation on the client side.
+frontend_build = settings.BASE_DIR / 'frontend_build'
+if os.path.exists(frontend_build):
+    from django.views.static import serve as static_serve
+    urlpatterns += [
+        # React static assets (JS, CSS, images)
+        re_path(r'^static/(?P<path>.*)$', static_serve,
+                {'document_root': frontend_build / 'static'}),
+        # All other routes → React index.html (React Router handles it)
+        re_path(r'^(?!api/|admin/).*$',
+                TemplateView.as_view(template_name='index.html'),
+                name='react-app'),
+    ]
+    # Tell Django where to find the React index.html
+    from django.template.loaders.filesystem import Loader
+    settings.TEMPLATES[0]['DIRS'] = [frontend_build]

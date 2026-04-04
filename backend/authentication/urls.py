@@ -1,22 +1,22 @@
 # ============================================================
 # FILE: authentication/urls.py
-# PURPOSE: URL routes for authentication module.
-#          Maps URL paths to view functions.
 # ============================================================
 
 from django.urls import path
 from . import views
 
 urlpatterns = [
-    # POST /api/authentication/login/  → login_view
-    path('login/', views.login_view, name='login'),
+    path('login/',              views.login_view,            name='login'),
+    path('logout/',             views.logout_view,           name='logout'),
+    path('current-user/',       views.current_user_view,     name='current-user'),
+    path('dashboard-summary/',  views.dashboard_summary_view,name='dashboard-summary'),
+    path('my-permissions/',     views.my_permissions_view,   name='my-permissions'),
 
-    # POST /api/authentication/logout/ → logout_view
-    path('logout/', views.logout_view, name='logout'),
+    # Role management (admin only)
+    path('roles/',              views.role_list_view,        name='role-list'),
+    path('roles/<int:role_id>/',views.role_detail_view,      name='role-detail'),
 
-    # GET /api/authentication/current-user/ → current_user_view
-    path('current-user/', views.current_user_view, name='current-user'),
-
-    # GET /api/authentication/dashboard-summary/ → live KPI data for dashboard
-    path('dashboard-summary/', views.dashboard_summary_view, name='dashboard-summary'),
+    # User management (admin only)
+    path('users/',              views.user_list_view,        name='user-list'),
+    path('users/<int:user_id>/',views.user_detail_view,      name='user-detail'),
 ]

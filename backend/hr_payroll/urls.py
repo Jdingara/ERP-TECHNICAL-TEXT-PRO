@@ -19,5 +19,6 @@ urlpatterns = [
 
     # Salary
     path('salary/',                                 views.salary_list_and_process,      name='salary-list'),
+    path('salary/<int:salary_id>/',                 views.salary_detail,                name='salary-detail'),
     path('salary/<int:salary_id>/paid/',            views.salary_mark_paid,             name='salary-paid'),
 ]

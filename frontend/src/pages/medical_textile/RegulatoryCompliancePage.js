@@ -15,8 +15,8 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 
-const API       = 'http://127.0.0.1:8000/api/medical-textile/compliance/';
-const API_ITEMS = 'http://127.0.0.1:8000/api/master-data/items/';
+const API       = '/api/medical-textile/compliance/';
+const API_ITEMS = '/api/master-data/items/';
 
 const STANDARDS = ['iso_13485','iso_9001','fda_510k','ce_mark','bis','nabl','who_gmp','other'];
 const STATUS_COLOR = { active: 'success', expired: 'error', pending: 'warning', revoked: 'error' };

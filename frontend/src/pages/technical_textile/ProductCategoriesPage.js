@@ -14,7 +14,7 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const API = 'http://127.0.0.1:8000/api/technical-textile/categories/';
+const API = '/api/technical-textile/categories/';
 const EMPTY = { name: '', code: '', description: '', application: '' };
 
 function ProductCategoriesPage() {

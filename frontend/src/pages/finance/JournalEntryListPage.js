@@ -5,14 +5,14 @@
 //          Posted entries affect account balances.
 // ============================================================
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Box, Typography, Button, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Paper, Chip,
     Dialog, DialogTitle, DialogContent, DialogActions,
-    TextField, IconButton, Alert, Divider
+    TextField, IconButton, Alert, Divider, Tooltip, Stack,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon    from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Autocomplete } from '@mui/material';
 
@@ -35,13 +35,13 @@ function JournalEntryListPage() {
     useEffect(() => { fetchEntries(); fetchAccounts(); }, []);
 
     const fetchEntries = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/finance/journal-entries/', { credentials: 'include' });
+        const res = await fetch('/api/finance/journal-entries/', { credentials: 'include' });
         const data = await res.json();
         setEntries(data.journal_entries || []);
     };
 
     const fetchAccounts = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/finance/accounts/', { credentials: 'include' });
+        const res = await fetch('/api/finance/accounts/', { credentials: 'include' });
         const data = await res.json();
         setAccounts(data.accounts || []);
     };
@@ -79,7 +79,7 @@ function JournalEntryListPage() {
                 credit_amount:  l.credit_amount || 0,
             })),
         };
-        const res = await fetch('http://127.0.0.1:8000/api/finance/journal-entries/', {
+        const res = await fetch('/api/finance/journal-entries/', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             credentials: 'include', body: JSON.stringify(payload),
         });
@@ -93,12 +93,23 @@ function JournalEntryListPage() {
     };
 
     const handlePost = async (entryId) => {
-        const res = await fetch(`http://127.0.0.1:8000/api/finance/journal-entries/${entryId}/post/`, {
+        const res = await fetch(`/api/finance/journal-entries/${entryId}/post/`, {
             method: 'POST', credentials: 'include',
         });
         const data = await res.json();
         if (res.ok) { setMessage('Journal entry posted.'); setMessageType('success'); fetchEntries(); }
         else { setMessage(data.message); setMessageType('error'); }
+    };
+
+    const handleDelete = async (entry) => {
+        if (entry.status === 'posted') return;
+        if (!window.confirm(`Delete journal entry ${entry.entry_number}?`)) return;
+        const res  = await fetch(`/api/finance/journal-entries/${entry.id}/`, {
+            method: 'DELETE', credentials: 'include',
+        });
+        const data = await res.json();
+        if (res.ok) { setMessage('Journal entry deleted.'); setMessageType('success'); fetchEntries(); }
+        else { setMessage(data.message || 'Delete failed.'); setMessageType('error'); }
     };
 
     const accountOptions = accounts.map(a => ({ id: a.id, label: `${a.account_code} — ${a.account_name}` }));
@@ -152,10 +163,19 @@ function JournalEntryListPage() {
                                             color={e.status === 'posted' ? 'success' : 'default'} size="small" />
                                     </TableCell>
                                     <TableCell>
-                                        {e.status === 'draft' && (
-                                            <Button size="small" variant="outlined" color="success"
-                                                onClick={() => handlePost(e.id)}>Post</Button>
-                                        )}
+                                        <Stack direction="row" spacing={0.5} alignItems="center">
+                                            {e.status === 'draft' && (
+                                                <Button size="small" variant="outlined" color="success"
+                                                    onClick={() => handlePost(e.id)}>Post</Button>
+                                            )}
+                                            {e.status === 'draft' && (
+                                                <Tooltip title="Delete Draft">
+                                                    <IconButton size="small" color="error" onClick={() => handleDelete(e)}>
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            )}
+                                        </Stack>
                                     </TableCell>
                                 </TableRow>
                             ))

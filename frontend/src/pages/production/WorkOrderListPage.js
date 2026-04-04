@@ -8,19 +8,20 @@
 //            - Creates a batch record for traceability
 // ============================================================
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Box, Typography, Button, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Paper, Chip,
     Dialog, DialogTitle, DialogContent, DialogActions,
-    TextField, Alert, IconButton
+    TextField, Alert, IconButton, Tooltip, Stack,
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon      from '@mui/icons-material/Delete';
+import PrintIcon       from '@mui/icons-material/Print';
+import AddIcon         from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
+import { printWorkOrder } from '../../utils/printUtils';
 
-// Status chip colors
 const STATUS_COLOR = {
     draft:        'default',
     confirmed:    'primary',
@@ -29,36 +30,26 @@ const STATUS_COLOR = {
     cancelled:    'error',
 };
 
+// Draft and confirmed can be deleted; in_progress/completed/cancelled cannot
+const canDelete = (wo) => ['draft', 'confirmed'].includes(wo.status);
+
 function WorkOrderListPage() {
     const navigate = useNavigate();
 
-    const [workOrders, setWorkOrders]   = useState([]);
-    const [message, setMessage]         = useState('');
-    const [messageType, setMessageType] = useState('success');
+    const [workOrders,   setWorkOrders]   = useState([]);
+    const [message,      setMessage]      = useState('');
+    const [messageType,  setMessageType]  = useState('success');
 
-    // Complete work order dialog
     const [completeDialog, setCompleteDialog] = useState(false);
-    const [selectedWo, setSelectedWo]         = useState(null);
-    const [actualQty, setActualQty]           = useState('');
-
-    // View work order dialog
-    const [viewDialog, setViewDialog]   = useState(false);
-    const [viewWo, setViewWo]           = useState(null);
+    const [selectedWo,     setSelectedWo]     = useState(null);
+    const [actualQty,      setActualQty]      = useState('');
 
     useEffect(() => { fetchWorkOrders(); }, []);
 
     const fetchWorkOrders = async () => {
-        const res  = await fetch('http://127.0.0.1:8000/api/production/work-orders/', { credentials: 'include' });
+        const res  = await fetch('/api/production/work-orders/', { credentials: 'include' });
         const data = await res.json();
         setWorkOrders(data.work_orders || []);
-    };
-
-    const handleViewWo = async (woId) => {
-        const res  = await fetch(`http://127.0.0.1:8000/api/production/work-orders/`, { credentials: 'include' });
-        // We have full data in the list already — just find from state
-        const wo = workOrders.find(w => w.id === woId);
-        setViewWo(wo);
-        setViewDialog(true);
     };
 
     const openCompleteDialog = (wo) => {
@@ -69,7 +60,7 @@ function WorkOrderListPage() {
 
     const handleComplete = async () => {
         const res = await fetch(
-            `http://127.0.0.1:8000/api/production/work-orders/${selectedWo.id}/complete/`,
+            `/api/production/work-orders/${selectedWo.id}/complete/`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -87,6 +78,27 @@ function WorkOrderListPage() {
             setMessage(data.message || 'Error completing work order.');
             setMessageType('error');
         }
+    };
+
+    const handleDelete = async (wo) => {
+        if (!canDelete(wo)) return;
+        if (!window.confirm(`Delete work order ${wo.work_order_number}?`)) return;
+        const res  = await fetch(`/api/production/work-orders/${wo.id}/`, {
+            method: 'DELETE', credentials: 'include',
+        });
+        const data = await res.json();
+        if (res.ok) {
+            setMessage('Work order deleted.'); setMessageType('success'); fetchWorkOrders();
+        } else {
+            setMessage(data.message || 'Delete failed.'); setMessageType('error');
+        }
+    };
+
+    const handlePrint = async (wo) => {
+        // Fetch detail to get BOM lines if available
+        const res  = await fetch(`/api/production/work-orders/${wo.id}/`, { credentials: 'include' });
+        const data = await res.json();
+        printWorkOrder(data.work_order || wo);
     };
 
     return (
@@ -148,18 +160,30 @@ function WorkOrderListPage() {
                                     />
                                 </TableCell>
                                 <TableCell>
-                                    <IconButton size="small" sx={{ color: '#1a237e' }} onClick={() => handleViewWo(wo.id)} title="View">
-                                        <VisibilityIcon fontSize="small" />
-                                    </IconButton>
-                                    {wo.status !== 'completed' && wo.status !== 'cancelled' && (
-                                        <IconButton
-                                            size="small"
-                                            sx={{ color: '#2e7d32', ml: 1 }}
-                                            onClick={() => openCompleteDialog(wo)}
-                                            title="Complete Work Order">
-                                            <CheckCircleIcon fontSize="small" />
-                                        </IconButton>
-                                    )}
+                                    <Stack direction="row" spacing={0.5} alignItems="center">
+                                        {wo.status !== 'completed' && wo.status !== 'cancelled' && (
+                                            <Tooltip title="Complete Work Order">
+                                                <IconButton
+                                                    size="small"
+                                                    sx={{ color: '#2e7d32' }}
+                                                    onClick={() => openCompleteDialog(wo)}>
+                                                    <CheckCircleIcon fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        )}
+                                        <Tooltip title="Print Work Order">
+                                            <IconButton size="small" onClick={() => handlePrint(wo)}>
+                                                <PrintIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                        {canDelete(wo) && (
+                                            <Tooltip title="Delete">
+                                                <IconButton size="small" color="error" onClick={() => handleDelete(wo)}>
+                                                    <DeleteIcon fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        )}
+                                    </Stack>
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -210,31 +234,6 @@ function WorkOrderListPage() {
                     </Button>
                 </DialogActions>
             </Dialog>
-
-            {/* View Work Order Dialog */}
-            {viewWo && (
-                <Dialog open={viewDialog} onClose={() => setViewDialog(false)} maxWidth="sm" fullWidth>
-                    <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>
-                        {viewWo.work_order_number}
-                    </DialogTitle>
-                    <DialogContent sx={{ pt: 3 }}>
-                        <Typography variant="body1" mb={1}>
-                            <strong>BOM:</strong> {viewWo.bom_name}<br />
-                            <strong>Product:</strong> {viewWo.finished_product_code} — {viewWo.finished_product}<br />
-                            <strong>Warehouse:</strong> {viewWo.warehouse}<br />
-                            <strong>Planned Qty:</strong> {viewWo.planned_quantity}<br />
-                            <strong>Actual Qty:</strong> {viewWo.actual_quantity}<br />
-                            <strong>Start Date:</strong> {viewWo.planned_start_date}<br />
-                            {viewWo.planned_end_date && <><strong>End Date:</strong> {viewWo.planned_end_date}<br /></>}
-                            <strong>Status:</strong> {viewWo.status}<br />
-                            {viewWo.notes && <><strong>Notes:</strong> {viewWo.notes}</>}
-                        </Typography>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => setViewDialog(false)}>Close</Button>
-                    </DialogActions>
-                </Dialog>
-            )}
         </Box>
     );
 }

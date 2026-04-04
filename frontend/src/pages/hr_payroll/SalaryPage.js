@@ -5,14 +5,18 @@
 //          Shows gross earnings, deductions (PF, ESI), net pay.
 // ============================================================
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Box, Typography, Button, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Paper, Chip,
     Dialog, DialogTitle, DialogContent, DialogActions,
-    TextField, MenuItem, Select, InputLabel, FormControl, Alert
+    TextField, MenuItem, Select, InputLabel, FormControl, Alert,
+    IconButton, Tooltip, Stack,
 } from '@mui/material';
 import CalculateIcon from '@mui/icons-material/Calculate';
+import DeleteIcon    from '@mui/icons-material/Delete';
+import PrintIcon     from '@mui/icons-material/Print';
+import { printSalarySlip } from '../../utils/printUtils';
 
 const MONTHS = [
     { value: 1, label: 'January' }, { value: 2, label: 'February' },
@@ -23,35 +27,37 @@ const MONTHS = [
     { value: 11, label: 'November'}, { value: 12, label: 'December' },
 ];
 
+const canDelete = (s) => s.status === 'draft';
+
 function SalaryPage() {
-    const [salaries, setSalaries]       = useState([]);
-    const [employees, setEmployees]     = useState([]);
-    const [dialogOpen, setDialogOpen]   = useState(false);
-    const [message, setMessage]         = useState('');
+    const [salaries,    setSalaries]    = useState([]);
+    const [employees,   setEmployees]   = useState([]);
+    const [dialogOpen,  setDialogOpen]  = useState(false);
+    const [message,     setMessage]     = useState('');
     const [messageType, setMessageType] = useState('success');
     const [monthFilter, setMonthFilter] = useState(new Date().getMonth() + 1);
-    const [yearFilter, setYearFilter]   = useState(new Date().getFullYear());
-    const [formData, setFormData]       = useState({
+    const [yearFilter,  setYearFilter]  = useState(new Date().getFullYear());
+    const [formData,    setFormData]    = useState({
         employee_id: '', month: new Date().getMonth() + 1,
         year: new Date().getFullYear(), working_days: 26, other_deduction: 0
     });
 
-    useEffect(() => { fetchSalaries(); fetchEmployees(); }, [monthFilter, yearFilter]);
+    useEffect(() => { fetchSalaries(); fetchEmployees(); }, [monthFilter, yearFilter]); // eslint-disable-line
 
     const fetchSalaries = async () => {
-        const res = await fetch(`http://127.0.0.1:8000/api/hr/salary/?month=${monthFilter}&year=${yearFilter}`, { credentials: 'include' });
+        const res  = await fetch(`/api/hr/salary/?month=${monthFilter}&year=${yearFilter}`, { credentials: 'include' });
         const data = await res.json();
         setSalaries(data.salaries || []);
     };
 
     const fetchEmployees = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/hr/employees/', { credentials: 'include' });
+        const res  = await fetch('/api/hr/employees/', { credentials: 'include' });
         const data = await res.json();
         setEmployees(data.employees || []);
     };
 
     const handleProcess = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/hr/salary/', {
+        const res  = await fetch('/api/hr/salary/', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             credentials: 'include', body: JSON.stringify(formData),
         });
@@ -65,11 +71,24 @@ function SalaryPage() {
     };
 
     const handleMarkPaid = async (salaryId) => {
-        const res = await fetch(`http://127.0.0.1:8000/api/hr/salary/${salaryId}/paid/`, {
+        const res = await fetch(`/api/hr/salary/${salaryId}/paid/`, {
             method: 'POST', credentials: 'include',
         });
         if (res.ok) { setMessage('Salary marked as paid.'); setMessageType('success'); fetchSalaries(); }
     };
+
+    const handleDelete = async (s) => {
+        if (!canDelete(s)) return;
+        if (!window.confirm(`Delete salary record for ${s.employee_name}?`)) return;
+        const res  = await fetch(`/api/hr/salary/${s.id}/`, {
+            method: 'DELETE', credentials: 'include',
+        });
+        const data = await res.json();
+        if (res.ok) { setMessage('Salary record deleted.'); setMessageType('success'); fetchSalaries(); }
+        else { setMessage(data.message || 'Delete failed.'); setMessageType('error'); }
+    };
+
+    const monthLabel = (m) => MONTHS.find(x => x.value === parseInt(m))?.label || m;
 
     const fmt = (val) => parseFloat(val || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 });
 
@@ -134,10 +153,24 @@ function SalaryPage() {
                                     <Chip label={s.status} size="small" color={s.status === 'paid' ? 'success' : 'warning'} />
                                 </TableCell>
                                 <TableCell>
-                                    {s.status === 'draft' && (
-                                        <Button size="small" variant="contained" color="success"
-                                            onClick={() => handleMarkPaid(s.id)}>Mark Paid</Button>
-                                    )}
+                                    <Stack direction="row" spacing={0.5} alignItems="center">
+                                        {s.status === 'draft' && (
+                                            <Button size="small" variant="contained" color="success"
+                                                onClick={() => handleMarkPaid(s.id)}>Mark Paid</Button>
+                                        )}
+                                        <Tooltip title={`Print Salary Slip — ${monthLabel(s.month)} ${s.year}`}>
+                                            <IconButton size="small" onClick={() => printSalarySlip(s)}>
+                                                <PrintIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                        {canDelete(s) && (
+                                            <Tooltip title="Delete Draft">
+                                                <IconButton size="small" color="error" onClick={() => handleDelete(s)}>
+                                                    <DeleteIcon fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        )}
+                                    </Stack>
                                 </TableCell>
                             </TableRow>
                         ))}

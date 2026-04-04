@@ -13,7 +13,7 @@ import {
     Alert, TextField, MenuItem
 } from '@mui/material';
 
-const API = 'http://127.0.0.1:8000/api/medical-textile/audit-trail/';
+const API = '/api/medical-textile/audit-trail/';
 
 const ACTION_COLOR = {
     created:  'success',

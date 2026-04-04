@@ -39,7 +39,7 @@ function CustomerListPage() {
     useEffect(() => { fetchCustomers(); }, []);
 
     const fetchCustomers = async (search = '') => {
-        const res = await fetch(`http://127.0.0.1:8000/api/master-data/customers/?search=${search}`, { credentials: 'include' });
+        const res = await fetch(`/api/master-data/customers/?search=${search}`, { credentials: 'include' });
         const data = await res.json();
         setCustomers(data.customers || []);
     };
@@ -50,8 +50,8 @@ function CustomerListPage() {
 
     const handleSave = async () => {
         const url = editingId
-            ? `http://127.0.0.1:8000/api/master-data/customers/${editingId}/`
-            : 'http://127.0.0.1:8000/api/master-data/customers/';
+            ? `/api/master-data/customers/${editingId}/`
+            : '/api/master-data/customers/';
         const method = editingId ? 'PUT' : 'POST';
         const res = await fetch(url, {
             method, headers: { 'Content-Type': 'application/json' },

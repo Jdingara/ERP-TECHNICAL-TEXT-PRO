@@ -153,6 +153,34 @@ def journal_entry_list_and_create(request):
 
 
 @csrf_exempt
+def journal_entry_detail(request, entry_id):
+    """ GET = get entry with lines | PUT = update draft entry | DELETE = delete draft entry """
+    try:
+        entry = JournalEntry.objects.get(id=entry_id)
+    except JournalEntry.DoesNotExist:
+        return JsonResponse({'message': 'Journal entry not found.'}, status=404)
+
+    if request.method == 'GET':
+        return JsonResponse({'entry': journal_to_dict(entry, include_lines=True)})
+
+    if request.method == 'PUT':
+        if entry.status == 'posted':
+            return JsonResponse({'message': 'Cannot edit a posted journal entry. It is locked.'}, status=400)
+        data = json.loads(request.body)
+        for field in ['entry_date', 'description', 'reference']:
+            if field in data:
+                setattr(entry, field, data[field])
+        entry.save()
+        return JsonResponse({'message': 'Journal entry updated.', 'entry': journal_to_dict(entry)})
+
+    if request.method == 'DELETE':
+        if entry.status == 'posted':
+            return JsonResponse({'message': 'Cannot delete a posted journal entry.'}, status=400)
+        entry.delete()
+        return JsonResponse({'message': 'Journal entry deleted.'})
+
+
+@csrf_exempt
 def journal_entry_post(request, entry_id):
     """
     POST /api/finance/journal-entries/<id>/post/

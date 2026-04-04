@@ -12,7 +12,7 @@ from django.utils import timezone
 import json
 from datetime import date
 
-from .models import BillOfMaterials, BOMLine, WorkOrder, WorkOrderMaterialConsumption, Batch, QualityCheck
+from .models import BillOfMaterials, BOMLine, WorkOrder, WorkOrderMaterialConsumption, Batch, QualityCheck, Machine
 from inventory.models import Stock, StockMovement
 
 
@@ -178,6 +178,38 @@ def work_order_list_and_create(request):
 
 
 @csrf_exempt
+def work_order_detail(request, wo_id):
+    """ GET = get WO with materials | PUT = update status/notes | DELETE = delete draft WO """
+    try:
+        wo = WorkOrder.objects.select_related('bom', 'finished_product', 'warehouse').get(id=wo_id)
+    except WorkOrder.DoesNotExist:
+        return JsonResponse({'message': 'Work order not found.'}, status=404)
+
+    if request.method == 'GET':
+        return JsonResponse({'work_order': work_order_to_dict(wo, include_lines=True)})
+
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        # Lock: completed/cancelled WO cannot be edited
+        if wo.status == 'completed':
+            return JsonResponse({'message': 'Cannot edit a completed work order. Batch and stock have been updated.'}, status=400)
+        if 'status' in data:
+            wo.status = data['status']
+        if 'notes' in data:
+            wo.notes = data['notes']
+        if 'planned_end_date' in data:
+            wo.planned_end_date = data['planned_end_date'] or None
+        wo.save()
+        return JsonResponse({'message': 'Work order updated.', 'work_order': work_order_to_dict(wo)})
+
+    if request.method == 'DELETE':
+        if wo.status not in ('draft', 'confirmed'):
+            return JsonResponse({'message': f'Cannot delete a {wo.status} work order.'}, status=400)
+        wo.delete()
+        return JsonResponse({'message': 'Work order deleted.'})
+
+
+@csrf_exempt
 def work_order_complete(request, wo_id):
     """
     POST /api/production/work-orders/<id>/complete/
@@ -286,6 +318,84 @@ def batch_list(request):
         'expiry_date':      str(b.expiry_date) if b.expiry_date else '',
     } for b in batches]
     return JsonResponse({'batches': result})
+
+
+# ============================================================
+# QUALITY CHECK
+# ============================================================
+
+# ============================================================
+# MACHINES
+# ============================================================
+
+def machine_to_dict(m):
+    return {
+        'id':            m.id,
+        'machine_code':  m.machine_code,
+        'machine_name':  m.machine_name,
+        'machine_type':  m.machine_type,
+        'capacity':      str(m.capacity) if m.capacity else '',
+        'capacity_unit': m.capacity_unit,
+        'location':      m.location,
+        'status':        m.status,
+        'purchase_date': str(m.purchase_date) if m.purchase_date else '',
+        'notes':         m.notes,
+        'created_at':    m.created_at.strftime('%Y-%m-%d'),
+    }
+
+@csrf_exempt
+def machine_list_and_create(request):
+    if request.method == 'GET':
+        machines = Machine.objects.all()
+        type_filter = request.GET.get('type', '')
+        if type_filter:
+            machines = machines.filter(machine_type=type_filter)
+        return JsonResponse({'machines': [machine_to_dict(m) for m in machines], 'total': machines.count()})
+
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        try:
+            machine = Machine.objects.create(
+                machine_code  = data['machine_code'],
+                machine_name  = data['machine_name'],
+                machine_type  = data['machine_type'],
+                capacity      = data.get('capacity') or None,
+                capacity_unit = data.get('capacity_unit', ''),
+                location      = data.get('location', ''),
+                status        = data.get('status', 'active'),
+                purchase_date = data.get('purchase_date') or None,
+                notes         = data.get('notes', ''),
+            )
+            return JsonResponse({'message': 'Machine created.', 'machine': machine_to_dict(machine)}, status=201)
+        except Exception as e:
+            return JsonResponse({'message': str(e)}, status=400)
+
+
+@csrf_exempt
+def machine_detail(request, machine_id):
+    try:
+        machine = Machine.objects.get(id=machine_id)
+    except Machine.DoesNotExist:
+        return JsonResponse({'message': 'Machine not found.'}, status=404)
+
+    if request.method == 'GET':
+        return JsonResponse({'machine': machine_to_dict(machine)})
+
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        for field in ['machine_name', 'machine_type', 'capacity_unit', 'location', 'status', 'notes']:
+            if field in data:
+                setattr(machine, field, data[field])
+        if 'capacity' in data:
+            machine.capacity = data['capacity'] or None
+        if 'purchase_date' in data:
+            machine.purchase_date = data['purchase_date'] or None
+        machine.save()
+        return JsonResponse({'message': 'Machine updated.', 'machine': machine_to_dict(machine)})
+
+    if request.method == 'DELETE':
+        machine.delete()
+        return JsonResponse({'message': 'Machine deleted.'})
 
 
 # ============================================================

@@ -15,9 +15,9 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-const API        = 'http://127.0.0.1:8000/api/medical-textile/traceability/';
-const API_BATCHES = 'http://127.0.0.1:8000/api/production/batches/';
-const API_ITEMS  = 'http://127.0.0.1:8000/api/master-data/items/';
+const API        = '/api/medical-textile/traceability/';
+const API_BATCHES = '/api/production/batches/';
+const API_ITEMS  = '/api/master-data/items/';
 
 const EMPTY = {
     batch_id:'', item_id:'', raw_material_lot:'', supplier_batch_ref:'', raw_material_coa:'',

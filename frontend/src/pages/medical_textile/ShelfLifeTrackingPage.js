@@ -15,9 +15,9 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
-const API         = 'http://127.0.0.1:8000/api/medical-textile/shelf-life/';
-const API_BATCHES = 'http://127.0.0.1:8000/api/production/batches/';
-const API_ITEMS   = 'http://127.0.0.1:8000/api/master-data/items/';
+const API         = '/api/medical-textile/shelf-life/';
+const API_BATCHES = '/api/production/batches/';
+const API_ITEMS   = '/api/master-data/items/';
 
 const STATUS_COLOR = { valid:'success', near_expiry:'warning', expired:'error', recalled:'error' };
 const EMPTY = { batch_id:'', item_id:'', manufacture_date:'', expiry_date:'', shelf_life_months:'24', storage_condition:'', quantity_remaining:'', notes:'' };

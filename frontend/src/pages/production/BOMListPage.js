@@ -37,19 +37,19 @@ function BOMListPage() {
     useEffect(() => { fetchBoms(); fetchItems(); }, []);
 
     const fetchBoms = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/production/bom/', { credentials: 'include' });
+        const res = await fetch('/api/production/bom/', { credentials: 'include' });
         const data = await res.json();
         setBoms(data.boms || []);
     };
 
     const fetchItems = async () => {
-        const res = await fetch('http://127.0.0.1:8000/api/master-data/items/', { credentials: 'include' });
+        const res = await fetch('/api/master-data/items/', { credentials: 'include' });
         const data = await res.json();
         setItems(data.items || []);
     };
 
     const handleViewBom = async (bomId) => {
-        const res = await fetch(`http://127.0.0.1:8000/api/production/bom/${bomId}/`, { credentials: 'include' });
+        const res = await fetch(`/api/production/bom/${bomId}/`, { credentials: 'include' });
         const data = await res.json();
         setSelectedBom(data.bom);
         setViewDialog(true);
@@ -73,7 +73,7 @@ function BOMListPage() {
                 notes: l.notes,
             })),
         };
-        const res = await fetch('http://127.0.0.1:8000/api/production/bom/', {
+        const res = await fetch('/api/production/bom/', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             credentials: 'include', body: JSON.stringify(payload),
         });

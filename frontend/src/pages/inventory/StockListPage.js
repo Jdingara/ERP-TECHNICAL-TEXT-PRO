@@ -24,7 +24,7 @@ function StockListPage() {
     useEffect(() => { fetchStocks(); }, []);
 
     const fetchStocks = async (search = '', lowOnly = false) => {
-        let url = `http://127.0.0.1:8000/api/inventory/stock/?search=${search}`;
+        let url = `/api/inventory/stock/?search=${search}`;
         if (lowOnly) url += '&low_stock=1';
         const res = await fetch(url, { credentials: 'include' });
         const data = await res.json();
