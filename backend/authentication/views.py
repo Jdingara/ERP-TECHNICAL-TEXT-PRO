@@ -151,17 +151,22 @@ def dashboard_summary_view(request):
         } for s in low_stock_qs]
 
         # ── Invoice / AR summary ──────────────────────────────
-        total_invoiced  = float(Invoice.objects.aggregate(s=Sum('total_amount'))['s'] or 0)
-        total_paid_amt  = float(Invoice.objects.filter(status='paid').aggregate(s=Sum('total_amount'))['s'] or 0)
-        outstanding_ar  = float(Invoice.objects.exclude(status__in=['paid', 'draft']).aggregate(s=Sum('balance_due'))['s'] or 0)
+        # balance_due is a computed property — use total_amount - paid_amount in ORM
+        from django.db.models import F
+        total_invoiced   = float(Invoice.objects.aggregate(s=Sum('total_amount'))['s'] or 0)
+        total_paid_amt   = float(Invoice.objects.filter(status='paid').aggregate(s=Sum('total_amount'))['s'] or 0)
+        outstanding_ar   = float(Invoice.objects.exclude(status__in=['paid', 'draft']).aggregate(
+                               s=Sum(F('total_amount') - F('paid_amount')))['s'] or 0)
         overdue_invoices = Invoice.objects.filter(status='overdue').count()
 
         # ── AR Aging buckets ──────────────────────────────────
         unpaid_inv = Invoice.objects.exclude(status__in=['paid', 'draft'])
-        ar_current = float(unpaid_inv.filter(due_date__gte=today).aggregate(s=Sum('balance_due'))['s'] or 0)
-        ar_30      = float(unpaid_inv.filter(due_date__lt=today, due_date__gte=today - timedelta(days=30)).aggregate(s=Sum('balance_due'))['s'] or 0)
-        ar_60      = float(unpaid_inv.filter(due_date__lt=today - timedelta(days=30), due_date__gte=today - timedelta(days=60)).aggregate(s=Sum('balance_due'))['s'] or 0)
-        ar_90plus  = float(unpaid_inv.filter(due_date__lt=today - timedelta(days=60)).aggregate(s=Sum('balance_due'))['s'] or 0)
+        def ar_sum(qs):
+            return float(qs.aggregate(s=Sum(F('total_amount') - F('paid_amount')))['s'] or 0)
+        ar_current = ar_sum(unpaid_inv.filter(due_date__gte=today))
+        ar_30      = ar_sum(unpaid_inv.filter(due_date__lt=today, due_date__gte=today - timedelta(days=30)))
+        ar_60      = ar_sum(unpaid_inv.filter(due_date__lt=today - timedelta(days=30), due_date__gte=today - timedelta(days=60)))
+        ar_90plus  = ar_sum(unpaid_inv.filter(due_date__lt=today - timedelta(days=60)))
 
         # ── Monthly revenue trend (last 6 months) ─────────────
         monthly_revenue = []
