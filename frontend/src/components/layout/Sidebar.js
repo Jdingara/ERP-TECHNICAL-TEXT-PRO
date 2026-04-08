@@ -50,21 +50,20 @@ const MENU_ITEMS = [
         { title: 'Warehouses',        path: '/master-data/warehouses' },
     ]},
     { title: 'Inventory', icon: <InventoryIcon />, children: [
-        { title: 'Stock List',     path: '/inventory/stock-list' },
-        { title: 'Stock Movement', path: '/inventory/stock-movement' },
+        { title: 'Stock List', path: '/inventory/stock-list' },
+        // Stock Movement hidden — accessed via "Add Movement" button on Stock List
     ]},
     { title: 'Purchasing', icon: <ShoppingCartIcon />, children: [
-        { title: 'Purchase Orders',       path: '/purchasing/purchase-orders' },
-        { title: 'Create Purchase Order', path: '/purchasing/create-purchase-order' },
-        { title: 'Goods Receipt (GRN)',   path: '/purchasing/goods-receipt' },
+        { title: 'Purchase Orders', path: '/purchasing/purchase-orders' },
+        // Create Purchase Order & Goods Receipt hidden — accessed via buttons on Purchase Orders
     ]},
     { title: 'Sales', icon: <PointOfSaleIcon />, children: [
-        { title: 'Inquiries',          path: '/sales/inquiries' },
-        { title: 'Quotations',         path: '/sales/quotations' },
-        { title: 'Order Journey',      path: '/sales/order-journey' },
-        { title: 'Sales Orders',       path: '/sales/sales-orders' },
-        { title: 'Create Sales Order', path: '/sales/create-sales-order' },
-        { title: 'Invoices (AR)',      path: '/sales/invoices' },
+        { title: 'Inquiries',     path: '/sales/inquiries' },
+        { title: 'Quotations',    path: '/sales/quotations' },
+        { title: 'Order Journey', path: '/sales/order-journey' },
+        { title: 'Sales Orders',  path: '/sales/sales-orders' },
+        { title: 'Invoices (AR)', path: '/sales/invoices' },
+        // Create Sales Order hidden — accessed via "New Order" button on Sales Orders
     ]},
     { title: 'Finance', icon: <AccountBalanceIcon />, children: [
         { title: 'Chart of Accounts', path: '/finance/chart-of-accounts' },
@@ -79,7 +78,7 @@ const MENU_ITEMS = [
     { title: 'Production', icon: <FactoryIcon />, children: [
         { title: 'Bill of Materials', path: '/production/bill-of-materials' },
         { title: 'Work Orders',       path: '/production/work-orders' },
-        { title: 'Create Work Order', path: '/production/create-work-order' },
+        // Create Work Order hidden — accessed via "New Work Order" button on Work Orders
         { title: 'Machines',          path: '/production/machines' },
         { title: 'Quality Checks',    path: '/production/quality-checks' },
         { title: 'Batch List',        path: '/production/batches' },
