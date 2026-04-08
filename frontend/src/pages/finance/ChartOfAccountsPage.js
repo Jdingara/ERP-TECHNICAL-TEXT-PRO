@@ -12,6 +12,7 @@ import {
     TextField, MenuItem, Select, InputLabel, FormControl, Alert
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import { ResizableTable } from '../../components/common/ResizableTable';
 
 const CATEGORY_OPTIONS = [
     { value: 'asset',     label: 'Asset',     color: 'primary'  },
@@ -87,7 +88,8 @@ function ChartOfAccountsPage() {
                 </Button>
             </Box>
 
-            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <ResizableTable storageKey="chartofaccounts">
+                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
@@ -124,6 +126,7 @@ function ChartOfAccountsPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
 
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
                 <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>Add New Account</DialogTitle>

@@ -13,6 +13,7 @@ import {
     MenuItem, Select, InputLabel, FormControl, Alert
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import { ResizableTable } from '../../components/common/ResizableTable';
 
 const MOVEMENT_TYPE_OPTIONS = [
     { value: 'stock_in',        label: 'Stock In (Received)',           color: 'success' },
@@ -107,7 +108,8 @@ function StockMovementPage() {
                 </Button>
             </Box>
 
-            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <ResizableTable storageKey="stockmovement">
+                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
@@ -149,6 +151,7 @@ function StockMovementPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
 
             {/* Add Movement Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>

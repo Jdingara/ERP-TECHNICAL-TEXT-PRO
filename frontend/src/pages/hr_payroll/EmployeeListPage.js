@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
+import { ResizableTable } from '../../components/common/ResizableTable';
 
 const GENDER_OPTIONS      = [{ value: 'male', label: 'Male' }, { value: 'female', label: 'Female' }, { value: 'other', label: 'Other' }];
 const EMP_TYPE_OPTIONS    = [
@@ -96,7 +97,8 @@ function EmployeeListPage() {
                 </Button>
             </Box>
 
-            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <ResizableTable storageKey="employeelist">
+                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
@@ -133,6 +135,7 @@ function EmployeeListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
 
             {/* Add/Edit Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>

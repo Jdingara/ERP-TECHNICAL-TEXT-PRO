@@ -13,6 +13,7 @@ import {
 import AddIcon    from '@mui/icons-material/Add';
 import PrintIcon  from '@mui/icons-material/Print';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { ResizableTable } from '../../components/common/ResizableTable';
 import { useNavigate } from 'react-router-dom';
 import { printPurchaseOrder } from '../../utils/printUtils';
 
@@ -90,7 +91,8 @@ function PurchaseOrderListPage() {
                 </Button>
             </Box>
 
-            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <ResizableTable storageKey="purchaseorderlist">
+                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
@@ -151,6 +153,7 @@ function PurchaseOrderListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
         </Box>
     );
 }

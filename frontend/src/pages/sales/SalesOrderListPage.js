@@ -14,6 +14,7 @@ import AddIcon        from '@mui/icons-material/Add';
 import PrintIcon      from '@mui/icons-material/Print';
 import DeleteIcon     from '@mui/icons-material/Delete';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import { ResizableTable } from '../../components/common/ResizableTable';
 import { useNavigate } from 'react-router-dom';
 import { printSalesOrder, printDeliveryChallan } from '../../utils/printUtils';
 
@@ -103,7 +104,8 @@ function SalesOrderListPage() {
                 </Button>
             </Box>
 
-            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <ResizableTable storageKey="salesorderlist">
+                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
@@ -177,6 +179,7 @@ function SalesOrderListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
         </Box>
     );
 }

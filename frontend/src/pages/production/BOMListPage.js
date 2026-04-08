@@ -16,6 +16,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { ResizableTable } from '../../components/common/ResizableTable';
 
 const EMPTY_LINE = { raw_material_id: '', quantity: '', waste_percent: 0, notes: '' };
 
@@ -106,7 +107,8 @@ function BOMListPage() {
                 </Button>
             </Box>
 
-            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <ResizableTable storageKey="bomlist">
+                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
@@ -140,6 +142,7 @@ function BOMListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
 
             {/* Create BOM Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="lg" fullWidth>

@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import AddIcon from '@mui/icons-material/Add';
+import { ResizableTable } from '../../components/common/ResizableTable';
 import { useNavigate } from 'react-router-dom';
 
 function StockListPage() {
@@ -87,7 +88,8 @@ function StockListPage() {
             </Box>
 
             {/* Stock Table */}
-            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <ResizableTable storageKey="stocklist">
+                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
@@ -140,6 +142,7 @@ function StockListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
         </Box>
     );
 }

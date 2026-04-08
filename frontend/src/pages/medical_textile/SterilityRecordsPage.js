@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { ResizableTable } from '../../components/common/ResizableTable';
 
 const API         = '/api/medical-textile/sterility/';
 const API_BATCHES = '/api/production/batches/';
@@ -77,7 +78,8 @@ function SterilityRecordsPage() {
                 </Button>
             </Box>
 
-            <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
+            <ResizableTable storageKey="sterilityrecords">
+                <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
                 <Table>
                     <TableHead sx={{ backgroundColor:'primary.main' }}>
                         <TableRow>
@@ -113,6 +115,7 @@ function SterilityRecordsPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
 
             {/* Create Dialog */}
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>

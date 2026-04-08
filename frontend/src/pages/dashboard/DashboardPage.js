@@ -27,6 +27,8 @@ import ReceiptIcon          from '@mui/icons-material/Receipt';
 import AccountBalanceIcon   from '@mui/icons-material/AccountBalance';
 import RefreshIcon          from '@mui/icons-material/Refresh';
 import SpeedIcon            from '@mui/icons-material/Speed';
+import { ResizableTable } from '../../components/common/ResizableTable';
+import { ResizableChartPanel } from '../../components/common/ResizableChartPanel';
 import { useNavigate }      from 'react-router-dom';
 import {
     AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -389,7 +391,7 @@ function DashboardPage() {
 
                 {/* ComposedChart: Revenue bars + Order line */}
                 <Grid item xs={12} md={8}>
-                    <Panel
+                    <ResizableChartPanel storageKey="dash_monthly_revenue_and_order_volu"
                         title="Monthly Revenue & Order Volume"
                         subtitle="Last 6 months — bars = revenue · line = order count"
                         height={320}>
@@ -415,7 +417,7 @@ function DashboardPage() {
                                     dot={{ r: 4, fill: C.orange }} type="monotone" />
                             </ComposedChart>
                         </ResponsiveContainer>
-                    </Panel>
+                    </ResizableChartPanel>
                 </Grid>
 
                 {/* Gauges + AR quick view */}
@@ -476,7 +478,7 @@ function DashboardPage() {
 
                 {/* AR Aging — Horizontal BarChart */}
                 <Grid item xs={12} md={4}>
-                    <Panel title="AR Aging Breakdown" subtitle="Outstanding receivables by age bucket" height={260}>
+                    <ResizableChartPanel storageKey="dash_ar_aging_breakdown" title="AR Aging Breakdown" subtitle="Outstanding receivables by age bucket" height={260}>
                         {arAgingData.every(d => d.value === 0) ? (
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                                 <Typography color="text.secondary" fontSize={12}>No outstanding AR</Typography>
@@ -497,12 +499,12 @@ function DashboardPage() {
                                 </BarChart>
                             </ResponsiveContainer>
                         )}
-                    </Panel>
+                    </ResizableChartPanel>
                 </Grid>
 
                 {/* SO Status Donut */}
                 <Grid item xs={12} md={4}>
-                    <Panel title="Sales Order Status" subtitle="All orders — status breakdown" height={260}>
+                    <ResizableChartPanel storageKey="dash_sales_order_status" title="Sales Order Status" subtitle="All orders — status breakdown" height={260}>
                         {soStatusPie.length === 0 ? (
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                                 <Typography color="text.secondary" fontSize={12}>No sales orders yet</Typography>
@@ -521,12 +523,12 @@ function DashboardPage() {
                                 </PieChart>
                             </ResponsiveContainer>
                         )}
-                    </Panel>
+                    </ResizableChartPanel>
                 </Grid>
 
                 {/* Stock Health Donut */}
                 <Grid item xs={12} md={3}>
-                    <Panel title="Stock Health" subtitle="Normal vs low stock items" height={260}>
+                    <ResizableChartPanel storageKey="dash_stock_health" title="Stock Health" subtitle="Normal vs low stock items" height={260}>
                         {data.total_stock_items === 0 ? (
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                                 <Typography color="text.secondary" fontSize={12}>No stock data</Typography>
@@ -545,7 +547,7 @@ function DashboardPage() {
                                 </PieChart>
                             </ResponsiveContainer>
                         )}
-                    </Panel>
+                    </ResizableChartPanel>
                 </Grid>
             </Grid>
 
@@ -555,7 +557,7 @@ function DashboardPage() {
 
                 {/* P&L Bar */}
                 <Grid item xs={12} md={4}>
-                    <Panel title="P&L Summary" subtitle="Posted journal entries — income vs expense" height={280}>
+                    <ResizableChartPanel storageKey="dash_pandl_summary" title="P&L Summary" subtitle="Posted journal entries — income vs expense" height={280}>
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={plData} margin={{ top: 5, right: 10, left: 5, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -567,12 +569,12 @@ function DashboardPage() {
                                 </Bar>
                             </BarChart>
                         </ResponsiveContainer>
-                    </Panel>
+                    </ResizableChartPanel>
                 </Grid>
 
                 {/* Module Activity */}
                 <Grid item xs={12} md={8}>
-                    <Panel title="Live Module Activity" subtitle="Open / active records across all modules" height={280}>
+                    <ResizableChartPanel storageKey="dash_live_module_activity" title="Live Module Activity" subtitle="Open / active records across all modules" height={280}>
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={moduleData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -584,7 +586,7 @@ function DashboardPage() {
                                 </Bar>
                             </BarChart>
                         </ResponsiveContainer>
-                    </Panel>
+                    </ResizableChartPanel>
                 </Grid>
             </Grid>
 
@@ -624,7 +626,8 @@ function DashboardPage() {
             {data.low_stock_items?.length > 0 && (
                 <>
                     <SectionLabel color={C.red}>Low Stock Alerts</SectionLabel>
-                    <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2, mb: 2 }}>
+                    <ResizableTable storageKey="dashboard">
+                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2, mb: 2 }}>
                         <Table size="small">
                             <TableHead sx={{ backgroundColor: C.red }}>
                                 <TableRow>
@@ -649,6 +652,7 @@ function DashboardPage() {
                             </TableBody>
                         </Table>
                     </TableContainer>
+            </ResizableTable>
                 </>
             )}
 

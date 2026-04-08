@@ -16,6 +16,7 @@ import PrintIcon        from '@mui/icons-material/Print';
 import PaymentIcon      from '@mui/icons-material/Payment';
 import AddIcon          from '@mui/icons-material/Add';
 import ReceiptIcon      from '@mui/icons-material/Receipt';
+import { ResizableTable } from '../../components/common/ResizableTable';
 import { printInvoice } from '../../utils/printUtils';
 
 const STATUS_COLOR = {
@@ -170,7 +171,8 @@ function SalesInvoicePage() {
             </Grid>
 
             {/* Invoice Table */}
-            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <ResizableTable storageKey="salesinvoice">
+                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table size="small">
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
@@ -230,6 +232,7 @@ function SalesInvoicePage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
 
             {/* Create Invoice Dialog */}
             <Dialog open={openDlg} onClose={() => setOpenDlg(false)} maxWidth="sm" fullWidth>

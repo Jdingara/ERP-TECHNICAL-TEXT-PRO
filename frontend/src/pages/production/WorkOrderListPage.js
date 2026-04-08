@@ -19,6 +19,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon      from '@mui/icons-material/Delete';
 import PrintIcon       from '@mui/icons-material/Print';
 import AddIcon         from '@mui/icons-material/Add';
+import { ResizableTable } from '../../components/common/ResizableTable';
 import { useNavigate } from 'react-router-dom';
 import { printWorkOrder } from '../../utils/printUtils';
 
@@ -120,7 +121,8 @@ function WorkOrderListPage() {
                 </Button>
             </Box>
 
-            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <ResizableTable storageKey="workorderlist">
+                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
@@ -190,6 +192,7 @@ function WorkOrderListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
 
             {/* Complete Work Order Dialog */}
             <Dialog open={completeDialog} onClose={() => setCompleteDialog(false)} maxWidth="sm" fullWidth>

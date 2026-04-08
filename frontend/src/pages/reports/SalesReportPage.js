@@ -9,6 +9,7 @@ import {
     Box, Typography, Grid, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
 } from '@mui/material';
+import { ResizableTable } from '../../components/common/ResizableTable';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, LineChart, Line
@@ -110,7 +111,8 @@ function SalesReportPage() {
                 <Grid item xs={12} md={6}>
                     <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
                         <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Top 5 Customers by Order Value</Typography>
-                        <TableContainer>
+                        <ResizableTable storageKey="salesreport">
+                <TableContainer>
                             <Table size="small">
                                 <TableHead sx={{ backgroundColor: 'action.hover' }}>
                                     <TableRow>
@@ -132,6 +134,7 @@ function SalesReportPage() {
                                 </TableBody>
                             </Table>
                         </TableContainer>
+            </ResizableTable>
                     </Paper>
                 </Grid>
 

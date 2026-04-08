@@ -16,6 +16,7 @@ import {
 import CalculateIcon from '@mui/icons-material/Calculate';
 import DeleteIcon    from '@mui/icons-material/Delete';
 import PrintIcon     from '@mui/icons-material/Print';
+import { ResizableTable } from '../../components/common/ResizableTable';
 import { printSalarySlip } from '../../utils/printUtils';
 
 const MONTHS = [
@@ -118,7 +119,8 @@ function SalaryPage() {
                 </Button>
             </Box>
 
-            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <ResizableTable storageKey="salary">
+                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
@@ -177,6 +179,7 @@ function SalaryPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
 
             {/* Process Salary Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>

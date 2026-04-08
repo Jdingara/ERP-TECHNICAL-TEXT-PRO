@@ -9,6 +9,7 @@ import {
     Box, Typography, Grid, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
 } from '@mui/material';
+import { ResizableTable } from '../../components/common/ResizableTable';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell, Legend
@@ -130,7 +131,8 @@ function InventoryReportPage() {
             {data.low_stock_items.length > 0 && (
                 <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, mb: 3 }}>
                     <Typography variant="subtitle1" fontWeight="bold" color="#e53935" mb={2}>Low Stock Items (Qty ≤ 10)</Typography>
-                    <TableContainer>
+                    <ResizableTable storageKey="inventoryreport">
+                <TableContainer>
                         <Table size="small">
                             <TableHead sx={{ backgroundColor: '#ffebee' }}>
                                 <TableRow>
@@ -152,6 +154,7 @@ function InventoryReportPage() {
                             </TableBody>
                         </Table>
                     </TableContainer>
+            </ResizableTable>
                 </Paper>
             )}
 

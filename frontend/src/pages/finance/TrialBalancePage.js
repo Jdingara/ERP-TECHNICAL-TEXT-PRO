@@ -12,6 +12,7 @@ import {
     Button, Alert
 } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import { ResizableTable } from '../../components/common/ResizableTable';
 
 function TrialBalancePage() {
     const [trialBalance, setTrialBalance] = useState([]);
@@ -57,7 +58,8 @@ function TrialBalancePage() {
                 </Alert>
             )}
 
-            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <ResizableTable storageKey="trialbalance">
+                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
@@ -98,6 +100,7 @@ function TrialBalancePage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
         </Box>
     );
 }

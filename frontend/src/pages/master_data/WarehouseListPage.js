@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
+import { ResizableTable } from '../../components/common/ResizableTable';
 
 const EMPTY_FORM = { code: '', name: '', address: '' };
 
@@ -72,7 +73,8 @@ function WarehouseListPage() {
                     sx={{ backgroundColor: 'primary.main' }}>Add Warehouse</Button>
             </Box>
 
-            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <ResizableTable storageKey="warehouselist">
+                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
@@ -106,6 +108,7 @@ function WarehouseListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
 
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
                 <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>

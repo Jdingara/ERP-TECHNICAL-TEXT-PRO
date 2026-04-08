@@ -9,6 +9,7 @@ import {
     Box, Typography, Grid, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
 } from '@mui/material';
+import { ResizableTable } from '../../components/common/ResizableTable';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, Cell
@@ -131,6 +132,7 @@ function ProductionReportPage() {
             {/* Top Produced Items */}
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, mb: 3 }}>
                 <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Top 5 Produced Items</Typography>
+                <ResizableTable storageKey="productionreport">
                 <TableContainer>
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: 'action.hover' }}>
@@ -151,6 +153,7 @@ function ProductionReportPage() {
                         </TableBody>
                     </Table>
                 </TableContainer>
+            </ResizableTable>
             </Paper>
 
             {/* Recent Batches */}

@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { ResizableTable } from '../../components/common/ResizableTable';
 
 const API         = '/api/medical-textile/shelf-life/';
 const API_BATCHES = '/api/production/batches/';
@@ -98,7 +99,8 @@ function ShelfLifeTrackingPage() {
                 </Button>
             </Box>
 
-            <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
+            <ResizableTable storageKey="shelflifetracking">
+                <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
                 <Table>
                     <TableHead sx={{ backgroundColor:'primary.main' }}>
                         <TableRow>
@@ -142,6 +144,7 @@ function ShelfLifeTrackingPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
 
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>
                 <DialogTitle sx={{ backgroundColor:'primary.main', color:'white' }}>Add Shelf Life Record</DialogTitle>

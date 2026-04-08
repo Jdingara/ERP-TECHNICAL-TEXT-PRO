@@ -20,6 +20,7 @@ import ExpandMoreIcon    from '@mui/icons-material/ExpandMore';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import GroupIcon         from '@mui/icons-material/Group';
 import TuneIcon          from '@mui/icons-material/Tune';
+import { ResizableTable } from '../../components/common/ResizableTable';
 
 const API = '/api/authentication';
 
@@ -253,7 +254,8 @@ function RolesTab() {
                 </Button>
             </Box>
 
-            <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+            <ResizableTable storageKey="admin">
+                <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
                 <Table size="small">
                     <TableHead>
                         <TableRow>
@@ -295,6 +297,7 @@ function RolesTab() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
 
             {/* Create / Edit Dialog */}
             <Dialog open={Boolean(dialog)} onClose={closeDialog} maxWidth="md" fullWidth>

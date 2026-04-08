@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { ResizableTable } from '../../components/common/ResizableTable';
 import { useNavigate } from 'react-router-dom';
 
 const EMPTY_LINE = { item_id: '', ordered_quantity: '', unit_price: '', notes: '' };
@@ -166,6 +167,7 @@ function CreateSalesOrderPage() {
                     <Button startIcon={<AddIcon />} onClick={addLine} variant="outlined" size="small">Add Item</Button>
                 </Box>
 
+                <ResizableTable storageKey="createsalesorder">
                 <TableContainer>
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: 'action.hover' }}>
@@ -220,6 +222,7 @@ function CreateSalesOrderPage() {
                         </TableBody>
                     </Table>
                 </TableContainer>
+            </ResizableTable>
 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, mb: 3 }}>
                     <Typography variant="h6" fontWeight="bold" color="primary">

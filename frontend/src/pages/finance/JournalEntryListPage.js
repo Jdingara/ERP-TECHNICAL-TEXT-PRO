@@ -15,6 +15,7 @@ import {
 import AddIcon    from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Autocomplete } from '@mui/material';
+import { ResizableTable } from '../../components/common/ResizableTable';
 
 const EMPTY_LINE = { account_id: '', account_label: '', description: '', debit_amount: '', credit_amount: '' };
 
@@ -128,7 +129,8 @@ function JournalEntryListPage() {
                     sx={{ backgroundColor: 'primary.main' }}>New Journal Entry</Button>
             </Box>
 
-            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <ResizableTable storageKey="journalentrylist">
+                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
@@ -183,6 +185,7 @@ function JournalEntryListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
 
             {/* New Journal Entry Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="lg" fullWidth>

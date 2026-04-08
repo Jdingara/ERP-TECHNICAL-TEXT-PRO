@@ -9,6 +9,7 @@ import {
     Box, Typography, Grid, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
 } from '@mui/material';
+import { ResizableTable } from '../../components/common/ResizableTable';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell
@@ -150,7 +151,8 @@ function HRReportPage() {
                                 <Bar dataKey="total_net" name="Net Salary" fill="#2e7d32" radius={[4,4,0,0]} />
                             </BarChart>
                         </ResponsiveContainer>
-                        <TableContainer sx={{ mt: 2 }}>
+                        <ResizableTable storageKey="hrreport">
+                <TableContainer sx={{ mt: 2 }}>
                             <Table size="small">
                                 <TableHead sx={{ backgroundColor: 'action.hover' }}>
                                     <TableRow>
@@ -176,6 +178,7 @@ function HRReportPage() {
                                 </TableBody>
                             </Table>
                         </TableContainer>
+            </ResizableTable>
                     </>
                 )}
             </Paper>

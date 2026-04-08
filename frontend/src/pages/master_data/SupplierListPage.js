@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
+import { ResizableTable } from '../../components/common/ResizableTable';
 
 const SUPPLIER_TYPE_OPTIONS = [
     { value: 'yarn_supplier',        label: 'Yarn Supplier' },
@@ -95,7 +96,8 @@ function SupplierListPage() {
                     sx={{ backgroundColor: 'primary.main' }}>Add Supplier</Button>
             </Box>
 
-            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <ResizableTable storageKey="supplierlist">
+                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
@@ -141,6 +143,7 @@ function SupplierListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
 
             {/* Add / Edit Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>

@@ -13,6 +13,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { ResizableTable } from '../../components/common/ResizableTable';
 
 const API = '/api/technical-textile/categories/';
 const EMPTY = { name: '', code: '', description: '', application: '' };
@@ -76,7 +77,8 @@ function ProductCategoriesPage() {
                 </Button>
             </Box>
 
-            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <ResizableTable storageKey="productcategories">
+                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
@@ -107,6 +109,7 @@ function ProductCategoriesPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            </ResizableTable>
 
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>
                 <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>

@@ -20,6 +20,7 @@ import RefreshIcon     from '@mui/icons-material/Refresh';
 import RestoreIcon     from '@mui/icons-material/Restore';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import SettingsIcon    from '@mui/icons-material/Settings';
+import { ResizableTable } from '../../components/common/ResizableTable';
 
 const API = '/api/master-data/settings';
 
@@ -102,6 +103,7 @@ function FinancialYearPanel() {
             {msg && <Alert severity={msgType} sx={{ mb: 2 }} onClose={() => setMsg('')}>{msg}</Alert>}
 
             {loading ? <CircularProgress size={24} /> : (
+                <ResizableTable storageKey="formatpanel">
                 <TableContainer>
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: 'action.hover' }}>
@@ -149,6 +151,7 @@ function FinancialYearPanel() {
                         </TableBody>
                     </Table>
                 </TableContainer>
+            </ResizableTable>
             )}
 
             {/* Create FY Dialog */}
