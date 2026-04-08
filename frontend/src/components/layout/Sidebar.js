@@ -132,8 +132,6 @@ function HorizontalSidebar({ visibleMenu, navigate, location, shades, isBottom, 
     const [anchorEl,   setAnchorEl]   = useState(null);
     const [activeMenu, setActiveMenu] = useState(null);
 
-    const ACCENT = shades.accent;
-    const isActive      = (path) => location.pathname === path;
     const isGroupActive = (item) =>
         item.children?.some(c => location.pathname === c.path) ||
         location.pathname === item.path;
@@ -143,102 +141,156 @@ function HorizontalSidebar({ visibleMenu, navigate, location, shades, isBottom, 
 
     return (
         <Box sx={{
-            width: '100%', height: 52, flexShrink: 0,
+            width: '100%', height: 56, flexShrink: 0,
             backgroundColor: shades.sidebarHeader,
             display: 'flex', alignItems: 'center',
-            borderBottom: !isBottom ? `1px solid ${DIVIDER}` : 'none',
-            borderTop:     isBottom ? `1px solid ${DIVIDER}` : 'none',
-            px: 1, zIndex: 100,
+            boxShadow: isBottom
+                ? '0 -4px 16px rgba(0,0,0,0.35)'
+                : '0 4px 16px rgba(0,0,0,0.35)',
+            px: 2, zIndex: 1200,
+            position: 'relative',
         }}>
-            {/* Logo */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1.5, flexShrink: 0 }}>
+
+            {/* ── Logo ── */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0, mr: 1.5 }}>
                 <Box sx={{
-                    width: 28, height: 28, borderRadius: 1,
-                    background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT}99)`,
+                    width: 30, height: 30, borderRadius: 1, flexShrink: 0,
+                    background: `linear-gradient(135deg, ${shades.accent}, ${shades.accent}99)`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                     <Typography fontWeight={700} color="white" fontSize={fs(13)}>S</Typography>
                 </Box>
-                <Typography fontWeight={700} color={TEXT_PRI} fontSize={fs(14)} sx={{ whiteSpace: 'nowrap' }}>
+                <Typography fontWeight={700} fontSize={fs(14)} noWrap
+                    sx={{ color: '#f1f5f9', display: { xs: 'none', sm: 'block' } }}>
                     SASI ERP
                 </Typography>
             </Box>
 
-            {/* Vertical divider */}
-            <Box sx={{ width: 1, height: 28, backgroundColor: DIVIDER, mx: 1, flexShrink: 0 }} />
+            {/* ── Divider ── */}
+            <Box sx={{ width: 1, height: 28, backgroundColor: 'rgba(255,255,255,0.15)', mx: 1.5, flexShrink: 0 }} />
 
-            {/* Nav items — horizontal scrollable */}
+            {/* ── Nav items (horizontal scrollable) ── */}
             <Box sx={{
-                display: 'flex', alignItems: 'center', gap: 0.5,
-                overflowX: 'auto', flexGrow: 1,
+                display: 'flex', alignItems: 'center', flexGrow: 1,
+                overflowX: 'auto', gap: 0.5,
                 '&::-webkit-scrollbar': { display: 'none' },
             }}>
                 {visibleMenu.map(item => {
-                    const color       = MODULE_COLORS[item.title] || ACCENT;
+                    const color       = MODULE_COLORS[item.title] || shades.accent;
                     const groupActive = isGroupActive(item);
                     const isOpen      = activeMenu?.title === item.title && Boolean(anchorEl);
 
                     return (
-                        <Box key={item.title}>
-                            <Box
-                                onClick={(e) => {
-                                    if (item.children.length === 0) navigate(item.path);
-                                    else isOpen ? handleClose() : handleOpen(e, item);
-                                }}
-                                sx={{
-                                    display: 'flex', alignItems: 'center', gap: 0.6,
-                                    px: 1.5, py: 0.8, borderRadius: 1.5,
-                                    cursor: 'pointer', whiteSpace: 'nowrap',
-                                    backgroundColor: groupActive ? shades.activeAlpha : 'transparent',
-                                    borderBottom: groupActive ? `2px solid ${color}` : '2px solid transparent',
-                                    transition: 'all 0.15s',
-                                    '&:hover': { backgroundColor: BG_HOVER },
-                                }}>
-                                <Box sx={{ color: groupActive ? color : TEXT_SEC, display: 'flex', '& svg': { fontSize: fs(16) } }}>
-                                    {item.icon}
-                                </Box>
-                                <Typography fontSize={fs(12.5)} fontWeight={groupActive ? 600 : 400}
-                                    color={groupActive ? TEXT_PRI : TEXT_SEC}>
-                                    {item.title}
-                                </Typography>
-                                {item.children.length > 0 && (
-                                    <ExpandMore sx={{ color: TEXT_SEC, fontSize: fs(14) }} />
-                                )}
+                        <Box
+                            key={item.title}
+                            onClick={(e) => {
+                                if (item.children.length === 0) navigate(item.path);
+                                else isOpen ? handleClose() : handleOpen(e, item);
+                            }}
+                            sx={{
+                                display: 'flex', alignItems: 'center', gap: 0.6,
+                                px: 1.5, py: 0.75,
+                                borderRadius: 1.5,
+                                flexShrink: 0,
+                                cursor: 'pointer',
+                                userSelect: 'none',
+                                backgroundColor: groupActive || isOpen
+                                    ? `${color}25`
+                                    : 'transparent',
+                                borderBottom: groupActive
+                                    ? `2px solid ${color}`
+                                    : '2px solid transparent',
+                                transition: 'all 0.15s',
+                                '&:hover': { backgroundColor: 'rgba(255,255,255,0.10)' },
+                            }}>
+                            {/* Icon */}
+                            <Box sx={{
+                                display: 'flex', alignItems: 'center',
+                                color: groupActive ? color : '#94a3b8',
+                                '& svg': { fontSize: fs(16) },
+                            }}>
+                                {item.icon}
                             </Box>
+                            {/* Label */}
+                            <Typography
+                                fontSize={fs(12.5)}
+                                fontWeight={groupActive ? 700 : 400}
+                                sx={{ color: groupActive ? '#f1f5f9' : '#cbd5e1', whiteSpace: 'nowrap' }}>
+                                {item.title}
+                            </Typography>
+                            {/* Arrow */}
+                            {item.children.length > 0 && (
+                                <ExpandMore sx={{
+                                    fontSize: fs(14),
+                                    color: '#94a3b8',
+                                    transform: isOpen ? 'rotate(180deg)' : 'none',
+                                    transition: 'transform 0.2s',
+                                }} />
+                            )}
                         </Box>
                     );
                 })}
             </Box>
 
-            {/* Dropdown */}
+            {/* ── Dropdown sub-menu ── */}
             <Menu
                 anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
+                open={Boolean(anchorEl) && Boolean(activeMenu)}
                 onClose={handleClose}
+                disableScrollLock
                 anchorOrigin={{ vertical: isBottom ? 'top' : 'bottom', horizontal: 'left' }}
                 transformOrigin={{ vertical: isBottom ? 'bottom' : 'top', horizontal: 'left' }}
                 slotProps={{ paper: { sx: {
                     backgroundColor: shades.sidebarBg,
-                    border: `1px solid ${DIVIDER}`,
-                    borderRadius: 2, minWidth: 210, py: 0.5,
+                    border: '1px solid rgba(255,255,255,0.10)',
+                    borderRadius: 2,
+                    minWidth: 230,
+                    py: 0.5,
+                    boxShadow: '0 12px 40px rgba(0,0,0,0.45)',
+                    mt: isBottom ? 0 : 0.5,
                 }}}}
             >
+                {/* Module header in dropdown */}
+                {activeMenu && (
+                    <Box sx={{
+                        px: 2, py: 1,
+                        borderBottom: '1px solid rgba(255,255,255,0.08)',
+                        mb: 0.5,
+                        display: 'flex', alignItems: 'center', gap: 1,
+                    }}>
+                        <Box sx={{ color: MODULE_COLORS[activeMenu.title] || shades.accent, display: 'flex', '& svg': { fontSize: 16 } }}>
+                            {activeMenu.icon}
+                        </Box>
+                        <Typography
+                            fontSize={fs(11)} fontWeight={700} letterSpacing={0.8}
+                            sx={{ color: MODULE_COLORS[activeMenu.title] || shades.accent, textTransform: 'uppercase' }}>
+                            {activeMenu.title}
+                        </Typography>
+                    </Box>
+                )}
+
+                {/* Sub-items */}
                 {activeMenu?.children.map(child => {
-                    const active = isActive(child.path);
-                    const color  = MODULE_COLORS[activeMenu.title] || ACCENT;
+                    const active = location.pathname === child.path;
+                    const color  = MODULE_COLORS[activeMenu.title] || shades.accent;
                     return (
                         <MenuItem
                             key={child.path}
                             onClick={() => { navigate(child.path); handleClose(); }}
                             sx={{
-                                fontSize: fs(13), py: 0.9, px: 2,
-                                color:           active ? TEXT_PRI : TEXT_SEC,
-                                fontWeight:      active ? 600 : 400,
-                                backgroundColor: active ? shades.activeAlpha : 'transparent',
+                                px: 2, py: 1,
+                                fontSize: fs(13),
+                                fontWeight: active ? 600 : 400,
+                                color:           active ? '#f1f5f9' : '#94a3b8',
+                                backgroundColor: active ? `${color}20` : 'transparent',
                                 borderLeft:      active ? `3px solid ${color}` : '3px solid transparent',
-                                '&:hover': { backgroundColor: BG_HOVER, color: TEXT_PRI },
+                                gap: 1.5,
+                                '&:hover': { backgroundColor: 'rgba(255,255,255,0.07)', color: '#f1f5f9' },
                             }}>
-                            <FiberManualRecordIcon sx={{ fontSize: active ? fs(7) : fs(5), mr: 1.5, color: active ? color : TEXT_SEC }} />
+                            <FiberManualRecordIcon sx={{
+                                fontSize: active ? fs(7) : fs(5),
+                                color: active ? color : '#64748b',
+                            }} />
                             {child.title}
                         </MenuItem>
                     );
