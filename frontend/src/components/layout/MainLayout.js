@@ -7,6 +7,7 @@ import {
     Box, AppBar, Toolbar, Typography, IconButton,
     Avatar, Menu, MenuItem, Divider, Chip,
 } from '@mui/material';
+import { useSettings } from '../../context/SettingsContext';
 import LogoutIcon               from '@mui/icons-material/Logout';
 import PersonOutlineIcon        from '@mui/icons-material/PersonOutline';
 import NotificationsNoneIcon    from '@mui/icons-material/NotificationsNone';
@@ -105,6 +106,7 @@ function MainLayout({ children, currentUser, onLogout, permissions, isAdmin }) {
     const location = useLocation();
     const navigate = useNavigate();
     const [anchor, setAnchor] = useState(null);
+    const { settings } = useSettings();
 
     const pageTitle  = PAGE_TITLES[location.pathname] || 'SASI ERP';
     const moduleChip = getModuleChip(location.pathname);
@@ -167,7 +169,7 @@ function MainLayout({ children, currentUser, onLogout, permissions, isAdmin }) {
                             }}>
                                 <Avatar sx={{
                                     width: 28, height: 28, fontSize: 13,
-                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                    background: `linear-gradient(135deg, ${settings.accentColor}, ${settings.accentColor}bb)`,
                                     fontWeight: 700,
                                 }}>
                                     {initials}
@@ -236,7 +238,26 @@ function MainLayout({ children, currentUser, onLogout, permissions, isAdmin }) {
                 </AppBar>
 
                 {/* ── Page content ── */}
-                <Box sx={{ flexGrow: 1, p: 3, overflowY: 'auto' }}>
+                <Box sx={{
+                    flexGrow: 1, p: 3, overflowY: 'auto',
+                    position: 'relative',
+                    ...(settings.bgImage ? {
+                        backgroundImage: `url(${settings.bgImage})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundAttachment: 'local',
+                        '&::before': {
+                            content: '""',
+                            position: 'absolute', inset: 0,
+                            backgroundColor: settings.themeMode === 'dark'
+                                ? 'rgba(0,0,0,0.55)'
+                                : 'rgba(255,255,255,0.72)',
+                            pointerEvents: 'none',
+                            zIndex: 0,
+                        },
+                        '& > *': { position: 'relative', zIndex: 1 },
+                    } : {}),
+                }}>
                     {children}
                 </Box>
             </Box>

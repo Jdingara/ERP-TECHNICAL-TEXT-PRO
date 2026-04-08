@@ -6,10 +6,12 @@
 
 import { Box, Typography, Paper, Grid, ToggleButton,
     ToggleButtonGroup, Divider, Button, Tooltip, Chip } from '@mui/material';
-import { useSettings, DEFAULTS } from '../../context/SettingsContext';
+import { useSettings } from '../../context/SettingsContext';
 import LightModeIcon   from '@mui/icons-material/LightMode';
 import DarkModeIcon    from '@mui/icons-material/DarkMode';
 import CheckIcon       from '@mui/icons-material/Check';
+import WallpaperIcon   from '@mui/icons-material/Wallpaper';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 const ACCENT_COLORS = [
     { label: 'Indigo',   value: '#6366f1' },
@@ -45,6 +47,15 @@ function Section({ title, subtitle, children }) {
 
 function SettingsPage() {
     const { settings, updateSetting, resetSettings } = useSettings();
+
+    const handleBgUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => updateSetting('bgImage', ev.target.result);
+        reader.readAsDataURL(file);
+        e.target.value = ''; // reset so same file can be re-selected
+    };
 
     return (
         <Box maxWidth={720}>
@@ -97,6 +108,67 @@ function SettingsPage() {
                             </Box>
                         </Tooltip>
                     ))}
+                </Box>
+            </Section>
+
+            {/* ── Background Image ── */}
+            <Section title="Background Image" subtitle="Sets a background picture on the main content area. Leave empty to use theme color only.">
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, flexWrap: 'wrap' }}>
+
+                    {/* Preview thumbnail */}
+                    {settings.bgImage ? (
+                        <Box sx={{
+                            width: 120, height: 80, borderRadius: 2, overflow: 'hidden',
+                            border: `2px solid ${settings.accentColor}`,
+                            flexShrink: 0,
+                        }}>
+                            <img src={settings.bgImage} alt="bg preview"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </Box>
+                    ) : (
+                        <Box sx={{
+                            width: 120, height: 80, borderRadius: 2,
+                            border: '2px dashed', borderColor: 'divider',
+                            display: 'flex', flexDirection: 'column',
+                            alignItems: 'center', justifyContent: 'center',
+                            color: 'text.disabled', flexShrink: 0,
+                        }}>
+                            <WallpaperIcon sx={{ fontSize: 28 }} />
+                            <Typography variant="caption">No image</Typography>
+                        </Box>
+                    )}
+
+                    {/* Buttons */}
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <Button
+                            variant="outlined" size="small"
+                            startIcon={<WallpaperIcon />}
+                            onClick={() => document.getElementById('bg-upload-input').click()}
+                            sx={{ textTransform: 'none', borderColor: settings.accentColor, color: settings.accentColor }}
+                        >
+                            {settings.bgImage ? 'Change Image' : 'Upload Image'}
+                        </Button>
+                        <input
+                            id="bg-upload-input"
+                            type="file"
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            onChange={handleBgUpload}
+                        />
+                        {settings.bgImage && (
+                            <Button
+                                variant="outlined" size="small" color="error"
+                                startIcon={<DeleteOutlineIcon />}
+                                onClick={() => updateSetting('bgImage', null)}
+                                sx={{ textTransform: 'none' }}
+                            >
+                                Remove Image
+                            </Button>
+                        )}
+                        <Typography variant="caption" color="text.secondary">
+                            JPG, PNG, WEBP supported
+                        </Typography>
+                    </Box>
                 </Box>
             </Section>
 
@@ -178,7 +250,8 @@ function SettingsPage() {
                 </Box>
             </Paper>
 
-            <Button variant="outlined" color="error" onClick={resetSettings}>
+            <Button variant="outlined" color="error"
+                onClick={() => { resetSettings(); updateSetting('bgImage', null); }}>
                 Reset to Defaults
             </Button>
         </Box>

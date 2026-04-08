@@ -8,6 +8,7 @@ import {
     Box, List, ListItem, ListItemButton,
     ListItemIcon, ListItemText, Collapse, Typography,
 } from '@mui/material';
+import { useSettings, getShades } from '../../context/SettingsContext';
 
 import DashboardIcon         from '@mui/icons-material/Dashboard';
 import InventoryIcon         from '@mui/icons-material/Inventory';
@@ -25,10 +26,8 @@ import ExpandLess            from '@mui/icons-material/ExpandLess';
 import ExpandMore            from '@mui/icons-material/ExpandMore';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
-const BG        = '#0f172a';
+// Static constants that don't change with theme
 const BG_HOVER  = 'rgba(255,255,255,0.06)';
-const BG_ACTIVE = 'rgba(99,102,241,0.18)';
-const ACCENT    = '#6366f1';
 const TEXT_PRI  = '#f1f5f9';
 const TEXT_SEC  = '#94a3b8';
 const DIVIDER   = 'rgba(255,255,255,0.07)';
@@ -123,6 +122,11 @@ function Sidebar({ permissions, isAdmin }) {
     const navigate = useNavigate();
     const location = useLocation();
     const [open, setOpen] = useState({ Dashboard: true });
+    const { settings } = useSettings();
+    const shades = getShades(settings.accentColor);
+    const ACCENT    = shades.accent;
+    const BG        = shades.sidebarBg;
+    const BG_ACTIVE = shades.activeAlpha;
 
     const canSee = (path) =>
         isAdmin || permissions === 'all' ||
@@ -152,15 +156,15 @@ function Sidebar({ permissions, isAdmin }) {
             {/* Logo */}
             <Box sx={{
                 px: 2.5, py: 2.5,
-                background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
+                backgroundColor: shades.sidebarHeader,
                 borderBottom: `1px solid ${DIVIDER}`,
             }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     <Box sx={{
                         width: 36, height: 36, borderRadius: 1.5,
-                        background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                        background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT}aa)`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 4px 12px rgba(99,102,241,0.4)',
+                        boxShadow: `0 4px 12px ${ACCENT}55`,
                     }}>
                         <Typography fontWeight="bold" color="white" fontSize={16}>S</Typography>
                     </Box>
