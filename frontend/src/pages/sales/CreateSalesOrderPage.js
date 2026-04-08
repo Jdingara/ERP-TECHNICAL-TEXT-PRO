@@ -116,7 +116,7 @@ function CreateSalesOrderPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>
                 Create Sales Order
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
@@ -126,7 +126,7 @@ function CreateSalesOrderPage() {
             {message && <Alert severity={messageType} sx={{ mb: 2 }} onClose={() => setMessage('')}>{message}</Alert>}
 
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Order Details</Typography>
+                <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Order Details</Typography>
                 <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, mb: 3 }}>
                     <TextField
                         label="SO Number"
@@ -162,13 +162,13 @@ function CreateSalesOrderPage() {
                 <Divider sx={{ mb: 3 }} />
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="subtitle1" fontWeight="bold" color="#1a237e">Items to Sell</Typography>
+                    <Typography variant="subtitle1" fontWeight="bold" color="primary">Items to Sell</Typography>
                     <Button startIcon={<AddIcon />} onClick={addLine} variant="outlined" size="small">Add Item</Button>
                 </Box>
 
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>#</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Item *</TableCell>
@@ -222,7 +222,7 @@ function CreateSalesOrderPage() {
                 </TableContainer>
 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, mb: 3 }}>
-                    <Typography variant="h6" fontWeight="bold" color="#1a237e">
+                    <Typography variant="h6" fontWeight="bold" color="primary">
                         Total Amount: ₹ {totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </Typography>
                 </Box>
@@ -231,7 +231,7 @@ function CreateSalesOrderPage() {
 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
                     <Button variant="outlined" onClick={() => navigate('/sales/sales-orders')}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#1a237e' }}>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>
                         Save Sales Order
                     </Button>
                 </Box>

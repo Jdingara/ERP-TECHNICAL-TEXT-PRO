@@ -116,7 +116,7 @@ function JournalEntryListPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Journal Entries</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Journal Entries</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Record all financial transactions using double-entry bookkeeping
             </Typography>
@@ -125,12 +125,12 @@ function JournalEntryListPage() {
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
                 <Button variant="contained" startIcon={<AddIcon />} onClick={openDialog}
-                    sx={{ backgroundColor: '#1a237e' }}>New Journal Entry</Button>
+                    sx={{ backgroundColor: 'primary.main' }}>New Journal Entry</Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Entry Number</TableCell>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Date</TableCell>
@@ -186,7 +186,7 @@ function JournalEntryListPage() {
 
             {/* New Journal Entry Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="lg" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>New Journal Entry</DialogTitle>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>New Journal Entry</DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
                     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 2, mb: 3, mt: 1 }}>
                         <TextField label="Entry Number" value={entryNumber} onChange={(e) => setEntryNumber(e.target.value)} />
@@ -198,12 +198,12 @@ function JournalEntryListPage() {
                     <Divider sx={{ mb: 2 }} />
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography fontWeight="bold" color="#1a237e">Entry Lines</Typography>
+                        <Typography fontWeight="bold" color="primary">Entry Lines</Typography>
                         <Button size="small" startIcon={<AddIcon />} onClick={addLine} variant="outlined">Add Line</Button>
                     </Box>
 
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Account *</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Description</TableCell>
@@ -247,8 +247,8 @@ function JournalEntryListPage() {
                             {/* Totals row */}
                             <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
                                 <TableCell colSpan={2}><strong>Total</strong></TableCell>
-                                <TableCell align="right"><strong style={{ color: '#1a237e' }}>{totalDebits.toFixed(2)}</strong></TableCell>
-                                <TableCell align="right"><strong style={{ color: '#1a237e' }}>{totalCredits.toFixed(2)}</strong></TableCell>
+                                <TableCell align="right"><strong style={{ color: 'primary.main' }}>{totalDebits.toFixed(2)}</strong></TableCell>
+                                <TableCell align="right"><strong style={{ color: 'primary.main' }}>{totalCredits.toFixed(2)}</strong></TableCell>
                                 <TableCell>
                                     {isBalanced
                                         ? <Chip label="Balanced" color="success" size="small" />
@@ -261,7 +261,7 @@ function JournalEntryListPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#1a237e' }}>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>
                         Save Journal Entry
                     </Button>
                 </DialogActions>

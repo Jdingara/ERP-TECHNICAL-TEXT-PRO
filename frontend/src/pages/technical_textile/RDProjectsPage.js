@@ -91,7 +91,7 @@ function RDProjectsPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>R&D Projects</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>R&D Projects</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Research & Development — new product development, trials, and innovation projects
             </Typography>
@@ -101,14 +101,14 @@ function RDProjectsPage() {
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
                 <Button variant="contained" startIcon={<AddIcon />}
                     onClick={() => { setForm(EMPTY); setDialog(true); }}
-                    sx={{ backgroundColor: '#1a237e' }}>
+                    sx={{ backgroundColor: 'primary.main' }}>
                     New R&D Project
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Project No.', 'Project Name', 'Target Product', 'Lead Engineer', 'Start Date', 'Target End', 'Status', 'Actions'].map(h => (
                                 <TableCell key={h} sx={{ color: 'white', fontWeight: 'bold' }}>{h}</TableCell>
@@ -133,7 +133,7 @@ function RDProjectsPage() {
                                         color={STATUS_COLOR[p.status] || 'default'} />
                                 </TableCell>
                                 <TableCell>
-                                    <IconButton size="small" sx={{ color: '#1a237e' }}
+                                    <IconButton size="small" sx={{ color: 'primary.main' }}
                                         onClick={() => { setViewProj(p); setViewDialog(true); }}>
                                         <VisibilityIcon fontSize="small" />
                                     </IconButton>
@@ -153,7 +153,7 @@ function RDProjectsPage() {
 
             {/* Create Dialog */}
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>New R&D Project</DialogTitle>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>New R&D Project</DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
                         <TextField label="Project Name *" value={form.project_name} onChange={f('project_name')} />
@@ -173,7 +173,7 @@ function RDProjectsPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setDialog(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#1a237e' }}>Create Project</Button>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>Create Project</Button>
                 </DialogActions>
             </Dialog>
 
@@ -198,7 +198,7 @@ function RDProjectsPage() {
             {/* View Dialog */}
             {viewProj && (
                 <Dialog open={viewDialog} onClose={() => setViewDialog(false)} maxWidth="sm" fullWidth>
-                    <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>{viewProj.project_number}</DialogTitle>
+                    <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>{viewProj.project_number}</DialogTitle>
                     <DialogContent sx={{ pt: 3 }}>
                         {[
                             ['Project Name', viewProj.project_name],

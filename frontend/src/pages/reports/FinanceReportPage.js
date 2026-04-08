@@ -16,8 +16,8 @@ import {
 import ReportToolbar from '../../components/common/ReportToolbar';
 
 const API = '/api/reports/finance/';
-const PIE_COLORS = ['#1a237e','#2e7d32','#e65100','#6a1b9a','#c62828'];
-const CATEGORY_COLOR = { asset:'#1a237e', liability:'#c62828', equity:'#2e7d32', income:'#e65100', expense:'#6a1b9a' };
+const PIE_COLORS = ['primary.main','#2e7d32','#e65100','#6a1b9a','#c62828'];
+const CATEGORY_COLOR = { asset:'primary.main', liability:'#c62828', equity:'#2e7d32', income:'#e65100', expense:'#6a1b9a' };
 
 function KpiCard({ title, value, color }) {
     return (
@@ -75,13 +75,13 @@ function FinanceReportPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Finance Report</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Finance Report</Typography>
             <Typography variant="body2" color="text.secondary" mb={2}>Accounts, journal entries, and financial activity summary</Typography>
             <ReportToolbar title="Finance_Report" printRef={printRef} onExcel={getExcelData} />
         <Box ref={printRef}>
 
             <Grid container spacing={3} mb={4}>
-                <Grid item xs={6} md={4}><KpiCard title="Total Accounts" value={data.total_accounts} color="#1a237e" /></Grid>
+                <Grid item xs={6} md={4}><KpiCard title="Total Accounts" value={data.total_accounts} color="primary" /></Grid>
                 <Grid item xs={6} md={4}><KpiCard title="Total Journal Entries" value={data.total_journal_entries} color="#6a1b9a" /></Grid>
                 <Grid item xs={6} md={4}><KpiCard title="Posted Entries" value={data.posted_entries} color="#2e7d32" /></Grid>
             </Grid>
@@ -90,7 +90,7 @@ function FinanceReportPage() {
                 {/* Accounts by Category Pie */}
                 <Grid item xs={12} md={5}>
                     <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Accounts by Category</Typography>
+                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Accounts by Category</Typography>
                         {data.accounts_by_category.length === 0 ? (
                             <Typography color="text.secondary" align="center" py={4}>No accounts yet</Typography>
                         ) : (
@@ -111,7 +111,7 @@ function FinanceReportPage() {
                 {/* Monthly Journal Entry Activity */}
                 <Grid item xs={12} md={7}>
                     <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Journal Entries — Last 6 Months</Typography>
+                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Journal Entries — Last 6 Months</Typography>
                         {data.monthly_entries.length === 0 ? (
                             <Typography color="text.secondary" align="center" py={4}>No journal entries yet</Typography>
                         ) : (
@@ -131,10 +131,10 @@ function FinanceReportPage() {
 
             {/* Account Balances by Category */}
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, mb: 3 }}>
-                <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Account Balances by Category</Typography>
+                <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Account Balances by Category</Typography>
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
                                 <TableCell><strong>Category</strong></TableCell>
                                 <TableCell align="right"><strong>No. of Accounts</strong></TableCell>
@@ -161,10 +161,10 @@ function FinanceReportPage() {
 
             {/* Recent Journal Entries */}
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Recent Journal Entries (Last 30 Days)</Typography>
+                <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Recent Journal Entries (Last 30 Days)</Typography>
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
                                 <TableCell><strong>Entry No.</strong></TableCell>
                                 <TableCell><strong>Date</strong></TableCell>

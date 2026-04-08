@@ -75,13 +75,13 @@ function SalesReportPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Sales Report</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Sales Report</Typography>
             <Typography variant="body2" color="text.secondary" mb={2}>Monthly sales, top customers, and order status analysis</Typography>
             <ReportToolbar title="Sales_Report" printRef={printRef} onExcel={getExcelData} />
         <Box ref={printRef}>
 
             <Grid container spacing={3} mb={4}>
-                <Grid item xs={6} md={3}><KpiCard title="Total Sales Orders" value={data.total_sales_orders} color="#1a237e" /></Grid>
+                <Grid item xs={6} md={3}><KpiCard title="Total Sales Orders" value={data.total_sales_orders} color="primary" /></Grid>
                 <Grid item xs={6} md={3}><KpiCard title="Delivered Orders" value={data.delivered_orders} color="#2e7d32" /></Grid>
                 <Grid item xs={6} md={3}><KpiCard title="Pending Invoices" value={data.pending_invoices} color="#e65100" /></Grid>
                 <Grid item xs={6} md={3}><KpiCard title="Paid Invoices" value={data.paid_invoices} color="#2e7d32" /></Grid>
@@ -89,7 +89,7 @@ function SalesReportPage() {
 
             {/* Monthly Sales Chart */}
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, mb: 3 }}>
-                <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Monthly Sales Value — Last 6 Months (₹)</Typography>
+                <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Monthly Sales Value — Last 6 Months (₹)</Typography>
                 {data.monthly_sales.length === 0 ? (
                     <Typography color="text.secondary" align="center" py={4}>No sales data yet</Typography>
                 ) : (
@@ -109,10 +109,10 @@ function SalesReportPage() {
                 {/* Top Customers */}
                 <Grid item xs={12} md={6}>
                     <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Top 5 Customers by Order Value</Typography>
+                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Top 5 Customers by Order Value</Typography>
                         <TableContainer>
                             <Table size="small">
-                                <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                                <TableHead sx={{ backgroundColor: 'action.hover' }}>
                                     <TableRow>
                                         <TableCell><strong>Customer</strong></TableCell>
                                         <TableCell align="right"><strong>Orders</strong></TableCell>
@@ -138,7 +138,7 @@ function SalesReportPage() {
                 {/* Status Breakdown */}
                 <Grid item xs={12} md={6}>
                     <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Orders by Status</Typography>
+                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Orders by Status</Typography>
                         {data.sales_by_status.map(s => (
                             <Box key={s.status} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
                                 <Chip label={s.status.toUpperCase()} size="small" color={STATUS_COLOR[s.status] || 'default'} />
@@ -154,10 +154,10 @@ function SalesReportPage() {
 
             {/* Recent Orders */}
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Recent Sales Orders</Typography>
+                <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Recent Sales Orders</Typography>
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
                                 <TableCell><strong>SO Number</strong></TableCell>
                                 <TableCell><strong>Customer</strong></TableCell>

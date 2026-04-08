@@ -68,7 +68,7 @@ function BatchTraceabilityPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Batch Traceability</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Batch Traceability</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Complete traceability: raw material lots → production → QC → customer dispatch
             </Typography>
@@ -78,14 +78,14 @@ function BatchTraceabilityPage() {
             <Box sx={{ display:'flex', justifyContent:'flex-end', mb:2 }}>
                 <Button variant="contained" startIcon={<AddIcon />}
                     onClick={() => { setForm(EMPTY); setDialog(true); }}
-                    sx={{ backgroundColor:'#1a237e' }}>
+                    sx={{ backgroundColor:'primary.main' }}>
                     Add Traceability Record
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor:'#1a237e' }}>
+                    <TableHead sx={{ backgroundColor:'primary.main' }}>
                         <TableRow>
                             {['Batch Number','Product','Production Date','Operator','QC Passed','Dispatched To','Actions'].map(h => (
                                 <TableCell key={h} sx={{ color:'white', fontWeight:'bold' }}>{h}</TableCell>
@@ -111,7 +111,7 @@ function BatchTraceabilityPage() {
                                 </TableCell>
                                 <TableCell>{r.dispatched_to || '—'}</TableCell>
                                 <TableCell>
-                                    <IconButton size="small" sx={{ color:'#1a237e' }} onClick={() => { setViewRec(r); setViewDialog(true); }}>
+                                    <IconButton size="small" sx={{ color:'primary.main' }} onClick={() => { setViewRec(r); setViewDialog(true); }}>
                                         <VisibilityIcon fontSize="small" />
                                     </IconButton>
                                 </TableCell>
@@ -123,7 +123,7 @@ function BatchTraceabilityPage() {
 
             {/* Create Dialog */}
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="md" fullWidth>
-                <DialogTitle sx={{ backgroundColor:'#1a237e', color:'white' }}>Add Traceability Record</DialogTitle>
+                <DialogTitle sx={{ backgroundColor:'primary.main', color:'white' }}>Add Traceability Record</DialogTitle>
                 <DialogContent sx={{ pt:3 }}>
                     <Box sx={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:2, mt:1 }}>
                         <TextField select label="Batch *" value={form.batch_id} onChange={f('batch_id')}>
@@ -172,14 +172,14 @@ function BatchTraceabilityPage() {
                 </DialogContent>
                 <DialogActions sx={{ p:2 }}>
                     <Button onClick={() => setDialog(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor:'#1a237e' }}>Save Record</Button>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor:'primary.main' }}>Save Record</Button>
                 </DialogActions>
             </Dialog>
 
             {/* View Dialog */}
             {viewRec && (
                 <Dialog open={viewDialog} onClose={() => setViewDialog(false)} maxWidth="sm" fullWidth>
-                    <DialogTitle sx={{ backgroundColor:'#1a237e', color:'white' }}>Batch: {viewRec.batch_number}</DialogTitle>
+                    <DialogTitle sx={{ backgroundColor:'primary.main', color:'white' }}>Batch: {viewRec.batch_number}</DialogTitle>
                     <DialogContent sx={{ pt:3 }}>
                         {[
                             ['Product', `${viewRec.item_code} — ${viewRec.item_name}`],

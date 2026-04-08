@@ -36,7 +36,7 @@ function TrialBalancePage() {
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
                 <Box>
-                    <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Trial Balance</Typography>
+                    <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Trial Balance</Typography>
                     <Typography variant="body2" color="text.secondary">
                         All accounts with current debit and credit balances
                     </Typography>
@@ -59,7 +59,7 @@ function TrialBalancePage() {
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Account Code</TableCell>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Account Name</TableCell>
@@ -90,7 +90,7 @@ function TrialBalancePage() {
                         )}
 
                         {/* Totals row */}
-                        <TableRow sx={{ backgroundColor: '#e8eaf6' }}>
+                        <TableRow sx={{ backgroundColor: 'action.hover' }}>
                             <TableCell colSpan={3}><strong>TOTAL</strong></TableCell>
                             <TableCell align="right"><strong>{fmt(totalDebit)}</strong></TableCell>
                             <TableCell align="right"><strong>{fmt(totalCredit)}</strong></TableCell>

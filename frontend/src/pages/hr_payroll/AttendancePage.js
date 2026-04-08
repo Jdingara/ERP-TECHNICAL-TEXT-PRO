@@ -65,7 +65,7 @@ function AttendancePage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Attendance</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Attendance</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>Daily employee attendance records</Typography>
 
             {message && <Alert severity={messageType} sx={{ mb: 2 }} onClose={() => setMessage('')}>{message}</Alert>}
@@ -75,14 +75,14 @@ function AttendancePage() {
                     onChange={(e) => setDateFilter(e.target.value)}
                     InputLabelProps={{ shrink: true }} size="small" />
                 <Button variant="contained" startIcon={<AddIcon />}
-                    onClick={() => setDialogOpen(true)} sx={{ backgroundColor: '#1a237e' }}>
+                    onClick={() => setDialogOpen(true)} sx={{ backgroundColor: 'primary.main' }}>
                     Mark Attendance
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Employee Code</TableCell>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Employee Name</TableCell>
@@ -116,7 +116,7 @@ function AttendancePage() {
             </TableContainer>
 
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>Mark Attendance</DialogTitle>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>Mark Attendance</DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
                         <FormControl fullWidth>
@@ -146,7 +146,7 @@ function AttendancePage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#1a237e' }}>Save</Button>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>Save</Button>
                 </DialogActions>
             </Dialog>
         </Box>

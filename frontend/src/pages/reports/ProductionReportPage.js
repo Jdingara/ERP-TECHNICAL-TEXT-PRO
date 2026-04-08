@@ -81,14 +81,14 @@ function ProductionReportPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Production Report</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Production Report</Typography>
             <Typography variant="body2" color="text.secondary" mb={2}>Work orders, batches, and monthly output summary</Typography>
             <ReportToolbar title="Production_Report" printRef={printRef} onExcel={getExcelData} />
         <Box ref={printRef}>
 
             {/* KPI Cards */}
             <Grid container spacing={3} mb={4}>
-                <Grid item xs={6} md={4}><KpiCard title="Total Work Orders" value={data.total_work_orders} color="#1a237e" /></Grid>
+                <Grid item xs={6} md={4}><KpiCard title="Total Work Orders" value={data.total_work_orders} color="primary" /></Grid>
                 <Grid item xs={6} md={4}><KpiCard title="Completed Work Orders" value={data.completed_work_orders} color="#2e7d32" /></Grid>
                 <Grid item xs={6} md={4}><KpiCard title="Total Batches" value={data.total_batches} color="#6a1b9a" /></Grid>
             </Grid>
@@ -97,7 +97,7 @@ function ProductionReportPage() {
                 {/* Monthly Production Chart */}
                 <Grid item xs={12} md={8}>
                     <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Monthly Production Output (Last 6 Months)</Typography>
+                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Monthly Production Output (Last 6 Months)</Typography>
                         {data.monthly_production.length === 0 ? (
                             <Typography color="text.secondary" align="center" py={4}>No production data yet</Typography>
                         ) : (
@@ -117,7 +117,7 @@ function ProductionReportPage() {
                 {/* Work Order Status */}
                 <Grid item xs={12} md={4}>
                     <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Work Orders by Status</Typography>
+                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Work Orders by Status</Typography>
                         {data.wo_by_status.map(s => (
                             <Box key={s.status} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
                                 <Chip label={s.status.replace('_',' ').toUpperCase()} size="small" color={STATUS_COLOR[s.status] || 'default'} />
@@ -130,10 +130,10 @@ function ProductionReportPage() {
 
             {/* Top Produced Items */}
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, mb: 3 }}>
-                <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Top 5 Produced Items</Typography>
+                <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Top 5 Produced Items</Typography>
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
                                 <TableCell><strong>Item Code</strong></TableCell>
                                 <TableCell><strong>Item Name</strong></TableCell>
@@ -155,10 +155,10 @@ function ProductionReportPage() {
 
             {/* Recent Batches */}
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Recent Batches</Typography>
+                <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Recent Batches</Typography>
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
                                 <TableCell><strong>Batch Number</strong></TableCell>
                                 <TableCell><strong>Item</strong></TableCell>

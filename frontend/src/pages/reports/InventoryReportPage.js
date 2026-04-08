@@ -16,7 +16,7 @@ import {
 import ReportToolbar from '../../components/common/ReportToolbar';
 
 const API = '/api/reports/inventory/';
-const PIE_COLORS = ['#1a237e','#2e7d32','#e65100','#6a1b9a','#00838f','#c62828'];
+const PIE_COLORS = ['primary.main','#2e7d32','#e65100','#6a1b9a','#00838f','#c62828'];
 
 function KpiCard({ title, value, color }) {
     return (
@@ -74,13 +74,13 @@ function InventoryReportPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Inventory Report</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Inventory Report</Typography>
             <Typography variant="body2" color="text.secondary" mb={2}>Stock levels, movements, and low stock analysis</Typography>
             <ReportToolbar title="Inventory_Report" printRef={printRef} onExcel={getExcelData} />
         <Box ref={printRef}>
 
             <Grid container spacing={3} mb={4}>
-                <Grid item xs={6} md={6}><KpiCard title="Total Stock Items" value={data.total_stock_items} color="#1a237e" /></Grid>
+                <Grid item xs={6} md={6}><KpiCard title="Total Stock Items" value={data.total_stock_items} color="primary" /></Grid>
                 <Grid item xs={6} md={6}><KpiCard title="Low Stock Items" value={data.low_stock_count} color="#e53935" /></Grid>
             </Grid>
 
@@ -88,7 +88,7 @@ function InventoryReportPage() {
                 {/* Stock by Item Type Pie */}
                 <Grid item xs={12} md={5}>
                     <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Stock by Item Type</Typography>
+                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Stock by Item Type</Typography>
                         {data.stock_by_type.length === 0 ? (
                             <Typography color="text.secondary" align="center" py={4}>No stock data yet</Typography>
                         ) : (
@@ -108,7 +108,7 @@ function InventoryReportPage() {
                 {/* Movement Summary */}
                 <Grid item xs={12} md={7}>
                     <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Stock Movements (Last 30 Days)</Typography>
+                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Stock Movements (Last 30 Days)</Typography>
                         {data.movement_summary.length === 0 ? (
                             <Typography color="text.secondary" align="center" py={4}>No movements in last 30 days</Typography>
                         ) : (
@@ -157,10 +157,10 @@ function InventoryReportPage() {
 
             {/* Top Stock Items */}
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Top 10 Items by Stock Quantity</Typography>
+                <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Top 10 Items by Stock Quantity</Typography>
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
                                 <TableCell><strong>Item Code</strong></TableCell>
                                 <TableCell><strong>Item Name</strong></TableCell>

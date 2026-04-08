@@ -81,7 +81,7 @@ function SupplierListPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Suppliers</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Suppliers</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Manage all raw material and spare parts suppliers
             </Typography>
@@ -92,12 +92,12 @@ function SupplierListPage() {
                 <TextField placeholder="Search suppliers..." value={searchText}
                     onChange={handleSearch} size="small" sx={{ width: 350 }} />
                 <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAddDialog}
-                    sx={{ backgroundColor: '#1a237e' }}>Add Supplier</Button>
+                    sx={{ backgroundColor: 'primary.main' }}>Add Supplier</Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Code</TableCell>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Supplier Name</TableCell>
@@ -131,7 +131,7 @@ function SupplierListPage() {
                                     <TableCell>{s.gstin || '—'}</TableCell>
                                     <TableCell>{s.payment_days} days</TableCell>
                                     <TableCell>
-                                        <IconButton size="small" onClick={() => handleOpenEditDialog(s)} sx={{ color: '#1a237e' }}>
+                                        <IconButton size="small" onClick={() => handleOpenEditDialog(s)} sx={{ color: 'primary.main' }}>
                                             <EditIcon fontSize="small" />
                                         </IconButton>
                                     </TableCell>
@@ -144,7 +144,7 @@ function SupplierListPage() {
 
             {/* Add / Edit Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>
                     {editingId ? 'Edit Supplier' : 'Add New Supplier'}
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
@@ -197,7 +197,7 @@ function SupplierListPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#1a237e' }}>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>
                         {editingId ? 'Update Supplier' : 'Save Supplier'}
                     </Button>
                 </DialogActions>

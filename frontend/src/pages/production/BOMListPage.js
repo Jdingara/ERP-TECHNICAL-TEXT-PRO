@@ -91,7 +91,7 @@ function BOMListPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Bill of Materials</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Bill of Materials</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Recipe for each product — what raw materials are needed and how much
             </Typography>
@@ -101,14 +101,14 @@ function BOMListPage() {
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
                 <Button variant="contained" startIcon={<AddIcon />}
                     onClick={() => { setDialogOpen(true); setBomName(''); setFinishedProductId(''); setLines([{ ...EMPTY_LINE }]); }}
-                    sx={{ backgroundColor: '#1a237e' }}>
+                    sx={{ backgroundColor: 'primary.main' }}>
                     Create BOM
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>BOM Name</TableCell>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Finished Product</TableCell>
@@ -131,7 +131,7 @@ function BOMListPage() {
                                 <TableCell>{b.quantity_produced}</TableCell>
                                 <TableCell><Chip label={b.status} size="small" color={b.status === 'active' ? 'success' : 'default'} /></TableCell>
                                 <TableCell>
-                                    <IconButton size="small" sx={{ color: '#1a237e' }} onClick={() => handleViewBom(b.id)}>
+                                    <IconButton size="small" sx={{ color: 'primary.main' }} onClick={() => handleViewBom(b.id)}>
                                         <VisibilityIcon fontSize="small" />
                                     </IconButton>
                                 </TableCell>
@@ -143,7 +143,7 @@ function BOMListPage() {
 
             {/* Create BOM Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="lg" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>Create Bill of Materials</DialogTitle>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>Create Bill of Materials</DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
                     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, mb: 3, mt: 1 }}>
                         <TextField label="BOM Name *" value={bomName} onChange={(e) => setBomName(e.target.value)} sx={{ gridColumn: 'span 2' }} />
@@ -158,11 +158,11 @@ function BOMListPage() {
                     </Box>
                     <Divider sx={{ mb: 2 }} />
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography fontWeight="bold" color="#1a237e">Raw Materials Required</Typography>
+                        <Typography fontWeight="bold" color="primary">Raw Materials Required</Typography>
                         <Button size="small" startIcon={<AddIcon />} onClick={addLine} variant="outlined">Add Material</Button>
                     </Box>
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Raw Material *</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Quantity *</TableCell>
@@ -217,14 +217,14 @@ function BOMListPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#1a237e' }}>Save BOM</Button>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>Save BOM</Button>
                 </DialogActions>
             </Dialog>
 
             {/* View BOM Dialog */}
             {selectedBom && (
                 <Dialog open={viewDialog} onClose={() => setViewDialog(false)} maxWidth="md" fullWidth>
-                    <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>
+                    <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>
                         BOM: {selectedBom.bom_name}
                     </DialogTitle>
                     <DialogContent sx={{ pt: 3 }}>
@@ -233,7 +233,7 @@ function BOMListPage() {
                             <strong>Quantity Produced:</strong> {selectedBom.quantity_produced}
                         </Typography>
                         <Table size="small">
-                            <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                            <TableHead sx={{ backgroundColor: 'action.hover' }}>
                                 <TableRow>
                                     <TableCell sx={{ fontWeight: 'bold' }}>Raw Material</TableCell>
                                     <TableCell sx={{ fontWeight: 'bold' }}>Quantity</TableCell>

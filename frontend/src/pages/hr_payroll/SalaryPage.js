@@ -94,7 +94,7 @@ function SalaryPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Salary Processing</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Salary Processing</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Calculate and process monthly salaries — auto deducts PF (12%) and ESI (0.75%)
             </Typography>
@@ -113,14 +113,14 @@ function SalaryPage() {
                         onChange={(e) => setYearFilter(e.target.value)} sx={{ width: 100 }} />
                 </Box>
                 <Button variant="contained" startIcon={<CalculateIcon />}
-                    onClick={() => setDialogOpen(true)} sx={{ backgroundColor: '#1a237e' }}>
+                    onClick={() => setDialogOpen(true)} sx={{ backgroundColor: 'primary.main' }}>
                     Process Salary
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Employee</TableCell>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Department</TableCell>
@@ -180,7 +180,7 @@ function SalaryPage() {
 
             {/* Process Salary Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>Process Salary</DialogTitle>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>Process Salary</DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
                         <FormControl fullWidth>
@@ -207,7 +207,7 @@ function SalaryPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleProcess} sx={{ backgroundColor: '#1a237e' }}>
+                    <Button variant="contained" onClick={handleProcess} sx={{ backgroundColor: 'primary.main' }}>
                         Calculate & Save
                     </Button>
                 </DialogActions>

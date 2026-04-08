@@ -90,7 +90,7 @@ function SampleManagementPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Sample Management</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Sample Management</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Track product samples sent to customers — approval status, feedback, and history
             </Typography>
@@ -100,14 +100,14 @@ function SampleManagementPage() {
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
                 <Button variant="contained" startIcon={<AddIcon />}
                     onClick={() => { setForm(EMPTY); setDialog(true); }}
-                    sx={{ backgroundColor: '#1a237e' }}>
+                    sx={{ backgroundColor: 'primary.main' }}>
                     New Sample
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Sample No.', 'Product', 'Customer', 'Qty', 'Sent Date', 'Approved Date', 'Status', 'Actions'].map(h => (
                                 <TableCell key={h} sx={{ color: 'white', fontWeight: 'bold' }}>{h}</TableCell>
@@ -157,7 +157,7 @@ function SampleManagementPage() {
 
             {/* Create Dialog */}
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>New Sample</DialogTitle>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>New Sample</DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
                         <TextField select label="Product *" value={form.item_id} onChange={e => setForm(p => ({ ...p, item_id: e.target.value }))}>
@@ -177,7 +177,7 @@ function SampleManagementPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setDialog(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#1a237e' }}>Create Sample</Button>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>Create Sample</Button>
                 </DialogActions>
             </Dialog>
 

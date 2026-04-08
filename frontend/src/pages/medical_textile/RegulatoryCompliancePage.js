@@ -66,7 +66,7 @@ function RegulatoryCompliancePage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Regulatory Compliance</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Regulatory Compliance</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Track ISO 13485, FDA, CE Mark, BIS certifications — expiry alerts included
             </Typography>
@@ -76,14 +76,14 @@ function RegulatoryCompliancePage() {
             <Box sx={{ display:'flex', justifyContent:'flex-end', mb:2 }}>
                 <Button variant="contained" startIcon={<AddIcon />}
                     onClick={() => { setForm(EMPTY); setEditRec(null); setDialog(true); }}
-                    sx={{ backgroundColor:'#1a237e' }}>
+                    sx={{ backgroundColor:'primary.main' }}>
                     Add Certificate
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor:'#1a237e' }}>
+                    <TableHead sx={{ backgroundColor:'primary.main' }}>
                         <TableRow>
                             {['Product','Standard','Certificate No.','Issuing Body','Issue Date','Expiry Date','Status','Actions'].map(h => (
                                 <TableCell key={h} sx={{ color:'white', fontWeight:'bold' }}>{h}</TableCell>
@@ -113,7 +113,7 @@ function RegulatoryCompliancePage() {
                                     <Chip label={r.status.toUpperCase()} size="small" color={STATUS_COLOR[r.status] || 'default'} />
                                 </TableCell>
                                 <TableCell>
-                                    <IconButton size="small" sx={{ color:'#1a237e' }}
+                                    <IconButton size="small" sx={{ color:'primary.main' }}
                                         onClick={() => { setForm(r); setEditRec(r); setDialog(true); }}>
                                         <EditIcon fontSize="small" />
                                     </IconButton>
@@ -125,7 +125,7 @@ function RegulatoryCompliancePage() {
             </TableContainer>
 
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ backgroundColor:'#1a237e', color:'white' }}>
+                <DialogTitle sx={{ backgroundColor:'primary.main', color:'white' }}>
                     {editRec ? 'Edit Certificate' : 'Add Certificate'}
                 </DialogTitle>
                 <DialogContent sx={{ pt:3 }}>
@@ -152,7 +152,7 @@ function RegulatoryCompliancePage() {
                 </DialogContent>
                 <DialogActions sx={{ p:2 }}>
                     <Button onClick={() => setDialog(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor:'#1a237e' }}>Save</Button>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor:'primary.main' }}>Save</Button>
                 </DialogActions>
             </Dialog>
         </Box>

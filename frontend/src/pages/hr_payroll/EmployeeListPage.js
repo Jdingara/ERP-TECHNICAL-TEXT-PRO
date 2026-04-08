@@ -84,21 +84,21 @@ function EmployeeListPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Employees</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Employees</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>Manage all factory and office employees</Typography>
 
             {message && <Alert severity={messageType} sx={{ mb: 2 }} onClose={() => setMessage('')}>{message}</Alert>}
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                 <TextField placeholder="Search employees..." value={searchText} onChange={handleSearch} size="small" sx={{ width: 350 }} />
-                <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd} sx={{ backgroundColor: '#1a237e' }}>
+                <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd} sx={{ backgroundColor: 'primary.main' }}>
                     Add Employee
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Code', 'Full Name', 'Department', 'Designation', 'Type', 'Phone', 'Joining Date', 'Gross Salary', 'Status', 'Actions'].map(h => (
                                 <TableCell key={h} sx={{ color: 'white', fontWeight: 'bold' }}>{h}</TableCell>
@@ -124,7 +124,7 @@ function EmployeeListPage() {
                                 <TableCell>₹ {parseFloat(e.gross_salary).toLocaleString()}</TableCell>
                                 <TableCell><Chip label={e.status} size="small" color={e.status === 'active' ? 'success' : 'default'} /></TableCell>
                                 <TableCell>
-                                    <IconButton size="small" onClick={() => handleOpenEdit(e)} sx={{ color: '#1a237e' }}>
+                                    <IconButton size="small" onClick={() => handleOpenEdit(e)} sx={{ color: 'primary.main' }}>
                                         <EditIcon fontSize="small" />
                                     </IconButton>
                                 </TableCell>
@@ -136,7 +136,7 @@ function EmployeeListPage() {
 
             {/* Add/Edit Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>
                     {editingId ? 'Edit Employee' : 'Add New Employee'}
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
@@ -200,7 +200,7 @@ function EmployeeListPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#1a237e' }}>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>
                         {editingId ? 'Update Employee' : 'Save Employee'}
                     </Button>
                 </DialogActions>

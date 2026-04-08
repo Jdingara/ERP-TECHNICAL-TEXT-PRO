@@ -67,7 +67,7 @@ function ShelfLifeTrackingPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Shelf Life Tracking</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Shelf Life Tracking</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Track expiry dates for all medical textile batches — sorted by soonest expiry
             </Typography>
@@ -93,14 +93,14 @@ function ShelfLifeTrackingPage() {
             <Box sx={{ display:'flex', justifyContent:'flex-end', mb:2 }}>
                 <Button variant="contained" startIcon={<AddIcon />}
                     onClick={() => { setForm(EMPTY); setDialog(true); }}
-                    sx={{ backgroundColor:'#1a237e' }}>
+                    sx={{ backgroundColor:'primary.main' }}>
                     Add Shelf Life Record
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor:'#1a237e' }}>
+                    <TableHead sx={{ backgroundColor:'primary.main' }}>
                         <TableRow>
                             {['Batch','Product','Mfg Date','Expiry Date','Shelf Life','Days Left','Qty Remaining','Storage','Status'].map(h => (
                                 <TableCell key={h} sx={{ color:'white', fontWeight:'bold' }}>{h}</TableCell>
@@ -144,7 +144,7 @@ function ShelfLifeTrackingPage() {
             </TableContainer>
 
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ backgroundColor:'#1a237e', color:'white' }}>Add Shelf Life Record</DialogTitle>
+                <DialogTitle sx={{ backgroundColor:'primary.main', color:'white' }}>Add Shelf Life Record</DialogTitle>
                 <DialogContent sx={{ pt:3 }}>
                     <Box sx={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:2, mt:1 }}>
                         <TextField select label="Batch *" value={form.batch_id} onChange={f('batch_id')} sx={{ gridColumn:'span 2' }}>
@@ -165,7 +165,7 @@ function ShelfLifeTrackingPage() {
                 </DialogContent>
                 <DialogActions sx={{ p:2 }}>
                     <Button onClick={() => setDialog(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor:'#1a237e' }}>Save</Button>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor:'primary.main' }}>Save</Button>
                 </DialogActions>
             </Dialog>
         </Box>

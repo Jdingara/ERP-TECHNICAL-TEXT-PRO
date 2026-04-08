@@ -46,7 +46,7 @@ function StockListPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>
                 Stock List
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
@@ -80,7 +80,7 @@ function StockListPage() {
                     </Button>
                     <Button variant="contained" startIcon={<AddIcon />}
                         onClick={() => navigate('/inventory/stock-movement')}
-                        sx={{ backgroundColor: '#1a237e' }}>
+                        sx={{ backgroundColor: 'primary.main' }}>
                         Add Stock Movement
                     </Button>
                 </Box>
@@ -89,7 +89,7 @@ function StockListPage() {
             {/* Stock Table */}
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Item Code</TableCell>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Item Name</TableCell>

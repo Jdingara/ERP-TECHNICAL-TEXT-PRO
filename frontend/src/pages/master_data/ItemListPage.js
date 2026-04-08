@@ -131,7 +131,7 @@ function ItemListPage() {
     return (
         <Box>
             {/* Page Title */}
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>
                 Items / Products
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
@@ -156,7 +156,7 @@ function ItemListPage() {
                 />
                 <Button variant="contained" startIcon={<AddIcon />}
                     onClick={handleOpenAddDialog}
-                    sx={{ backgroundColor: '#1a237e' }}>
+                    sx={{ backgroundColor: 'primary.main' }}>
                     Add Item
                 </Button>
             </Box>
@@ -164,7 +164,7 @@ function ItemListPage() {
             {/* Items Table */}
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Item Code</TableCell>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Item Name</TableCell>
@@ -198,7 +198,7 @@ function ItemListPage() {
                                     <TableCell>{item.minimum_stock}</TableCell>
                                     <TableCell>
                                         <IconButton size="small" onClick={() => handleOpenEditDialog(item)}
-                                            sx={{ color: '#1a237e' }}>
+                                            sx={{ color: 'primary.main' }}>
                                             <EditIcon fontSize="small" />
                                         </IconButton>
                                     </TableCell>
@@ -211,7 +211,7 @@ function ItemListPage() {
 
             {/* Add / Edit Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>
                     {editingId ? 'Edit Item' : 'Add New Item'}
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
@@ -279,7 +279,7 @@ function ItemListPage() {
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
                     <Button variant="contained" onClick={handleSave}
-                        sx={{ backgroundColor: '#1a237e' }}>
+                        sx={{ backgroundColor: 'primary.main' }}>
                         {editingId ? 'Update Item' : 'Save Item'}
                     </Button>
                 </DialogActions>

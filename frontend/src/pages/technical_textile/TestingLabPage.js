@@ -71,7 +71,7 @@ function TestingLabPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Testing Lab</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Testing Lab</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Record actual lab test results — compare against performance specs
             </Typography>
@@ -81,14 +81,14 @@ function TestingLabPage() {
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
                 <Button variant="contained" startIcon={<AddIcon />}
                     onClick={() => { setForm(EMPTY); setDialog(true); }}
-                    sx={{ backgroundColor: '#1a237e' }}>
+                    sx={{ backgroundColor: 'primary.main' }}>
                     Add Test Record
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Test No.', 'Product', 'Test Type', 'Test Date', 'Tested By', 'Lab', 'GSM', 'Tensile W/F', 'Result', 'Actions'].map(h => (
                                 <TableCell key={h} sx={{ color: 'white', fontWeight: 'bold' }}>{h}</TableCell>
@@ -118,7 +118,7 @@ function TestingLabPage() {
                                         color={RESULT_COLOR[r.overall_result] || 'default'} />
                                 </TableCell>
                                 <TableCell>
-                                    <IconButton size="small" sx={{ color: '#1a237e' }}
+                                    <IconButton size="small" sx={{ color: 'primary.main' }}
                                         onClick={() => { setViewRecord(r); setViewDialog(true); }}>
                                         <VisibilityIcon fontSize="small" />
                                     </IconButton>
@@ -131,7 +131,7 @@ function TestingLabPage() {
 
             {/* Create Dialog */}
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="md" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>Add Test Record</DialogTitle>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>Add Test Record</DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
                     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, mt: 1 }}>
                         <TextField select label="Product *" value={form.item_id} onChange={f('item_id')} sx={{ gridColumn: 'span 2' }}>
@@ -151,7 +151,7 @@ function TestingLabPage() {
                     </Box>
 
                     <Divider sx={{ my: 2 }} />
-                    <Typography fontWeight="bold" color="#1a237e" mb={2}>Actual Test Values</Typography>
+                    <Typography fontWeight="bold" color="primary" mb={2}>Actual Test Values</Typography>
                     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2 }}>
                         <TextField label="GSM Actual (g/m²)" type="number" value={form.gsm_actual} onChange={f('gsm_actual')} />
                         <TextField label="Tensile Warp Actual (N)" type="number" value={form.tensile_warp_actual} onChange={f('tensile_warp_actual')} />
@@ -165,14 +165,14 @@ function TestingLabPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setDialog(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#1a237e' }}>Save Test Record</Button>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>Save Test Record</Button>
                 </DialogActions>
             </Dialog>
 
             {/* View Dialog */}
             {viewRecord && (
                 <Dialog open={viewDialog} onClose={() => setViewDialog(false)} maxWidth="sm" fullWidth>
-                    <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>{viewRecord.test_number}</DialogTitle>
+                    <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>{viewRecord.test_number}</DialogTitle>
                     <DialogContent sx={{ pt: 3 }}>
                         {[
                             ['Product', `${viewRecord.item_code} — ${viewRecord.item_name}`],

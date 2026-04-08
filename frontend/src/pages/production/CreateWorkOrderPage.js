@@ -119,8 +119,8 @@ function CreateWorkOrderPage() {
                     sx={{ mr: 2 }}>
                     Back
                 </Button>
-                <FactoryIcon sx={{ color: '#1a237e', mr: 1 }} />
-                <Typography variant="h5" fontWeight="bold" color="#1a237e">
+                <FactoryIcon sx={{ color: 'primary.main', mr: 1 }} />
+                <Typography variant="h5" fontWeight="bold" color="primary">
                     Create Work Order
                 </Typography>
             </Box>
@@ -132,7 +132,7 @@ function CreateWorkOrderPage() {
             )}
 
             <Paper sx={{ p: 3, boxShadow: 2, borderRadius: 2, mb: 3 }}>
-                <Typography variant="h6" fontWeight="bold" mb={2} color="#1a237e">
+                <Typography variant="h6" fontWeight="bold" mb={2} color="primary">
                     Production Details
                 </Typography>
 
@@ -213,7 +213,7 @@ function CreateWorkOrderPage() {
             {bomDetail && (
                 <Paper sx={{ p: 3, boxShadow: 2, borderRadius: 2, mb: 3 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                        <Typography variant="h6" fontWeight="bold" color="#1a237e" sx={{ flexGrow: 1 }}>
+                        <Typography variant="h6" fontWeight="bold" color="primary" sx={{ flexGrow: 1 }}>
                             Material Requirements
                         </Typography>
                         <Chip
@@ -275,7 +275,7 @@ function CreateWorkOrderPage() {
                     variant="contained"
                     onClick={handleSubmit}
                     disabled={saving}
-                    sx={{ backgroundColor: '#1a237e', px: 4 }}>
+                    sx={{ backgroundColor: 'primary.main', px: 4 }}>
                     {saving ? 'Creating...' : 'Create Work Order'}
                 </Button>
             </Box>

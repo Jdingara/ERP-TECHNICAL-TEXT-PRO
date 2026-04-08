@@ -90,11 +90,11 @@ function FinancialYearPanel() {
             {/* Header */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CalendarMonthIcon sx={{ color: '#1a237e' }} />
-                    <Typography variant="h6" fontWeight="bold" color="#1a237e">Financial Year</Typography>
+                    <CalendarMonthIcon sx={{ color: 'primary.main' }} />
+                    <Typography variant="h6" fontWeight="bold" color="primary">Financial Year</Typography>
                 </Box>
                 <Button variant="contained" size="small" startIcon={<AddIcon />}
-                    sx={{ backgroundColor: '#1a237e' }} onClick={() => setOpen(true)}>
+                    sx={{ backgroundColor: 'primary.main' }} onClick={() => setOpen(true)}>
                     New Financial Year
                 </Button>
             </Box>
@@ -104,7 +104,7 @@ function FinancialYearPanel() {
             {loading ? <CircularProgress size={24} /> : (
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
                                 {['Year Label', 'Start Date', 'End Date', 'Status', 'Actions'].map(h => (
                                     <TableCell key={h} sx={{ fontWeight: 'bold', fontSize: 12 }}>{h}</TableCell>
@@ -153,7 +153,7 @@ function FinancialYearPanel() {
 
             {/* Create FY Dialog */}
             <Dialog open={open} onClose={() => setOpen(false)} maxWidth="xs" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white', fontWeight: 'bold' }}>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white', fontWeight: 'bold' }}>
                     Create New Financial Year
                 </DialogTitle>
                 <DialogContent sx={{ pt: 2.5, display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
@@ -171,7 +171,7 @@ function FinancialYearPanel() {
                     <Button onClick={() => setOpen(false)}>Cancel</Button>
                     <Button variant="contained" onClick={create}
                         disabled={!form.label || !form.start_date || !form.end_date}
-                        sx={{ backgroundColor: '#1a237e' }}>
+                        sx={{ backgroundColor: 'primary.main' }}>
                         Create
                     </Button>
                 </DialogActions>
@@ -271,8 +271,8 @@ function DocumentSeriesPanel() {
             {/* Header */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <SettingsIcon sx={{ color: '#1a237e' }} />
-                    <Typography variant="h6" fontWeight="bold" color="#1a237e">Document Series Format</Typography>
+                    <SettingsIcon sx={{ color: 'primary.main' }} />
+                    <Typography variant="h6" fontWeight="bold" color="primary">Document Series Format</Typography>
                 </Box>
                 <Button size="small" variant="outlined" startIcon={<RefreshIcon />} onClick={load}>
                     Refresh
@@ -289,7 +289,7 @@ function DocumentSeriesPanel() {
             {loading ? <CircularProgress size={24} /> : (
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
                                 {['Document', 'Prefix', 'Sep', 'Inc. FY', 'Padding', 'Start', 'Current #', 'Preview', 'Status', 'Actions'].map(h => (
                                     <TableCell key={h} sx={{ fontWeight: 'bold', fontSize: 11, whiteSpace: 'nowrap' }}>{h}</TableCell>
@@ -348,7 +348,7 @@ function DocumentSeriesPanel() {
 
             {/* Edit Dialog */}
             <Dialog open={!!editing} onClose={() => setEditing(null)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white', fontWeight: 'bold' }}>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white', fontWeight: 'bold' }}>
                     Edit Format — {editing?.label}
                 </DialogTitle>
                 <DialogContent sx={{ pt: 2.5, mt: 1 }}>
@@ -434,7 +434,7 @@ function DocumentSeriesPanel() {
                         <Grid item xs={12}>
                             <Box sx={{ backgroundColor: '#f5f7ff', border: '1px solid #c5cae9', borderRadius: 1.5, p: 2, textAlign: 'center' }}>
                                 <Typography fontSize={11} color="text.secondary" mb={0.5}>NEXT NUMBER PREVIEW</Typography>
-                                <Typography variant="h5" fontWeight="bold" color="#1a237e" fontFamily="monospace">
+                                <Typography variant="h5" fontWeight="bold" color="primary" fontFamily="monospace">
                                     {form.is_enabled ? previewNumber() : 'Manual entry'}
                                 </Typography>
                                 {form.include_fy && (
@@ -449,7 +449,7 @@ function DocumentSeriesPanel() {
                 <DialogActions sx={{ px: 3, pb: 2 }}>
                     <Button onClick={() => setEditing(null)}>Cancel</Button>
                     <Button variant="contained" onClick={save}
-                        sx={{ backgroundColor: '#1a237e' }}>
+                        sx={{ backgroundColor: 'primary.main' }}>
                         Save Format
                     </Button>
                 </DialogActions>
@@ -465,7 +465,7 @@ function FormatPanelPage() {
         <Box sx={{ pb: 4 }}>
             {/* Page header */}
             <Box sx={{
-                background: 'linear-gradient(135deg, #0d1b4b 0%, #1a237e 100%)',
+                background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.dark || theme.palette.primary.main} 0%, ${theme.palette.primary.main} 100%)`,
                 borderRadius: 2, p: 2.5, mb: 3, color: 'white',
             }}>
                 <Typography variant="h5" fontWeight="bold">Format Panel</Typography>

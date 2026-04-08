@@ -90,7 +90,7 @@ function StockMovementPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>
                 Stock Movement
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
@@ -102,14 +102,14 @@ function StockMovementPage() {
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
                 <Button variant="contained" startIcon={<AddIcon />}
                     onClick={() => setDialogOpen(true)}
-                    sx={{ backgroundColor: '#1a237e' }}>
+                    sx={{ backgroundColor: 'primary.main' }}>
                     Add Movement
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Date</TableCell>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Item Code</TableCell>
@@ -152,7 +152,7 @@ function StockMovementPage() {
 
             {/* Add Movement Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>
                     Add Stock Movement
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
@@ -206,7 +206,7 @@ function StockMovementPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#1a237e' }}>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>
                         Save Movement
                     </Button>
                 </DialogActions>

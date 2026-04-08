@@ -80,7 +80,7 @@ function PerformanceSpecsPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Performance Specifications</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Performance Specifications</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Define technical specs per product — GSM, tensile, elongation, tear strength, etc.
             </Typography>
@@ -90,14 +90,14 @@ function PerformanceSpecsPage() {
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
                 <Button variant="contained" startIcon={<AddIcon />}
                     onClick={() => { setForm(EMPTY); setDialog(true); }}
-                    sx={{ backgroundColor: '#1a237e' }}>
+                    sx={{ backgroundColor: 'primary.main' }}>
                     Add Spec
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Product', 'Category', 'Version', 'GSM', 'Tensile W/F (N)', 'Elongation W/F (%)', 'Standard', 'Status', 'Actions'].map(h => (
                                 <TableCell key={h} sx={{ color: 'white', fontWeight: 'bold' }}>{h}</TableCell>
@@ -125,7 +125,7 @@ function PerformanceSpecsPage() {
                                     <Chip label={s.status.toUpperCase()} size="small" color={STATUS_COLOR[s.status] || 'default'} />
                                 </TableCell>
                                 <TableCell>
-                                    <IconButton size="small" sx={{ color: '#1a237e' }} onClick={() => { setViewSpec(s); setViewDialog(true); }}>
+                                    <IconButton size="small" sx={{ color: 'primary.main' }} onClick={() => { setViewSpec(s); setViewDialog(true); }}>
                                         <VisibilityIcon fontSize="small" />
                                     </IconButton>
                                     <IconButton size="small" color="error" onClick={() => handleDelete(s.id)}>
@@ -140,7 +140,7 @@ function PerformanceSpecsPage() {
 
             {/* Create Dialog */}
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="md" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>Add Performance Specification</DialogTitle>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>Add Performance Specification</DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
                     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, mt: 1 }}>
                         <TextField select label="Product *" value={form.item_id} onChange={f('item_id')} sx={{ gridColumn: 'span 2' }}>
@@ -159,7 +159,7 @@ function PerformanceSpecsPage() {
                     </Box>
 
                     <Divider sx={{ my: 2 }} />
-                    <Typography fontWeight="bold" color="#1a237e" mb={2}>Physical Properties</Typography>
+                    <Typography fontWeight="bold" color="primary" mb={2}>Physical Properties</Typography>
                     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2 }}>
                         <TextField label="GSM (g/m²)" type="number" value={form.gsm} onChange={f('gsm')} />
                         <TextField label="Width (cm)" type="number" value={form.width_cm} onChange={f('width_cm')} />
@@ -167,7 +167,7 @@ function PerformanceSpecsPage() {
                     </Box>
 
                     <Divider sx={{ my: 2 }} />
-                    <Typography fontWeight="bold" color="#1a237e" mb={2}>Strength Properties</Typography>
+                    <Typography fontWeight="bold" color="primary" mb={2}>Strength Properties</Typography>
                     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2 }}>
                         <TextField label="Tensile Strength Warp (N)" type="number" value={form.tensile_strength_warp} onChange={f('tensile_strength_warp')} />
                         <TextField label="Tensile Strength Weft (N)" type="number" value={form.tensile_strength_weft} onChange={f('tensile_strength_weft')} />
@@ -182,14 +182,14 @@ function PerformanceSpecsPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setDialog(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#1a237e' }}>Save Spec</Button>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>Save Spec</Button>
                 </DialogActions>
             </Dialog>
 
             {/* View Dialog */}
             {viewSpec && (
                 <Dialog open={viewDialog} onClose={() => setViewDialog(false)} maxWidth="sm" fullWidth>
-                    <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>
+                    <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>
                         {viewSpec.item_code} — {viewSpec.spec_version}
                     </DialogTitle>
                     <DialogContent sx={{ pt: 3 }}>

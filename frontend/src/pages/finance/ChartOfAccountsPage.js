@@ -64,7 +64,7 @@ function ChartOfAccountsPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Chart of Accounts</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Chart of Accounts</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 All financial accounts — assets, liabilities, income, expenses
             </Typography>
@@ -82,14 +82,14 @@ function ChartOfAccountsPage() {
                 </FormControl>
                 <Button variant="contained" startIcon={<AddIcon />}
                     onClick={() => { setFormData(EMPTY_FORM); setDialogOpen(true); }}
-                    sx={{ backgroundColor: '#1a237e' }}>
+                    sx={{ backgroundColor: 'primary.main' }}>
                     Add Account
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Account Code</TableCell>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Account Name</TableCell>
@@ -126,7 +126,7 @@ function ChartOfAccountsPage() {
             </TableContainer>
 
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>Add New Account</DialogTitle>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>Add New Account</DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
                         <TextField label="Account Code * (e.g. 1001)" value={formData.account_code}
@@ -146,7 +146,7 @@ function ChartOfAccountsPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#1a237e' }}>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>
                         Save Account
                     </Button>
                 </DialogActions>

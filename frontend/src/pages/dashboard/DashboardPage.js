@@ -36,7 +36,7 @@ import {
 
 // ─── Color palette ──────────────────────────────────────────
 const C = {
-    navy:   '#1a237e',
+    navy:   'primary.main',
     green:  '#2e7d32',
     orange: '#e65100',
     red:    '#c62828',

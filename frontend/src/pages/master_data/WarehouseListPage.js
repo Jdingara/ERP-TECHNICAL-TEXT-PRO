@@ -60,7 +60,7 @@ function WarehouseListPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Warehouses</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Warehouses</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Manage stock storage locations
             </Typography>
@@ -69,12 +69,12 @@ function WarehouseListPage() {
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
                 <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd}
-                    sx={{ backgroundColor: '#1a237e' }}>Add Warehouse</Button>
+                    sx={{ backgroundColor: 'primary.main' }}>Add Warehouse</Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Code</TableCell>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Warehouse Name</TableCell>
@@ -96,7 +96,7 @@ function WarehouseListPage() {
                                     <TableCell>{w.name}</TableCell>
                                     <TableCell>{w.address || '—'}</TableCell>
                                     <TableCell>
-                                        <IconButton size="small" onClick={() => handleOpenEdit(w)} sx={{ color: '#1a237e' }}>
+                                        <IconButton size="small" onClick={() => handleOpenEdit(w)} sx={{ color: 'primary.main' }}>
                                             <EditIcon fontSize="small" />
                                         </IconButton>
                                     </TableCell>
@@ -108,7 +108,7 @@ function WarehouseListPage() {
             </TableContainer>
 
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>
                     {editingId ? 'Edit Warehouse' : 'Add New Warehouse'}
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
@@ -123,7 +123,7 @@ function WarehouseListPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#1a237e' }}>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>
                         {editingId ? 'Update' : 'Save Warehouse'}
                     </Button>
                 </DialogActions>

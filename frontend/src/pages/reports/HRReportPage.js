@@ -16,7 +16,7 @@ import {
 import ReportToolbar from '../../components/common/ReportToolbar';
 
 const API = '/api/reports/hr/';
-const PIE_COLORS = ['#1a237e','#2e7d32','#e65100','#6a1b9a','#00838f','#c62828'];
+const PIE_COLORS = ['primary.main','#2e7d32','#e65100','#6a1b9a','#00838f','#c62828'];
 const ATTENDANCE_COLOR = { present: '#2e7d32', absent: '#c62828', half_day: '#e65100', leave: '#6a1b9a' };
 
 function KpiCard({ title, value, color }) {
@@ -78,13 +78,13 @@ function HRReportPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>HR Report</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>HR Report</Typography>
             <Typography variant="body2" color="text.secondary" mb={2}>Employee strength, salary summary, and attendance analysis</Typography>
             <ReportToolbar title="HR_Report" printRef={printRef} onExcel={getExcelData} />
         <Box ref={printRef}>
 
             <Grid container spacing={3} mb={4}>
-                <Grid item xs={6} md={6}><KpiCard title="Total Active Employees" value={data.total_employees} color="#1a237e" /></Grid>
+                <Grid item xs={6} md={6}><KpiCard title="Total Active Employees" value={data.total_employees} color="primary" /></Grid>
                 <Grid item xs={6} md={6}><KpiCard title="Total Departments" value={data.total_departments} color="#2e7d32" /></Grid>
             </Grid>
 
@@ -92,7 +92,7 @@ function HRReportPage() {
                 {/* Employees by Department */}
                 <Grid item xs={12} md={6}>
                     <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Employees by Department</Typography>
+                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Employees by Department</Typography>
                         {data.employees_by_dept.length === 0 ? (
                             <Typography color="text.secondary" align="center" py={4}>No department data yet</Typography>
                         ) : (
@@ -112,7 +112,7 @@ function HRReportPage() {
                 {/* Attendance This Month */}
                 <Grid item xs={12} md={6}>
                     <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Attendance This Month</Typography>
+                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Attendance This Month</Typography>
                         {data.attendance_this_month.length === 0 ? (
                             <Typography color="text.secondary" align="center" py={4}>No attendance records this month</Typography>
                         ) : (
@@ -135,7 +135,7 @@ function HRReportPage() {
 
             {/* Salary Summary */}
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, mb: 3 }}>
-                <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Salary Summary (Last 6 Months)</Typography>
+                <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Salary Summary (Last 6 Months)</Typography>
                 {data.salary_summary.length === 0 ? (
                     <Typography color="text.secondary" align="center" py={3}>No salary records processed yet</Typography>
                 ) : (
@@ -152,7 +152,7 @@ function HRReportPage() {
                         </ResponsiveContainer>
                         <TableContainer sx={{ mt: 2 }}>
                             <Table size="small">
-                                <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                                <TableHead sx={{ backgroundColor: 'action.hover' }}>
                                     <TableRow>
                                         <TableCell><strong>Period</strong></TableCell>
                                         <TableCell align="right"><strong>Employees</strong></TableCell>
@@ -182,10 +182,10 @@ function HRReportPage() {
 
             {/* Recent Salary Records */}
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>Recent Salary Records</Typography>
+                <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Recent Salary Records</Typography>
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
                                 <TableCell><strong>Employee</strong></TableCell>
                                 <TableCell><strong>Code</strong></TableCell>

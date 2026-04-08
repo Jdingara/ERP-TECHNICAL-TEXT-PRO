@@ -75,7 +75,7 @@ function CustomerListPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Customers</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Customers</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Manage all domestic and export customers
             </Typography>
@@ -86,12 +86,12 @@ function CustomerListPage() {
                 <TextField placeholder="Search customers..." value={searchText}
                     onChange={handleSearch} size="small" sx={{ width: 350 }} />
                 <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAddDialog}
-                    sx={{ backgroundColor: '#1a237e' }}>Add Customer</Button>
+                    sx={{ backgroundColor: 'primary.main' }}>Add Customer</Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Code</TableCell>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Customer Name</TableCell>
@@ -126,7 +126,7 @@ function CustomerListPage() {
                                     <TableCell>{c.gstin || '—'}</TableCell>
                                     <TableCell>{c.credit_days} days</TableCell>
                                     <TableCell>
-                                        <IconButton size="small" onClick={() => handleOpenEditDialog(c)} sx={{ color: '#1a237e' }}>
+                                        <IconButton size="small" onClick={() => handleOpenEditDialog(c)} sx={{ color: 'primary.main' }}>
                                             <EditIcon fontSize="small" />
                                         </IconButton>
                                     </TableCell>
@@ -139,7 +139,7 @@ function CustomerListPage() {
 
             {/* Add / Edit Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>
                     {editingId ? 'Edit Customer' : 'Add New Customer'}
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
@@ -194,7 +194,7 @@ function CustomerListPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#1a237e' }}>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>
                         {editingId ? 'Update Customer' : 'Save Customer'}
                     </Button>
                 </DialogActions>

@@ -130,7 +130,7 @@ function CreatePurchaseOrderPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>
                 Create Purchase Order
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
@@ -142,7 +142,7 @@ function CreatePurchaseOrderPage() {
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
 
                 {/* Header Section */}
-                <Typography variant="subtitle1" fontWeight="bold" color="#1a237e" mb={2}>
+                <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>
                     Order Details
                 </Typography>
                 <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, mb: 3 }}>
@@ -192,7 +192,7 @@ function CreatePurchaseOrderPage() {
 
                 {/* Items Section */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="subtitle1" fontWeight="bold" color="#1a237e">
+                    <Typography variant="subtitle1" fontWeight="bold" color="primary">
                         Items to Order
                     </Typography>
                     <Button startIcon={<AddIcon />} onClick={addLine} variant="outlined" size="small">
@@ -202,7 +202,7 @@ function CreatePurchaseOrderPage() {
 
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: '#e8eaf6' }}>
+                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>#</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Item *</TableCell>
@@ -262,7 +262,7 @@ function CreatePurchaseOrderPage() {
 
                 {/* Total */}
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, mb: 3 }}>
-                    <Typography variant="h6" fontWeight="bold" color="#1a237e">
+                    <Typography variant="h6" fontWeight="bold" color="primary">
                         Total Amount: ₹ {totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </Typography>
                 </Box>
@@ -274,7 +274,7 @@ function CreatePurchaseOrderPage() {
                     <Button variant="outlined" onClick={() => navigate('/purchasing/purchase-orders')}>
                         Cancel
                     </Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#1a237e' }}>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>
                         Save Purchase Order
                     </Button>
                 </Box>

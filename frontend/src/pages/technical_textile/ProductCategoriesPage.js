@@ -63,7 +63,7 @@ function ProductCategoriesPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Product Categories</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Product Categories</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Technical textile categories — Geotextile, Agrotextile, Protective, Automotive, etc.
             </Typography>
@@ -71,14 +71,14 @@ function ProductCategoriesPage() {
             {message && <Alert severity={msgType} sx={{ mb: 2 }} onClose={() => setMessage('')}>{message}</Alert>}
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-                <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate} sx={{ backgroundColor: '#1a237e' }}>
+                <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate} sx={{ backgroundColor: 'primary.main' }}>
                     Add Category
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Code', 'Category Name', 'Application Area', 'Description', 'Actions'].map(h => (
                                 <TableCell key={h} sx={{ color: 'white', fontWeight: 'bold' }}>{h}</TableCell>
@@ -99,7 +99,7 @@ function ProductCategoriesPage() {
                                 <TableCell>{cat.application}</TableCell>
                                 <TableCell>{cat.description}</TableCell>
                                 <TableCell>
-                                    <IconButton size="small" sx={{ color: '#1a237e' }} onClick={() => openEdit(cat)}><EditIcon fontSize="small" /></IconButton>
+                                    <IconButton size="small" sx={{ color: 'primary.main' }} onClick={() => openEdit(cat)}><EditIcon fontSize="small" /></IconButton>
                                     <IconButton size="small" color="error" onClick={() => handleDelete(cat.id)}><DeleteIcon fontSize="small" /></IconButton>
                                 </TableCell>
                             </TableRow>
@@ -109,7 +109,7 @@ function ProductCategoriesPage() {
             </TableContainer>
 
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ backgroundColor: '#1a237e', color: 'white' }}>
+                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>
                     {editId ? 'Edit Category' : 'Add Category'}
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
@@ -124,7 +124,7 @@ function ProductCategoriesPage() {
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={() => setDialog(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#1a237e' }}>Save</Button>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>Save</Button>
                 </DialogActions>
             </Dialog>
         </Box>

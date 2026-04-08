@@ -62,7 +62,7 @@ function SterilityRecordsPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Sterility Records</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Sterility Records</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Sterilization process records for surgical and wound care product batches
             </Typography>
@@ -72,14 +72,14 @@ function SterilityRecordsPage() {
             <Box sx={{ display:'flex', justifyContent:'flex-end', mb:2 }}>
                 <Button variant="contained" startIcon={<AddIcon />}
                     onClick={() => { setForm(EMPTY); setDialog(true); }}
-                    sx={{ backgroundColor:'#1a237e' }}>
+                    sx={{ backgroundColor:'primary.main' }}>
                     Add Sterility Record
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor:'#1a237e' }}>
+                    <TableHead sx={{ backgroundColor:'primary.main' }}>
                         <TableRow>
                             {['Batch','Method','Sterilization Date','Sterilized By','Cycle No.','Temp (°C)','Time (min)','Result','Actions'].map(h => (
                                 <TableCell key={h} sx={{ color:'white', fontWeight:'bold' }}>{h}</TableCell>
@@ -104,7 +104,7 @@ function SterilityRecordsPage() {
                                     <Chip label={r.test_result.toUpperCase()} size="small" color={RESULT_COLOR[r.test_result] || 'default'} />
                                 </TableCell>
                                 <TableCell>
-                                    <IconButton size="small" sx={{ color:'#1a237e' }} onClick={() => { setViewRec(r); setViewDialog(true); }}>
+                                    <IconButton size="small" sx={{ color:'primary.main' }} onClick={() => { setViewRec(r); setViewDialog(true); }}>
                                         <VisibilityIcon fontSize="small" />
                                     </IconButton>
                                 </TableCell>
@@ -116,7 +116,7 @@ function SterilityRecordsPage() {
 
             {/* Create Dialog */}
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ backgroundColor:'#1a237e', color:'white' }}>Add Sterility Record</DialogTitle>
+                <DialogTitle sx={{ backgroundColor:'primary.main', color:'white' }}>Add Sterility Record</DialogTitle>
                 <DialogContent sx={{ pt:3 }}>
                     <Box sx={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:2, mt:1 }}>
                         <TextField select label="Batch *" value={form.batch_id} onChange={f('batch_id')} sx={{ gridColumn:'span 2' }}>
@@ -142,13 +142,13 @@ function SterilityRecordsPage() {
                 </DialogContent>
                 <DialogActions sx={{ p:2 }}>
                     <Button onClick={() => setDialog(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor:'#1a237e' }}>Save</Button>
+                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor:'primary.main' }}>Save</Button>
                 </DialogActions>
             </Dialog>
 
             {viewRec && (
                 <Dialog open={viewDialog} onClose={() => setViewDialog(false)} maxWidth="sm" fullWidth>
-                    <DialogTitle sx={{ backgroundColor:'#1a237e', color:'white' }}>Sterility: {viewRec.batch_number}</DialogTitle>
+                    <DialogTitle sx={{ backgroundColor:'primary.main', color:'white' }}>Sterility: {viewRec.batch_number}</DialogTitle>
                     <DialogContent sx={{ pt:3 }}>
                         {[
                             ['Batch', viewRec.batch_number],

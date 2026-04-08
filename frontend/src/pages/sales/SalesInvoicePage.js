@@ -138,7 +138,7 @@ function SalesInvoicePage() {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     <ReceiptIcon sx={{ color: '#e65100', fontSize: 28 }} />
                     <Box>
-                        <Typography variant="h5" fontWeight="bold" color="#1a237e">Sales Invoices</Typography>
+                        <Typography variant="h5" fontWeight="bold" color="primary">Sales Invoices</Typography>
                         <Typography variant="body2" color="text.secondary">
                             Accounts Receivable — {invoices.length} invoice(s)
                         </Typography>
@@ -155,7 +155,7 @@ function SalesInvoicePage() {
             {/* Summary Cards */}
             <Grid container spacing={2} mb={3}>
                 {[
-                    { label: 'Total Invoiced', value: fmtCur(invoices.reduce((s, i) => s + parseFloat(i.total_amount || 0), 0)), color: '#1a237e' },
+                    { label: 'Total Invoiced', value: fmtCur(invoices.reduce((s, i) => s + parseFloat(i.total_amount || 0), 0)), color: 'primary.main' },
                     { label: 'Total Collected', value: fmtCur(invoices.filter(i => i.status === 'paid').reduce((s, i) => s + parseFloat(i.total_amount || 0), 0)), color: '#2e7d32' },
                     { label: 'Outstanding AR', value: fmtCur(invoices.filter(i => i.status !== 'paid').reduce((s, i) => s + parseFloat(i.balance_due || 0), 0)), color: '#e65100' },
                     { label: 'Overdue', value: invoices.filter(i => i.status === 'overdue').length + ' invoice(s)', color: '#c62828' },
@@ -172,7 +172,7 @@ function SalesInvoicePage() {
             {/* Invoice Table */}
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table size="small">
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Invoice #', 'Customer', 'SO #', 'Invoice Date', 'Due Date',
                               'Total', 'Paid', 'Balance Due', 'Status', 'Actions'].map(h => (

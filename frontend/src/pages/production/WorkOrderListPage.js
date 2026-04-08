@@ -103,7 +103,7 @@ function WorkOrderListPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Work Orders</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Work Orders</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Production instructions — tracks what to make, how much, and actual output
             </Typography>
@@ -115,14 +115,14 @@ function WorkOrderListPage() {
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={() => navigate('/production/create-work-order')}
-                    sx={{ backgroundColor: '#1a237e' }}>
+                    sx={{ backgroundColor: 'primary.main' }}>
                     Create Work Order
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>WO Number</TableCell>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>BOM / Product</TableCell>

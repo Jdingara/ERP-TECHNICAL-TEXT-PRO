@@ -50,7 +50,7 @@ function AuditTrailPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Audit Trail</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Audit Trail</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Complete activity log — auto-recorded. Read-only. Required for regulatory inspection.
             </Typography>
@@ -67,7 +67,7 @@ function AuditTrailPage() {
 
             <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
                 <Table size="small">
-                    <TableHead sx={{ backgroundColor:'#1a237e' }}>
+                    <TableHead sx={{ backgroundColor:'primary.main' }}>
                         <TableRow>
                             {['Date & Time','Module','Record Reference','Action','Performed By','Details'].map(h => (
                                 <TableCell key={h} sx={{ color:'white', fontWeight:'bold' }}>{h}</TableCell>

@@ -88,7 +88,7 @@ function SalesOrderListPage() {
 
     return (
         <Box>
-            <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Sales Orders</Typography>
+            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Sales Orders</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Manage all customer sales orders
             </Typography>
@@ -98,14 +98,14 @@ function SalesOrderListPage() {
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
                 <Button variant="contained" startIcon={<AddIcon />}
                     onClick={() => navigate('/sales/create-sales-order')}
-                    sx={{ backgroundColor: '#1a237e' }}>
+                    sx={{ backgroundColor: 'primary.main' }}>
                     Create Sales Order
                 </Button>
             </Box>
 
             <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table>
-                    <TableHead sx={{ backgroundColor: '#1a237e' }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>SO Number</TableCell>
                             <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Customer</TableCell>
