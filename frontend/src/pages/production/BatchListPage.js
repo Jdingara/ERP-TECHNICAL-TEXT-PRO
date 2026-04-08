@@ -136,7 +136,7 @@ export default function BatchListPage() {
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Batch #','Work Order','Item Code','Item Name','Qty Produced','Production Date','Expiry Date','Shelf Life Status'].map((h, i) => (
-                                <TableCell key={h} sx={{ color:'white', fontWeight:'bold', whiteSpace:'nowrap', position:'relative', userSelect:'none', px:2, py:1 }} style={{ width: widths[i] }}>
+                                <TableCell key={h} sx={{ color:'white', fontWeight:'bold', whiteSpace:'nowrap', position:'relative', userSelect:'none', backgroundColor:'primary.main', px:2, py:1 }} style={{ width: widths[i] }}>
                                     {h}<Resizer index={i} />
                                 </TableCell>
                             ))}
