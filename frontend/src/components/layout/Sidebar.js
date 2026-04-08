@@ -392,6 +392,8 @@ function Sidebar({ permissions, isAdmin }) {
 
     // Only show menu groups that have at least one visible page
     const visibleMenu = MENU_ITEMS.map(item => {
+        // Top-level leaf items (no children, e.g. Activity Log)
+        if (!item.children) return canSee(item.path) ? item : null;
         if (item.children.length === 0) return item;
         const visibleChildren = item.children.filter(c => canSee(c.path));
         return visibleChildren.length > 0 ? { ...item, children: visibleChildren } : null;
@@ -516,7 +518,7 @@ function Sidebar({ permissions, isAdmin }) {
                                 <Tooltip title={item.title} placement="right" arrow>
                                     <ListItemButton
                                         onClick={(e) => {
-                                            if (item.children.length === 0) navigate(item.path);
+                                            if (!item.children?.length) navigate(item.path);
                                             else { setPopoverEl(e.currentTarget); setPopoverMenu(item); }
                                         }}
                                         sx={{
@@ -544,12 +546,12 @@ function Sidebar({ permissions, isAdmin }) {
                             <ListItem disablePadding>
                                 <ListItemButton
                                     onClick={() => {
-                                        if (item.children.length === 0) navigate(item.path);
+                                        if (!item.children?.length) navigate(item.path);
                                         else toggle(item.title);
                                     }}
                                     sx={{
                                         borderRadius: 1.5, py: 0.9, px: 1.5,
-                                        backgroundColor: (groupActive && item.children.length === 0) ? BG_ACTIVE : 'transparent',
+                                        backgroundColor: (groupActive && !item.children?.length) ? BG_ACTIVE : 'transparent',
                                         borderLeft: groupActive ? `3px solid ${color}` : '3px solid transparent',
                                         transition: 'all 0.15s ease',
                                         '&:hover': { backgroundColor: BG_HOVER },
@@ -570,7 +572,7 @@ function Sidebar({ permissions, isAdmin }) {
                                             letterSpacing: 0.1,
                                         }}}
                                     />
-                                    {item.children.length > 0 && (
+                                    {!!item.children?.length && (
                                         groupOpen
                                             ? <ExpandLess sx={{ color: TEXT_SEC, fontSize: fs(18) }} />
                                             : <ExpandMore sx={{ color: TEXT_SEC, fontSize: fs(18) }} />
@@ -578,7 +580,7 @@ function Sidebar({ permissions, isAdmin }) {
                                 </ListItemButton>
                             </ListItem>
 
-                            {item.children.length > 0 && (
+                            {!!item.children?.length && (
                                 <Collapse in={groupOpen} timeout="auto">
                                     <List disablePadding sx={{ pl: 1, mt: 0.3 }}>
                                         {item.children.map((child) => {
