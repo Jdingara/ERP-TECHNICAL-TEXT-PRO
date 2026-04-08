@@ -15,7 +15,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const API       = '/api/technical-textile/data-sheets/';
 const API_ITEMS = '/api/master-data/items/';
@@ -25,6 +25,7 @@ const STATUS_COLOR = { draft: 'default', issued: 'success', revised: 'warning' }
 const EMPTY = { item_id: '', spec_id: '', issue_date: '', revision_number: 'R0', prepared_by: '', approved_by: '', notes: '' };
 
 function TechnicalDataSheetPage() {
+    const { widths, Resizer } = useColumnResize("technicaldatasheet", [100, 180, 150, 80]);
     const [sheets, setSheets]   = useState([]);
     const [items, setItems]     = useState([]);
     const [specs, setSpecs]     = useState([]);
@@ -96,9 +97,8 @@ function TechnicalDataSheetPage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="technicaldatasheet">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['TDS Number', 'Product', 'Revision', 'Issue Date', 'Prepared By', 'Approved By', 'Status', 'Actions'].map(h => (
@@ -142,7 +142,6 @@ function TechnicalDataSheetPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* Create Dialog */}
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>

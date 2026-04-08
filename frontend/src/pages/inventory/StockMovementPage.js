@@ -13,7 +13,7 @@ import {
     MenuItem, Select, InputLabel, FormControl, Alert
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const MOVEMENT_TYPE_OPTIONS = [
     { value: 'stock_in',        label: 'Stock In (Received)',           color: 'success' },
@@ -30,6 +30,7 @@ const EMPTY_FORM = {
 };
 
 function StockMovementPage() {
+    const { widths, Resizer } = useColumnResize("stockmovement", [100, 180, 150, 150, 150, 150, 150, 80]);
     const [movements, setMovements]   = useState([]);
     const [items, setItems]           = useState([]);
     const [warehouses, setWarehouses] = useState([]);
@@ -108,19 +109,18 @@ function StockMovementPage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="stockmovement">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Date</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Item Code</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Item Name</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Movement Type</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Quantity</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Warehouse</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Reference</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>By</TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[0] }}>Date<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[1] }}>Item Code<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[2] }}>Item Name<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[3] }}>Movement Type<Resizer index={3} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[4] }}>Quantity<Resizer index={4} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[5] }}>Warehouse<Resizer index={5} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[6] }}>Reference<Resizer index={6} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[7] }}>By<Resizer index={7} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -151,7 +151,6 @@ function StockMovementPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* Add Movement Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>

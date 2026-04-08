@@ -12,7 +12,7 @@ import {
     TextField, MenuItem, Select, InputLabel, FormControl, Alert
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const CATEGORY_OPTIONS = [
     { value: 'asset',     label: 'Asset',     color: 'primary'  },
@@ -25,6 +25,7 @@ const CATEGORY_OPTIONS = [
 const EMPTY_FORM = { account_code: '', account_name: '', account_category: 'asset', description: '' };
 
 function ChartOfAccountsPage() {
+    const { widths, Resizer } = useColumnResize("chartofaccounts", [100, 180, 150, 150, 80]);
     const [accounts, setAccounts]       = useState([]);
     const [dialogOpen, setDialogOpen]   = useState(false);
     const [formData, setFormData]       = useState(EMPTY_FORM);
@@ -88,16 +89,15 @@ function ChartOfAccountsPage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="chartofaccounts">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Account Code</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Account Name</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Category</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Description</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="right">Balance (₹)</TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[0] }}>Account Code<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[1] }}>Account Name<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[2] }}>Category<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[3] }}>Description<Resizer index={3} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[4] }}>Balance (₹)<Resizer index={4} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -126,7 +126,6 @@ function ChartOfAccountsPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
                 <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>Add New Account</DialogTitle>

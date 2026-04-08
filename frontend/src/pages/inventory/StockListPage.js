@@ -13,10 +13,11 @@ import {
 } from '@mui/material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import AddIcon from '@mui/icons-material/Add';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 import { useNavigate } from 'react-router-dom';
 
 function StockListPage() {
+    const { widths, Resizer } = useColumnResize("stock_list", [100, 180, 150, 150, 150, 150, 150, 150, 80]);
     const [stocks, setStocks]         = useState([]);
     const [searchText, setSearchText] = useState('');
     const [showLowOnly, setShowLowOnly] = useState(false);
@@ -88,20 +89,19 @@ function StockListPage() {
             </Box>
 
             {/* Stock Table */}
-            <ResizableTable storageKey="stocklist">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Item Code</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Item Name</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Type</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Yarn Count</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Warehouse</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Unit</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Current Stock</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Min Stock</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[0] }}>Item Code<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[1] }}>Item Name<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[2] }}>Type<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[3] }}>Yarn Count<Resizer index={3} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[4] }}>Warehouse<Resizer index={4} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[5] }}>Unit<Resizer index={5} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[6] }}>Current Stock<Resizer index={6} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[7] }}>Min Stock<Resizer index={7} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[8] }}>Status<Resizer index={8} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -142,7 +142,6 @@ function StockListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
         </Box>
     );
 }

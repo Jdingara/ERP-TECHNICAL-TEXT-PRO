@@ -20,7 +20,7 @@ import ExpandMoreIcon    from '@mui/icons-material/ExpandMore';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import GroupIcon         from '@mui/icons-material/Group';
 import TuneIcon          from '@mui/icons-material/Tune';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const API = '/api/authentication';
 
@@ -173,6 +173,7 @@ function PageChecklist({ selected, onChange }) {
 
 // ── Roles Tab ────────────────────────────────────────────────
 function RolesTab() {
+    const { widths, Resizer } = useColumnResize("admin", [100, 180, 150, 80]);
     const [roles,   setRoles]   = useState([]);
     const [loading, setLoading] = useState(true);
     const [error,   setError]   = useState('');
@@ -254,8 +255,7 @@ function RolesTab() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="admin">
-                <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
+            <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
                 <Table size="small">
                     <TableHead>
                         <TableRow>
@@ -297,7 +297,6 @@ function RolesTab() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* Create / Edit Dialog */}
             <Dialog open={Boolean(dialog)} onClose={closeDialog} maxWidth="md" fullWidth>

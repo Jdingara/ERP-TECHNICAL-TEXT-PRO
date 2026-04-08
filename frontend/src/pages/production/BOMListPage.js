@@ -16,11 +16,12 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const EMPTY_LINE = { raw_material_id: '', quantity: '', waste_percent: 0, notes: '' };
 
 function BOMListPage() {
+    const { widths, Resizer } = useColumnResize("bom_list", [100, 180, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 80]);
     const [boms, setBoms]               = useState([]);
     const [items, setItems]             = useState([]);
     const [dialogOpen, setDialogOpen]   = useState(false);
@@ -107,16 +108,15 @@ function BOMListPage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="bomlist">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>BOM Name</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Finished Product</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Qty Produced</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[0] }}>BOM Name<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[1] }}>Finished Product<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[2] }}>Qty Produced<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[3] }}>Status<Resizer index={3} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[4] }}>Actions<Resizer index={4} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -142,7 +142,6 @@ function BOMListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* Create BOM Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="lg" fullWidth>
@@ -167,11 +166,11 @@ function BOMListPage() {
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Raw Material *</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Quantity *</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Waste % (for spinning)</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Qty incl. Waste</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Notes</TableCell>
+                                <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[5] }}>Raw Material *<Resizer index={5} /></TableCell>
+                                <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[6] }}>Quantity *<Resizer index={6} /></TableCell>
+                                <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[7] }}>Waste % (for spinning)<Resizer index={7} /></TableCell>
+                                <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[8] }}>Qty incl. Waste<Resizer index={8} /></TableCell>
+                                <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[9] }}>Notes<Resizer index={9} /></TableCell>
                                 <TableCell></TableCell>
                             </TableRow>
                         </TableHead>
@@ -238,11 +237,11 @@ function BOMListPage() {
                         <Table size="small">
                             <TableHead sx={{ backgroundColor: 'action.hover' }}>
                                 <TableRow>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Raw Material</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Waste %</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Qty incl. Waste</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Unit</TableCell>
+                                    <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[10] }}>Raw Material<Resizer index={10} /></TableCell>
+                                    <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[11] }}>Quantity<Resizer index={11} /></TableCell>
+                                    <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[12] }}>Waste %<Resizer index={12} /></TableCell>
+                                    <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[13] }}>Qty incl. Waste<Resizer index={13} /></TableCell>
+                                    <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[14] }}>Unit<Resizer index={14} /></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>

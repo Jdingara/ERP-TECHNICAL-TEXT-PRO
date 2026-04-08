@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 // Item type options for dropdown
 const ITEM_TYPE_OPTIONS = [
@@ -34,6 +34,7 @@ const EMPTY_FORM = {
 };
 
 function ItemListPage() {
+    const { widths, Resizer } = useColumnResize('items_list', [110, 200, 130, 150, 80, 110, 100, 70]);
     const [items, setItems]           = useState([]);
     const [categories, setCategories] = useState([]);
     const [units, setUnits]           = useState([]);
@@ -163,19 +164,15 @@ function ItemListPage() {
             </Box>
 
             {/* Items Table */}
-            <ResizableTable storageKey="itemlist">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: 'fixed' }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Item Code</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Item Name</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Type</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Category</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Unit</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Yarn Count</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Min Stock</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell>
+                            {['Item Code','Item Name','Type','Category','Unit','Yarn Count','Min Stock','Actions'].map((label, i) => (
+                                <TableCell key={label} sx={{ color: 'white', fontWeight: 'bold', position: 'relative', overflow: 'hidden', whiteSpace: 'nowrap' }} style={{ width: widths[i] }}>
+                                    {label}<Resizer index={i} />
+                                </TableCell>
+                            ))}
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -210,7 +207,6 @@ function ItemListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* Add / Edit Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>

@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const API       = '/api/technical-textile/testing-lab/';
 const API_ITEMS = '/api/master-data/items/';
@@ -31,6 +31,7 @@ const EMPTY = {
 };
 
 function TestingLabPage() {
+    const { widths, Resizer } = useColumnResize("testinglab", [100, 180, 150, 80]);
     const [records, setRecords] = useState([]);
     const [items, setItems]     = useState([]);
     const [dialog, setDialog]   = useState(false);
@@ -87,9 +88,8 @@ function TestingLabPage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="testinglab">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Test No.', 'Product', 'Test Type', 'Test Date', 'Tested By', 'Lab', 'GSM', 'Tensile W/F', 'Result', 'Actions'].map(h => (
@@ -130,7 +130,6 @@ function TestingLabPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* Create Dialog */}
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="md" fullWidth>

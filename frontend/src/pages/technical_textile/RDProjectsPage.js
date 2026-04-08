@@ -14,7 +14,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const API      = '/api/technical-textile/rd-projects/';
 const API_CATS = '/api/technical-textile/categories/';
@@ -33,6 +33,7 @@ const EMPTY = {
 };
 
 function RDProjectsPage() {
+    const { widths, Resizer } = useColumnResize("rdprojects", [100, 180, 150, 80]);
     const [projects, setProjects]   = useState([]);
     const [categories, setCategories] = useState([]);
     const [dialog, setDialog]       = useState(false);
@@ -107,9 +108,8 @@ function RDProjectsPage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="rdprojects">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Project No.', 'Project Name', 'Target Product', 'Lead Engineer', 'Start Date', 'Target End', 'Status', 'Actions'].map(h => (
@@ -152,7 +152,6 @@ function RDProjectsPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* Create Dialog */}
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>

@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const API         = '/api/medical-textile/shelf-life/';
 const API_BATCHES = '/api/production/batches/';
@@ -24,6 +24,7 @@ const STATUS_COLOR = { valid:'success', near_expiry:'warning', expired:'error', 
 const EMPTY = { batch_id:'', item_id:'', manufacture_date:'', expiry_date:'', shelf_life_months:'24', storage_condition:'', quantity_remaining:'', notes:'' };
 
 function ShelfLifeTrackingPage() {
+    const { widths, Resizer } = useColumnResize("shelflifetracking", [100, 180, 150, 80]);
     const [records, setRecords] = useState([]);
     const [batches, setBatches] = useState([]);
     const [items, setItems]     = useState([]);
@@ -99,9 +100,8 @@ function ShelfLifeTrackingPage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="shelflifetracking">
-                <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor:'primary.main' }}>
                         <TableRow>
                             {['Batch','Product','Mfg Date','Expiry Date','Shelf Life','Days Left','Qty Remaining','Storage','Status'].map(h => (
@@ -144,7 +144,6 @@ function ShelfLifeTrackingPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>
                 <DialogTitle sx={{ backgroundColor:'primary.main', color:'white' }}>Add Shelf Life Record</DialogTitle>

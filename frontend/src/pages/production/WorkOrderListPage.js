@@ -19,7 +19,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon      from '@mui/icons-material/Delete';
 import PrintIcon       from '@mui/icons-material/Print';
 import AddIcon         from '@mui/icons-material/Add';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 import { useNavigate } from 'react-router-dom';
 import { printWorkOrder } from '../../utils/printUtils';
 
@@ -35,6 +35,7 @@ const STATUS_COLOR = {
 const canDelete = (wo) => ['draft', 'confirmed'].includes(wo.status);
 
 function WorkOrderListPage() {
+    const { widths, Resizer } = useColumnResize("workorder_list", [100, 180, 150, 150, 150, 150, 80]);
     const navigate = useNavigate();
 
     const [workOrders,   setWorkOrders]   = useState([]);
@@ -121,18 +122,17 @@ function WorkOrderListPage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="workorderlist">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>WO Number</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>BOM / Product</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Planned Qty</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actual Qty</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Start Date</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[0] }}>WO Number<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[1] }}>BOM / Product<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[2] }}>Planned Qty<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[3] }}>Actual Qty<Resizer index={3} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[4] }}>Start Date<Resizer index={4} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[5] }}>Status<Resizer index={5} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[6] }}>Actions<Resizer index={6} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -192,7 +192,6 @@ function WorkOrderListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* Complete Work Order Dialog */}
             <Dialog open={completeDialog} onClose={() => setCompleteDialog(false)} maxWidth="sm" fullWidth>

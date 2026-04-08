@@ -14,7 +14,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const API       = '/api/technical-textile/samples/';
 const API_ITEMS = '/api/master-data/items/';
@@ -28,6 +28,7 @@ const STATUS_COLOR = {
 const EMPTY = { item_id: '', customer_id: '', quantity: '', sent_date: '', status: 'prepared', internal_notes: '' };
 
 function SampleManagementPage() {
+    const { widths, Resizer } = useColumnResize("samplemanagement", [100, 180, 150, 80]);
     const [samples, setSamples]     = useState([]);
     const [items, setItems]         = useState([]);
     const [customers, setCustomers] = useState([]);
@@ -106,9 +107,8 @@ function SampleManagementPage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="samplemanagement">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Sample No.', 'Product', 'Customer', 'Qty', 'Sent Date', 'Approved Date', 'Status', 'Actions'].map(h => (
@@ -156,7 +156,6 @@ function SampleManagementPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* Create Dialog */}
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>

@@ -12,7 +12,7 @@ import {
     MenuItem, Select, InputLabel, FormControl, Alert
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const STATUS_OPTIONS = [
     { value: 'present',  label: 'Present',  color: 'success' },
@@ -23,6 +23,7 @@ const STATUS_OPTIONS = [
 ];
 
 function AttendancePage() {
+    const { widths, Resizer } = useColumnResize("attendance", [100, 180, 150, 150, 150, 150, 80]);
     const [attendance, setAttendance]   = useState([]);
     const [employees, setEmployees]     = useState([]);
     const [dateFilter, setDateFilter]   = useState(new Date().toISOString().split('T')[0]);
@@ -81,18 +82,17 @@ function AttendancePage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="attendance">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Employee Code</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Employee Name</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Date</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Shift</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Overtime Hrs</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Notes</TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[0] }}>Employee Code<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[1] }}>Employee Name<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[2] }}>Date<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[3] }}>Status<Resizer index={3} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[4] }}>Shift<Resizer index={4} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[5] }}>Overtime Hrs<Resizer index={5} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[6] }}>Notes<Resizer index={6} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -116,7 +116,6 @@ function AttendancePage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
                 <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>Mark Attendance</DialogTitle>

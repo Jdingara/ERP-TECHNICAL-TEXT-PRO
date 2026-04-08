@@ -13,11 +13,12 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const EMPTY_FORM = { code: '', name: '', address: '' };
 
 function WarehouseListPage() {
+    const { widths, Resizer } = useColumnResize("warehouse_list", [100, 180, 150, 80]);
     const [warehouses, setWarehouses]   = useState([]);
     const [dialogOpen, setDialogOpen]   = useState(false);
     const [formData, setFormData]       = useState(EMPTY_FORM);
@@ -73,15 +74,14 @@ function WarehouseListPage() {
                     sx={{ backgroundColor: 'primary.main' }}>Add Warehouse</Button>
             </Box>
 
-            <ResizableTable storageKey="warehouselist">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Code</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Warehouse Name</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Address</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[0] }}>Code<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[1] }}>Warehouse Name<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[2] }}>Address<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[3] }}>Actions<Resizer index={3} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -108,7 +108,6 @@ function WarehouseListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
                 <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>

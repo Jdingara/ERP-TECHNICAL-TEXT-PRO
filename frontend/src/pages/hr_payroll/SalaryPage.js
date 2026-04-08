@@ -16,7 +16,7 @@ import {
 import CalculateIcon from '@mui/icons-material/Calculate';
 import DeleteIcon    from '@mui/icons-material/Delete';
 import PrintIcon     from '@mui/icons-material/Print';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 import { printSalarySlip } from '../../utils/printUtils';
 
 const MONTHS = [
@@ -31,6 +31,7 @@ const MONTHS = [
 const canDelete = (s) => s.status === 'draft';
 
 function SalaryPage() {
+    const { widths, Resizer } = useColumnResize("salary", [100, 180, 150, 150, 150, 150, 150, 150, 80]);
     const [salaries,    setSalaries]    = useState([]);
     const [employees,   setEmployees]   = useState([]);
     const [dialogOpen,  setDialogOpen]  = useState(false);
@@ -119,20 +120,19 @@ function SalaryPage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="salary">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Employee</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Department</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Present Days</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="right">Gross (₹)</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="right">PF (₹)</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="right">ESI (₹)</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="right">Net Pay (₹)</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[0] }}>Employee<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[1] }}>Department<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[2] }}>Present Days<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[3] }}>Gross (₹)<Resizer index={3} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[4] }}>PF (₹)<Resizer index={4} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[5] }}>ESI (₹)<Resizer index={5} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[6] }}>Net Pay (₹)<Resizer index={6} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[7] }}>Status<Resizer index={7} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[8] }}>Actions<Resizer index={8} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -179,7 +179,6 @@ function SalaryPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* Process Salary Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>

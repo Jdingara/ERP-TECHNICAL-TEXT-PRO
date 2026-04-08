@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const API         = '/api/medical-textile/sterility/';
 const API_BATCHES = '/api/production/batches/';
@@ -29,6 +29,7 @@ const EMPTY = {
 };
 
 function SterilityRecordsPage() {
+    const { widths, Resizer } = useColumnResize("sterilityrecords", [100, 180, 150, 80]);
     const [records, setRecords] = useState([]);
     const [batches, setBatches] = useState([]);
     const [dialog, setDialog]   = useState(false);
@@ -78,9 +79,8 @@ function SterilityRecordsPage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="sterilityrecords">
-                <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor:'primary.main' }}>
                         <TableRow>
                             {['Batch','Method','Sterilization Date','Sterilized By','Cycle No.','Temp (°C)','Time (min)','Result','Actions'].map(h => (
@@ -115,7 +115,6 @@ function SterilityRecordsPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* Create Dialog */}
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>

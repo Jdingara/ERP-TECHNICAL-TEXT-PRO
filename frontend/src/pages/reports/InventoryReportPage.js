@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { ResizableChartPanel } from '../../components/common/ResizableChartPanel';
 import { ResizablePanelRowInner } from '../../components/common/ResizablePanelRow';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell, Legend
@@ -31,6 +31,7 @@ function KpiCard({ title, value, color }) {
 }
 
 function InventoryReportPage() {
+    const { widths, Resizer } = useColumnResize("inventoryreport", [100, 180, 150, 80]);
     const [data, setData]       = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError]     = useState('');
@@ -127,8 +128,7 @@ function InventoryReportPage() {
             {data.low_stock_items.length > 0 && (
                 <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, mb: 3 }}>
                     <Typography variant="subtitle1" fontWeight="bold" color="#e53935" mb={2}>Low Stock Items (Qty ≤ 10)</Typography>
-                    <ResizableTable storageKey="inventoryreport">
-                <TableContainer>
+                    <TableContainer>
                         <Table size="small">
                             <TableHead sx={{ backgroundColor: '#ffebee' }}>
                                 <TableRow>
@@ -150,7 +150,6 @@ function InventoryReportPage() {
                             </TableBody>
                         </Table>
                     </TableContainer>
-            </ResizableTable>
                 </Paper>
             )}
 

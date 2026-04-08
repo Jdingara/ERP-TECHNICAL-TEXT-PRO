@@ -16,7 +16,7 @@ import PrintIcon        from '@mui/icons-material/Print';
 import PaymentIcon      from '@mui/icons-material/Payment';
 import AddIcon          from '@mui/icons-material/Add';
 import ReceiptIcon      from '@mui/icons-material/Receipt';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 import { printInvoice } from '../../utils/printUtils';
 
 const STATUS_COLOR = {
@@ -27,6 +27,7 @@ const STATUS_COLOR = {
 };
 
 function SalesInvoicePage() {
+    const { widths, Resizer } = useColumnResize("salesinvoice", [100, 180, 150, 80]);
     const [invoices, setInvoices]     = useState([]);
     const [loading,  setLoading]      = useState(true);
     const [msg,      setMsg]          = useState('');
@@ -171,8 +172,7 @@ function SalesInvoicePage() {
             </Grid>
 
             {/* Invoice Table */}
-            <ResizableTable storageKey="salesinvoice">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
                 <Table size="small">
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
@@ -232,7 +232,6 @@ function SalesInvoicePage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* Create Invoice Dialog */}
             <Dialog open={openDlg} onClose={() => setOpenDlg(false)} maxWidth="sm" fullWidth>

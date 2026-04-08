@@ -14,7 +14,7 @@ import AddIcon        from '@mui/icons-material/Add';
 import PrintIcon      from '@mui/icons-material/Print';
 import DeleteIcon     from '@mui/icons-material/Delete';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 import { useNavigate } from 'react-router-dom';
 import { printSalesOrder, printDeliveryChallan } from '../../utils/printUtils';
 
@@ -29,6 +29,7 @@ const STATUS_COLORS = {
 const canDelete = (so) => so.status === 'draft';
 
 function SalesOrderListPage() {
+    const { widths, Resizer } = useColumnResize("salesorder_list", [100, 180, 150, 150, 150, 150, 150, 80]);
     const [orders,  setOrders]  = useState([]);
     const [message, setMessage] = useState('');
     const [msgType, setMsgType] = useState('success');
@@ -104,19 +105,18 @@ function SalesOrderListPage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="salesorderlist">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>SO Number</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Customer</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Warehouse</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Order Date</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Delivery Date</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Total Amount</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[0] }}>SO Number<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[1] }}>Customer<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[2] }}>Warehouse<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[3] }}>Order Date<Resizer index={3} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[4] }}>Delivery Date<Resizer index={4} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[5] }}>Total Amount<Resizer index={5} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[6] }}>Status<Resizer index={6} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[7] }}>Actions<Resizer index={7} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -179,7 +179,6 @@ function SalesOrderListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
         </Box>
     );
 }

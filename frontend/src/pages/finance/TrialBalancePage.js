@@ -12,9 +12,10 @@ import {
     Button, Alert
 } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 function TrialBalancePage() {
+    const { widths, Resizer } = useColumnResize("trialbalance", [100, 180, 150, 150, 80]);
     const [trialBalance, setTrialBalance] = useState([]);
     const [totalDebit, setTotalDebit]     = useState(0);
     const [totalCredit, setTotalCredit]   = useState(0);
@@ -58,16 +59,15 @@ function TrialBalancePage() {
                 </Alert>
             )}
 
-            <ResizableTable storageKey="trialbalance">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Account Code</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Account Name</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Category</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="right">Debit (₹)</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="right">Credit (₹)</TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[0] }}>Account Code<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[1] }}>Account Name<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[2] }}>Category<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[3] }}>Debit (₹)<Resizer index={3} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[4] }}>Credit (₹)<Resizer index={4} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -100,7 +100,6 @@ function TrialBalancePage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
         </Box>
     );
 }

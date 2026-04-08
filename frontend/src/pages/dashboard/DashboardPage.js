@@ -27,7 +27,7 @@ import ReceiptIcon          from '@mui/icons-material/Receipt';
 import AccountBalanceIcon   from '@mui/icons-material/AccountBalance';
 import RefreshIcon          from '@mui/icons-material/Refresh';
 import SpeedIcon            from '@mui/icons-material/Speed';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 import { ResizableChartPanel } from '../../components/common/ResizableChartPanel';
 import { ResizablePanelRowInner } from '../../components/common/ResizablePanelRow';
 import { useNavigate }      from 'react-router-dom';
@@ -210,6 +210,7 @@ const CurTip = ({ active, payload, label }) => {
 // MAIN DASHBOARD
 // ════════════════════════════════════════════════════════════
 function DashboardPage() {
+    const { widths, Resizer } = useColumnResize("dashboard", [100, 180, 150, 80]);
     const navigate = useNavigate();
     const theme    = useTheme();
     const accentColor = theme.palette.primary.main;
@@ -574,8 +575,7 @@ function DashboardPage() {
             {data.low_stock_items?.length > 0 && (
                 <>
                     <SectionLabel color={C.red}>Low Stock Alerts</SectionLabel>
-                    <ResizableTable storageKey="dashboard">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2, mb: 2 }}>
+                    <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2, mb: 2 }}>
                         <Table size="small">
                             <TableHead sx={{ backgroundColor: C.red }}>
                                 <TableRow>
@@ -590,7 +590,7 @@ function DashboardPage() {
                                         <TableCell><strong>{item.item_code}</strong></TableCell>
                                         <TableCell>{item.item_name}</TableCell>
                                         <TableCell>{item.warehouse}</TableCell>
-                                        <TableCell sx={{ color: C.red, fontWeight: 'bold' }}>{item.quantity}</TableCell>
+                                        <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[0] }}>{item.quantity}<Resizer index={0} /></TableCell>
                                         <TableCell>{item.reorder_level}</TableCell>
                                         <TableCell>
                                             <Chip label="LOW" size="small" color="error" sx={{ fontSize: 10 }} />
@@ -600,7 +600,6 @@ function DashboardPage() {
                             </TableBody>
                         </Table>
                     </TableContainer>
-            </ResizableTable>
                 </>
             )}
 

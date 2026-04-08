@@ -12,7 +12,7 @@ import {
     TableContainer, TableHead, TableRow, Paper, Chip,
     Alert, TextField, MenuItem
 } from '@mui/material';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const API = '/api/medical-textile/audit-trail/';
 
@@ -26,6 +26,7 @@ const ACTION_COLOR = {
 };
 
 function AuditTrailPage() {
+    const { widths, Resizer } = useColumnResize("audittrail", [100, 180, 150, 80]);
     const [trails, setTrails]     = useState([]);
     const [filtered, setFiltered] = useState([]);
     const [moduleFilter, setModuleFilter] = useState('');
@@ -66,8 +67,7 @@ function AuditTrailPage() {
                 </TextField>
             </Box>
 
-            <ResizableTable storageKey="audittrail">
-                <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
+            <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
                 <Table size="small">
                     <TableHead sx={{ backgroundColor:'primary.main' }}>
                         <TableRow>
@@ -98,7 +98,6 @@ function AuditTrailPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             <Typography variant="caption" color="text.secondary" sx={{ mt:2, display:'block' }}>
                 Showing last 200 entries. All actions in the Medical Textile module are logged automatically.

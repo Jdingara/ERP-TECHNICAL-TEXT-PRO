@@ -15,7 +15,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const API_SPECS = '/api/technical-textile/specs/';
 const API_CATS  = '/api/technical-textile/categories/';
@@ -33,6 +33,7 @@ const EMPTY = {
 };
 
 function PerformanceSpecsPage() {
+    const { widths, Resizer } = useColumnResize("performancespecs", [100, 180, 150, 80]);
     const [specs, setSpecs]         = useState([]);
     const [items, setItems]         = useState([]);
     const [categories, setCategories] = useState([]);
@@ -96,9 +97,8 @@ function PerformanceSpecsPage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="performancespecs">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Product', 'Category', 'Version', 'GSM', 'Tensile W/F (N)', 'Elongation W/F (%)', 'Standard', 'Status', 'Actions'].map(h => (
@@ -139,7 +139,6 @@ function PerformanceSpecsPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* Create Dialog */}
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="md" fullWidth>

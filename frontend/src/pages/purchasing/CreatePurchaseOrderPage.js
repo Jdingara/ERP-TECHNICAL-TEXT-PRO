@@ -14,13 +14,14 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 import { useNavigate } from 'react-router-dom';
 
 // Empty line template
 const EMPTY_LINE = { item_id: '', ordered_quantity: '', unit_price: '', notes: '' };
 
 function CreatePurchaseOrderPage() {
+    const { widths, Resizer } = useColumnResize("createpurchaseorder", [100, 180, 150, 150, 150, 80]);
     const navigate = useNavigate();
 
     // Form header fields
@@ -201,17 +202,16 @@ function CreatePurchaseOrderPage() {
                     </Button>
                 </Box>
 
-                <ResizableTable storageKey="createpurchaseorder">
                 <TableContainer>
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold' }}>#</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Item *</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Quantity *</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Unit Price (₹)</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Total (₹)</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Notes</TableCell>
+                                <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[0] }}>#<Resizer index={0} /></TableCell>
+                                <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[1] }}>Item *<Resizer index={1} /></TableCell>
+                                <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[2] }}>Quantity *<Resizer index={2} /></TableCell>
+                                <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[3] }}>Unit Price (₹)<Resizer index={3} /></TableCell>
+                                <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[4] }}>Total (₹)<Resizer index={4} /></TableCell>
+                                <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[5] }}>Notes<Resizer index={5} /></TableCell>
                                 <TableCell></TableCell>
                             </TableRow>
                         </TableHead>
@@ -261,7 +261,6 @@ function CreatePurchaseOrderPage() {
                         </TableBody>
                     </Table>
                 </TableContainer>
-            </ResizableTable>
 
                 {/* Total */}
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, mb: 3 }}>

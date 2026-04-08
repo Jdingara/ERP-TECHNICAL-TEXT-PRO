@@ -15,11 +15,12 @@ import {
 import AddIcon    from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Autocomplete } from '@mui/material';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const EMPTY_LINE = { account_id: '', account_label: '', description: '', debit_amount: '', credit_amount: '' };
 
 function JournalEntryListPage() {
+    const { widths, Resizer } = useColumnResize("journalentry_list", [100, 180, 150, 150, 150, 150, 150, 150, 150, 150, 150, 80]);
     const [entries, setEntries]         = useState([]);
     const [accounts, setAccounts]       = useState([]);
     const [dialogOpen, setDialogOpen]   = useState(false);
@@ -129,19 +130,18 @@ function JournalEntryListPage() {
                     sx={{ backgroundColor: 'primary.main' }}>New Journal Entry</Button>
             </Box>
 
-            <ResizableTable storageKey="journalentrylist">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Entry Number</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Date</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Description</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Reference</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="right">Total Debit</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="right">Total Credit</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[0] }}>Entry Number<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[1] }}>Date<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[2] }}>Description<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[3] }}>Reference<Resizer index={3} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[4] }}>Total Debit<Resizer index={4} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[5] }}>Total Credit<Resizer index={5} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[6] }}>Status<Resizer index={6} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[7] }}>Actions<Resizer index={7} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -185,7 +185,6 @@ function JournalEntryListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* New Journal Entry Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="lg" fullWidth>
@@ -208,10 +207,10 @@ function JournalEntryListPage() {
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Account *</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Description</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }} align="right">Debit (₹)</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }} align="right">Credit (₹)</TableCell>
+                                <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[8] }}>Account *<Resizer index={8} /></TableCell>
+                                <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[9] }}>Description<Resizer index={9} /></TableCell>
+                                <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[10] }}>Debit (₹)<Resizer index={10} /></TableCell>
+                                <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[11] }}>Credit (₹)<Resizer index={11} /></TableCell>
                                 <TableCell></TableCell>
                             </TableRow>
                         </TableHead>

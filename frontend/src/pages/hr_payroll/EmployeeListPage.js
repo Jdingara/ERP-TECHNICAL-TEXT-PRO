@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const GENDER_OPTIONS      = [{ value: 'male', label: 'Male' }, { value: 'female', label: 'Female' }, { value: 'other', label: 'Other' }];
 const EMP_TYPE_OPTIONS    = [
@@ -33,6 +33,7 @@ const EMPTY_FORM = {
 };
 
 function EmployeeListPage() {
+    const { widths, Resizer } = useColumnResize("employee_list", [100, 180, 150, 80]);
     const [employees, setEmployees]     = useState([]);
     const [departments, setDepartments] = useState([]);
     const [searchText, setSearchText]   = useState('');
@@ -97,9 +98,8 @@ function EmployeeListPage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="employeelist">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Code', 'Full Name', 'Department', 'Designation', 'Type', 'Phone', 'Joining Date', 'Gross Salary', 'Status', 'Actions'].map(h => (
@@ -135,7 +135,6 @@ function EmployeeListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* Add/Edit Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>

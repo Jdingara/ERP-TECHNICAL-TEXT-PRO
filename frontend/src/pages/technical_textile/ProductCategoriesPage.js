@@ -13,12 +13,13 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const API = '/api/technical-textile/categories/';
 const EMPTY = { name: '', code: '', description: '', application: '' };
 
 function ProductCategoriesPage() {
+    const { widths, Resizer } = useColumnResize("productcategories", [100, 180, 150, 80]);
     const [categories, setCategories] = useState([]);
     const [dialog, setDialog]         = useState(false);
     const [form, setForm]             = useState(EMPTY);
@@ -77,9 +78,8 @@ function ProductCategoriesPage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="productcategories">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Code', 'Category Name', 'Application Area', 'Description', 'Actions'].map(h => (
@@ -109,7 +109,6 @@ function ProductCategoriesPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>
                 <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>

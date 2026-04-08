@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const SUPPLIER_TYPE_OPTIONS = [
     { value: 'yarn_supplier',        label: 'Yarn Supplier' },
@@ -31,6 +31,7 @@ const EMPTY_FORM = {
 };
 
 function SupplierListPage() {
+    const { widths, Resizer } = useColumnResize("supplier_list", [100, 180, 150, 150, 150, 150, 150, 150, 80]);
     const [suppliers, setSuppliers]     = useState([]);
     const [searchText, setSearchText]   = useState('');
     const [dialogOpen, setDialogOpen]   = useState(false);
@@ -96,20 +97,19 @@ function SupplierListPage() {
                     sx={{ backgroundColor: 'primary.main' }}>Add Supplier</Button>
             </Box>
 
-            <ResizableTable storageKey="supplierlist">
-                <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow: 2, borderRadius: 2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Code</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Supplier Name</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Type</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Contact</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Phone</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>City</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>GSTIN</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Credit Days</TableCell>
-                            <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[0] }}>Code<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[1] }}>Supplier Name<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[2] }}>Type<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[3] }}>Contact<Resizer index={3} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[4] }}>Phone<Resizer index={4} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[5] }}>City<Resizer index={5} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[6] }}>GSTIN<Resizer index={6} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[7] }}>Credit Days<Resizer index={7} /></TableCell>
+                            <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[8] }}>Actions<Resizer index={8} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -143,7 +143,6 @@ function SupplierListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* Add / Edit Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>

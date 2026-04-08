@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { ResizableChartPanel } from '../../components/common/ResizableChartPanel';
 import { ResizablePanelRowInner } from '../../components/common/ResizablePanelRow';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell
@@ -32,6 +32,7 @@ function KpiCard({ title, value, color }) {
 }
 
 function HRReportPage() {
+    const { widths, Resizer } = useColumnResize("hrreport", [100, 180, 150, 80]);
     const [data, setData]       = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError]     = useState('');
@@ -147,8 +148,7 @@ function HRReportPage() {
                                 <Bar dataKey="total_net" name="Net Salary" fill="#2e7d32" radius={[4,4,0,0]} />
                             </BarChart>
                         </ResponsiveContainer>
-                        <ResizableTable storageKey="hrreport">
-                <TableContainer sx={{ mt: 2 }}>
+                        <TableContainer sx={{ mt: 2 }}>
                             <Table size="small">
                                 <TableHead sx={{ backgroundColor: 'action.hover' }}>
                                     <TableRow>
@@ -174,7 +174,6 @@ function HRReportPage() {
                                 </TableBody>
                             </Table>
                         </TableContainer>
-            </ResizableTable>
                     </>
                 )}
             </Paper>

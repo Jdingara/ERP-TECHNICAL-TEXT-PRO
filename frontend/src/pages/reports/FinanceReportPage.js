@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { ResizableChartPanel } from '../../components/common/ResizableChartPanel';
 import { ResizablePanelRowInner } from '../../components/common/ResizablePanelRow';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell
@@ -32,6 +32,7 @@ function KpiCard({ title, value, color }) {
 }
 
 function FinanceReportPage() {
+    const { widths, Resizer } = useColumnResize("financereport", [100, 180, 150, 80]);
     const [data, setData]       = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError]     = useState('');
@@ -129,7 +130,6 @@ function FinanceReportPage() {
             {/* Account Balances by Category */}
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, mb: 3 }}>
                 <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Account Balances by Category</Typography>
-                <ResizableTable storageKey="financereport">
                 <TableContainer>
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: 'action.hover' }}>
@@ -155,7 +155,6 @@ function FinanceReportPage() {
                         </TableBody>
                     </Table>
                 </TableContainer>
-            </ResizableTable>
             </Paper>
 
             {/* Recent Journal Entries */}

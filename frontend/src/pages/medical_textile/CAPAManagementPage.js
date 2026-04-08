@@ -16,7 +16,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 const API = '/api/medical-textile/capa/';
 
@@ -25,6 +25,7 @@ const SOURCES = ['customer_complaint','internal_audit','external_audit','product
 const EMPTY = { capa_type:'corrective', source:'customer_complaint', description:'', root_cause:'', responsible_person:'', target_date:'' };
 
 function CAPAManagementPage() {
+    const { widths, Resizer } = useColumnResize("capamanagement", [100, 180, 150, 80]);
     const [capas, setCapas]         = useState([]);
     const [dialog, setDialog]       = useState(false);
     const [closeDialog, setCloseDialog] = useState(false);
@@ -81,9 +82,8 @@ function CAPAManagementPage() {
                 </Button>
             </Box>
 
-            <ResizableTable storageKey="capamanagement">
-                <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
-                <Table>
+            <TableContainer component={Paper} sx={{ boxShadow:2, borderRadius:2 }}>
+                <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor:'primary.main' }}>
                         <TableRow>
                             {['CAPA No.','Type','Source','Description','Responsible','Target Date','Status','Actions'].map(h => (
@@ -125,7 +125,6 @@ function CAPAManagementPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-            </ResizableTable>
 
             {/* Create Dialog */}
             <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>

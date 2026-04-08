@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { ResizableChartPanel } from '../../components/common/ResizableChartPanel';
 import { ResizablePanelRowInner } from '../../components/common/ResizablePanelRow';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, LineChart, Line
@@ -32,6 +32,7 @@ function KpiCard({ title, value, subtitle, color }) {
 }
 
 function SalesReportPage() {
+    const { widths, Resizer } = useColumnResize("salesreport", [100, 180, 150, 80]);
     const [data, setData]       = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError]     = useState('');
@@ -111,8 +112,7 @@ function SalesReportPage() {
             <ResizablePanelRowInner storageKey="salesreport_charts" defaultPercents={[50,50]}>
                 {/* Top Customers */}
                 <ResizableChartPanel storageKey="salesreport_top_5_customers_by_order_" title="Top 5 Customers by Order Value" defaultHeight={280}>
-                        <ResizableTable storageKey="salesreport">
-                <TableContainer>
+                        <TableContainer>
                             <Table size="small">
                                 <TableHead sx={{ backgroundColor: 'action.hover' }}>
                                     <TableRow>
@@ -134,7 +134,6 @@ function SalesReportPage() {
                                 </TableBody>
                             </Table>
                         </TableContainer>
-            </ResizableTable>
                     </ResizableChartPanel>
 
                 {/* Status Breakdown */}

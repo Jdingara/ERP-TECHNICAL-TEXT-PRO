@@ -15,9 +15,10 @@ import {
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FactoryIcon from '@mui/icons-material/Factory';
-import { ResizableTable } from '../../components/common/ResizableTable';
+import { useColumnResize } from '../../components/common/useColumnResize';
 
 function CreateWorkOrderPage() {
+    const { widths, Resizer } = useColumnResize("createworkorder", [100, 180, 150, 80]);
     const navigate = useNavigate();
 
     const [boms, setBoms]             = useState([]);
@@ -229,8 +230,7 @@ function CreateWorkOrderPage() {
                         will be calculated when you complete the work order.
                     </Alert>
 
-                    <ResizableTable storageKey="createworkorder">
-                <TableContainer>
+                    <TableContainer>
                         <Table size="small">
                             <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                                 <TableRow>
@@ -263,7 +263,6 @@ function CreateWorkOrderPage() {
                             </TableBody>
                         </Table>
                     </TableContainer>
-            </ResizableTable>
                 </Paper>
             )}
 
