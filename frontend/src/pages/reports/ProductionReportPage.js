@@ -4,7 +4,7 @@
 //          monthly output chart, top produced items.
 // ============================================================
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Box, Typography, Grid, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
@@ -13,6 +13,7 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, Cell
 } from 'recharts';
+import ReportToolbar from '../../components/common/ReportToolbar';
 
 const API = '/api/reports/production/';
 const STATUS_COLOR = { draft:'default', confirmed:'primary', in_progress:'warning', completed:'success', cancelled:'error' };
@@ -30,6 +31,7 @@ function ProductionReportPage() {
     const [data, setData]     = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError]   = useState('');
+    const printRef = useRef();
 
     useEffect(() => {
         fetch(API, { credentials: 'include' })
@@ -41,10 +43,48 @@ function ProductionReportPage() {
     if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}><CircularProgress /></Box>;
     if (error)   return <Alert severity="error">{error}</Alert>;
 
+    const getExcelData = () => [
+        {
+            sheetName: 'Work Orders by Status',
+            rows: data.wo_by_status.map(s => ({
+                'Status': s.status,
+                'Count':  s.count,
+            })),
+        },
+        {
+            sheetName: 'Top Produced Items',
+            rows: data.top_items.map(t => ({
+                'Item Code':      t.item_code,
+                'Item Name':      t.item_name,
+                'Total Produced': t.total_produced,
+            })),
+        },
+        {
+            sheetName: 'Recent Batches',
+            rows: data.recent_batches.map(b => ({
+                'Batch Number':    b.batch_number,
+                'Item Code':       b.item_code,
+                'Item Name':       b.item_name,
+                'Qty Produced':    b.quantity_produced,
+                'Production Date': b.production_date,
+            })),
+        },
+        {
+            sheetName: 'Monthly Production',
+            rows: data.monthly_production.map(m => ({
+                'Month':      m.month,
+                'Total Qty':  m.total_qty,
+                'Batch Count': m.batch_count,
+            })),
+        },
+    ];
+
     return (
         <Box>
             <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Production Report</Typography>
-            <Typography variant="body2" color="text.secondary" mb={3}>Work orders, batches, and monthly output summary</Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>Work orders, batches, and monthly output summary</Typography>
+            <ReportToolbar title="Production_Report" printRef={printRef} onExcel={getExcelData} />
+        <Box ref={printRef}>
 
             {/* KPI Cards */}
             <Grid container spacing={3} mb={4}>
@@ -139,6 +179,7 @@ function ProductionReportPage() {
                     </Table>
                 </TableContainer>
             </Paper>
+        </Box> {/* end printRef Box */}
         </Box>
     );
 }

@@ -4,7 +4,7 @@
 //          journal entry activity, monthly trends.
 // ============================================================
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Box, Typography, Grid, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
@@ -13,6 +13,7 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
+import ReportToolbar from '../../components/common/ReportToolbar';
 
 const API = '/api/reports/finance/';
 const PIE_COLORS = ['#1a237e','#2e7d32','#e65100','#6a1b9a','#c62828'];
@@ -31,6 +32,7 @@ function FinanceReportPage() {
     const [data, setData]       = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError]     = useState('');
+    const printRef = useRef();
 
     useEffect(() => {
         fetch(API, { credentials: 'include' })
@@ -42,10 +44,41 @@ function FinanceReportPage() {
     if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}><CircularProgress /></Box>;
     if (error)   return <Alert severity="error">{error}</Alert>;
 
+    const getExcelData = () => [
+        {
+            sheetName: 'Account Balances',
+            rows: data.accounts_by_category.map(c => ({
+                'Category':       c.category,
+                'No. of Accounts': c.account_count,
+                'Total Balance (₹)': c.total_balance,
+            })),
+        },
+        {
+            sheetName: 'Journal Entries',
+            rows: data.recent_entries.map(e => ({
+                'Entry No.':   e.entry_number,
+                'Date':        e.entry_date,
+                'Description': e.description,
+                'Amount (₹)':  e.total_debit,
+                'Status':      e.status,
+            })),
+        },
+        {
+            sheetName: 'Monthly Activity',
+            rows: data.monthly_entries.map(m => ({
+                'Month':        m.month,
+                'Entries':      m.count,
+                'Total Debit (₹)': m.total_debit,
+            })),
+        },
+    ];
+
     return (
         <Box>
             <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Finance Report</Typography>
-            <Typography variant="body2" color="text.secondary" mb={3}>Accounts, journal entries, and financial activity summary</Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>Accounts, journal entries, and financial activity summary</Typography>
+            <ReportToolbar title="Finance_Report" printRef={printRef} onExcel={getExcelData} />
+        <Box ref={printRef}>
 
             <Grid container spacing={3} mb={4}>
                 <Grid item xs={6} md={4}><KpiCard title="Total Accounts" value={data.total_accounts} color="#1a237e" /></Grid>
@@ -158,6 +191,7 @@ function FinanceReportPage() {
                     </Table>
                 </TableContainer>
             </Paper>
+        </Box> {/* end printRef Box */}
         </Box>
     );
 }

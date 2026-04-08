@@ -4,7 +4,7 @@
 //          order status breakdown, invoice summary.
 // ============================================================
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Box, Typography, Grid, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
@@ -13,6 +13,7 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, LineChart, Line
 } from 'recharts';
+import ReportToolbar from '../../components/common/ReportToolbar';
 
 const API = '/api/reports/sales/';
 const STATUS_COLOR = { draft:'default', confirmed:'primary', partial:'warning', delivered:'success', cancelled:'error' };
@@ -31,6 +32,7 @@ function SalesReportPage() {
     const [data, setData]       = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError]     = useState('');
+    const printRef = useRef();
 
     useEffect(() => {
         fetch(API, { credentials: 'include' })
@@ -42,10 +44,41 @@ function SalesReportPage() {
     if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}><CircularProgress /></Box>;
     if (error)   return <Alert severity="error">{error}</Alert>;
 
+    const getExcelData = () => [
+        {
+            sheetName: 'Sales Orders',
+            rows: data.recent_orders.map(o => ({
+                'SO Number':   o.so_number,
+                'Customer':    o.customer,
+                'Order Date':  o.order_date,
+                'Amount (₹)':  o.total_amount,
+                'Status':      o.status,
+            })),
+        },
+        {
+            sheetName: 'Top Customers',
+            rows: data.top_customers.map(c => ({
+                'Customer':      c.customer,
+                'Orders':        c.order_count,
+                'Total Value (₹)': c.total_value,
+            })),
+        },
+        {
+            sheetName: 'Monthly Sales',
+            rows: data.monthly_sales.map(m => ({
+                'Month':         m.month,
+                'Orders':        m.order_count,
+                'Total Value (₹)': m.total_value,
+            })),
+        },
+    ];
+
     return (
         <Box>
             <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Sales Report</Typography>
-            <Typography variant="body2" color="text.secondary" mb={3}>Monthly sales, top customers, and order status analysis</Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>Monthly sales, top customers, and order status analysis</Typography>
+            <ReportToolbar title="Sales_Report" printRef={printRef} onExcel={getExcelData} />
+        <Box ref={printRef}>
 
             <Grid container spacing={3} mb={4}>
                 <Grid item xs={6} md={3}><KpiCard title="Total Sales Orders" value={data.total_sales_orders} color="#1a237e" /></Grid>
@@ -149,6 +182,7 @@ function SalesReportPage() {
                     </Table>
                 </TableContainer>
             </Paper>
+        </Box> {/* end printRef Box */}
         </Box>
     );
 }

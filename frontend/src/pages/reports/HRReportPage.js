@@ -4,7 +4,7 @@
 //          attendance breakdown, department distribution.
 // ============================================================
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Box, Typography, Grid, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
@@ -13,6 +13,7 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
+import ReportToolbar from '../../components/common/ReportToolbar';
 
 const API = '/api/reports/hr/';
 const PIE_COLORS = ['#1a237e','#2e7d32','#e65100','#6a1b9a','#00838f','#c62828'];
@@ -31,6 +32,7 @@ function HRReportPage() {
     const [data, setData]       = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError]     = useState('');
+    const printRef = useRef();
 
     useEffect(() => {
         fetch(API, { credentials: 'include' })
@@ -42,10 +44,44 @@ function HRReportPage() {
     if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}><CircularProgress /></Box>;
     if (error)   return <Alert severity="error">{error}</Alert>;
 
+    const getExcelData = () => [
+        {
+            sheetName: 'Employees by Dept',
+            rows: data.employees_by_dept.map(d => ({
+                'Department': d.department,
+                'Count':      d.count,
+            })),
+        },
+        {
+            sheetName: 'Salary Summary',
+            rows: data.salary_summary.map(s => ({
+                'Period':        s.period,
+                'Employees':     s.employee_count,
+                'Gross (₹)':     s.total_gross,
+                'Net (₹)':       s.total_net,
+                'PF (₹)':        s.total_pf,
+                'ESI (₹)':       s.total_esi,
+            })),
+        },
+        {
+            sheetName: 'Salary Records',
+            rows: data.recent_salary.map(s => ({
+                'Employee':  s.employee,
+                'Code':      s.emp_code,
+                'Period':    s.period,
+                'Gross (₹)': s.gross,
+                'Net (₹)':   s.net,
+                'Status':    s.status,
+            })),
+        },
+    ];
+
     return (
         <Box>
             <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>HR Report</Typography>
-            <Typography variant="body2" color="text.secondary" mb={3}>Employee strength, salary summary, and attendance analysis</Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>Employee strength, salary summary, and attendance analysis</Typography>
+            <ReportToolbar title="HR_Report" printRef={printRef} onExcel={getExcelData} />
+        <Box ref={printRef}>
 
             <Grid container spacing={3} mb={4}>
                 <Grid item xs={6} md={6}><KpiCard title="Total Active Employees" value={data.total_employees} color="#1a237e" /></Grid>
@@ -178,6 +214,7 @@ function HRReportPage() {
                     </Table>
                 </TableContainer>
             </Paper>
+        </Box> {/* end printRef Box */}
         </Box>
     );
 }

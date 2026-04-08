@@ -4,7 +4,7 @@
 //          movement summary, top stock items.
 // ============================================================
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Box, Typography, Grid, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
@@ -13,6 +13,7 @@ import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell, Legend
 } from 'recharts';
+import ReportToolbar from '../../components/common/ReportToolbar';
 
 const API = '/api/reports/inventory/';
 const PIE_COLORS = ['#1a237e','#2e7d32','#e65100','#6a1b9a','#00838f','#c62828'];
@@ -30,6 +31,7 @@ function InventoryReportPage() {
     const [data, setData]       = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError]     = useState('');
+    const printRef = useRef();
 
     useEffect(() => {
         fetch(API, { credentials: 'include' })
@@ -41,10 +43,41 @@ function InventoryReportPage() {
     if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}><CircularProgress /></Box>;
     if (error)   return <Alert severity="error">{error}</Alert>;
 
+    const getExcelData = () => [
+        {
+            sheetName: 'Top Stock Items',
+            rows: data.top_stock_items.map(t => ({
+                'Item Code': t.item_code,
+                'Item Name': t.item_name,
+                'Type':      t.item_type,
+                'Total Qty': t.total_qty,
+            })),
+        },
+        {
+            sheetName: 'Low Stock Items',
+            rows: data.low_stock_items.map(l => ({
+                'Item Code':   l.item_code,
+                'Item Name':   l.item_name,
+                'Warehouse':   l.warehouse,
+                'Current Qty': l.quantity,
+            })),
+        },
+        {
+            sheetName: 'Movement Summary',
+            rows: data.movement_summary.map(m => ({
+                'Movement Type': m.movement_type,
+                'Count':         m.count,
+                'Total Qty':     m.total_qty,
+            })),
+        },
+    ];
+
     return (
         <Box>
             <Typography variant="h5" fontWeight="bold" color="#1a237e" mb={1}>Inventory Report</Typography>
-            <Typography variant="body2" color="text.secondary" mb={3}>Stock levels, movements, and low stock analysis</Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>Stock levels, movements, and low stock analysis</Typography>
+            <ReportToolbar title="Inventory_Report" printRef={printRef} onExcel={getExcelData} />
+        <Box ref={printRef}>
 
             <Grid container spacing={3} mb={4}>
                 <Grid item xs={6} md={6}><KpiCard title="Total Stock Items" value={data.total_stock_items} color="#1a237e" /></Grid>
@@ -148,6 +181,7 @@ function InventoryReportPage() {
                     </Table>
                 </TableContainer>
             </Paper>
+        </Box> {/* end printRef Box */}
         </Box>
     );
 }
