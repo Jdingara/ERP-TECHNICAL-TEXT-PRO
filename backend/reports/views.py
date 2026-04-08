@@ -189,7 +189,7 @@ def sales_report(request):
     # Top 5 customers by order value
     top_customers = list(
         SalesOrder.objects.filter(status__in=['confirmed','partial','delivered'])
-        .values('customer__company_name')
+        .values('customer__customer_name')
         .annotate(total_value=Sum('total_amount'), order_count=Count('id'))
         .order_by('-total_value')[:5]
     )
@@ -198,13 +198,13 @@ def sales_report(request):
     recent_orders = list(
         SalesOrder.objects.select_related('customer')
         .order_by('-order_date')[:10]
-        .values('so_number', 'customer__company_name', 'order_date',
+        .values('so_number', 'customer__customer_name', 'order_date',
                 'total_amount', 'status')
     )
 
     # Invoice summary
     paid_invoices    = Invoice.objects.filter(status='paid').count()
-    pending_invoices = Invoice.objects.filter(status='unpaid').count()
+    pending_invoices = Invoice.objects.filter(status__in=['sent','draft','overdue']).count()
 
     return JsonResponse({
         'total_sales_orders':  SalesOrder.objects.count(),
@@ -227,7 +227,7 @@ def sales_report(request):
         ],
         'top_customers': [
             {
-                'customer':    t['customer__company_name'],
+                'customer':    t['customer__customer_name'],
                 'total_value': float(t['total_value'] or 0),
                 'order_count': t['order_count'],
             } for t in top_customers
@@ -235,7 +235,7 @@ def sales_report(request):
         'recent_orders': [
             {
                 'so_number':    o['so_number'],
-                'customer':     o['customer__company_name'],
+                'customer':     o['customer__customer_name'],
                 'order_date':   str(o['order_date']),
                 'total_amount': float(o['total_amount'] or 0),
                 'status':       o['status'],
@@ -248,48 +248,48 @@ def sales_report(request):
 # FINANCE REPORT
 # ============================================================
 def finance_report(request):
-    # Account balances by category
-    accounts = Account.objects.select_related('account_type').all()
+    # Account balances by category (use account_category field on Account)
+    accounts = Account.objects.all()
     by_category = {}
     for acc in accounts:
-        cat = acc.account_type.category
+        cat = acc.account_category
         balance = float(acc.get_balance())
         if cat not in by_category:
             by_category[cat] = {'category': cat, 'total_balance': 0, 'account_count': 0}
         by_category[cat]['total_balance'] += balance
         by_category[cat]['account_count'] += 1
 
-    # Journal entries last 30 days
+    # Journal entries last 30 days (total_debit is a method, not a field — fetch entries then compute)
     thirty_days_ago = datetime.date.today() - datetime.timedelta(days=30)
-    recent_entries = list(
+    recent_entries_qs = (
         JournalEntry.objects.filter(entry_date__gte=thirty_days_ago)
         .order_by('-entry_date')[:15]
-        .values('entry_number', 'entry_date', 'description', 'status', 'total_debit')
     )
 
-    # Monthly journal entries count (last 6 months)
+    # Monthly journal entries count (last 6 months) — annotate debit from lines
+    from django.db.models import Sum as DSum
     six_months_ago = datetime.date.today() - datetime.timedelta(days=180)
     monthly_entries = list(
         JournalEntry.objects.filter(entry_date__gte=six_months_ago)
         .annotate(month=TruncMonth('entry_date'))
         .values('month')
-        .annotate(count=Count('id'), total_debit=Sum('total_debit'))
+        .annotate(count=Count('id'), total_debit=DSum('lines__debit_amount'))
         .order_by('month')
     )
 
     return JsonResponse({
-        'total_accounts':       Account.objects.count(),
+        'total_accounts':        Account.objects.count(),
         'total_journal_entries': JournalEntry.objects.count(),
-        'posted_entries':       JournalEntry.objects.filter(status='posted').count(),
-        'accounts_by_category': list(by_category.values()),
+        'posted_entries':        JournalEntry.objects.filter(status='posted').count(),
+        'accounts_by_category':  list(by_category.values()),
         'recent_entries': [
             {
-                'entry_number': e['entry_number'],
-                'entry_date':   str(e['entry_date']),
-                'description':  e['description'],
-                'status':       e['status'],
-                'total_debit':  float(e['total_debit'] or 0),
-            } for e in recent_entries
+                'entry_number': e.entry_number,
+                'entry_date':   str(e.entry_date),
+                'description':  e.description,
+                'status':       e.status,
+                'total_debit':  float(e.total_debits()),
+            } for e in recent_entries_qs
         ],
         'monthly_entries': [
             {
@@ -324,7 +324,7 @@ def hr_report(request):
     salary_summary = list(
         SalaryRecord.objects.values('month', 'year')
         .annotate(
-            total_gross=Sum('gross_salary'),
+            total_gross=Sum('gross_earnings'),
             total_net=Sum('net_salary'),
             total_pf=Sum('pf_deduction'),
             total_esi=Sum('esi_deduction'),
@@ -345,7 +345,7 @@ def hr_report(request):
         .order_by('-year', '-month')[:10]
         .values('employee__first_name', 'employee__last_name',
                 'employee__employee_code', 'month', 'year',
-                'gross_salary', 'net_salary', 'status')
+                'gross_earnings', 'net_salary', 'status')
     )
 
     return JsonResponse({
@@ -378,7 +378,7 @@ def hr_report(request):
                 'employee':     f"{s['employee__first_name']} {s['employee__last_name']}",
                 'emp_code':     s['employee__employee_code'],
                 'period':       f"{s['month']}/{s['year']}",
-                'gross':        float(s['gross_salary'] or 0),
+                'gross':        float(s['gross_earnings'] or 0),
                 'net':          float(s['net_salary'] or 0),
                 'status':       s['status'],
             } for s in recent_salary
