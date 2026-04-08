@@ -26,6 +26,7 @@ import InquiryListPage         from './pages/sales/InquiryListPage';
 import QuotationPage           from './pages/sales/QuotationPage';
 import OrderJourneyPage        from './pages/sales/OrderJourneyPage';
 import SalesInvoicePage        from './pages/sales/SalesInvoicePage';
+import FormatPanelPage         from './pages/settings/FormatPanelPage';
 import ChartOfAccountsPage     from './pages/finance/ChartOfAccountsPage';
 import JournalEntryListPage    from './pages/finance/JournalEntryListPage';
 import TrialBalancePage        from './pages/finance/TrialBalancePage';
@@ -208,6 +209,8 @@ function App() {
                                     <Route path="/reports/sales"      element={canSee('/reports/sales')      ? <SalesReportPage />      : <Navigate to="/dashboard" />} />
                                     <Route path="/reports/finance"    element={canSee('/reports/finance')    ? <FinanceReportPage />    : <Navigate to="/dashboard" />} />
                                     <Route path="/reports/hr"         element={canSee('/reports/hr')         ? <HRReportPage />         : <Navigate to="/dashboard" />} />
+
+                                    <Route path="/settings/format-panel" element={canSee('/settings/format-panel') ? <FormatPanelPage /> : <Navigate to="/dashboard" />} />
 
                                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                                 </Routes>

@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 
 from .models import Item, ItemCategory, UnitOfMeasure, Supplier, Customer, Warehouse
+from .doc_series_utils import generate_next_number
 
 
 # ============================================================
@@ -139,8 +140,11 @@ def item_list_and_create(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
+            item_code = generate_next_number('item') or data.get('item_code', '').strip()
+            if not item_code:
+                return JsonResponse({'message': 'Item code required. Enable auto-numbering in Settings → Format Panel.'}, status=400)
             item = Item.objects.create(
-                item_code           = data['item_code'],
+                item_code           = item_code,
                 item_name           = data['item_name'],
                 item_type           = data['item_type'],
                 category_id         = data.get('category_id'),
@@ -205,8 +209,11 @@ def supplier_list_and_create(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
+            supplier_code = generate_next_number('supplier') or data.get('supplier_code', '').strip()
+            if not supplier_code:
+                return JsonResponse({'message': 'Supplier code required. Enable auto-numbering in Settings → Format Panel.'}, status=400)
             supplier = Supplier.objects.create(
-                supplier_code   = data['supplier_code'],
+                supplier_code   = supplier_code,
                 supplier_name   = data['supplier_name'],
                 supplier_type   = data.get('supplier_type', 'other'),
                 contact_person  = data.get('contact_person', ''),
@@ -270,8 +277,11 @@ def customer_list_and_create(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
+            customer_code = generate_next_number('customer') or data.get('customer_code', '').strip()
+            if not customer_code:
+                return JsonResponse({'message': 'Customer code required. Enable auto-numbering in Settings → Format Panel.'}, status=400)
             customer = Customer.objects.create(
-                customer_code   = data['customer_code'],
+                customer_code   = customer_code,
                 customer_name   = data['customer_name'],
                 customer_type   = data.get('customer_type', 'domestic'),
                 contact_person  = data.get('contact_person', ''),
@@ -334,9 +344,12 @@ def warehouse_list_and_create(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
+            wh_code = generate_next_number('warehouse') or data.get('code', '').strip()
+            if not wh_code:
+                return JsonResponse({'message': 'Warehouse code required. Enable auto-numbering in Settings → Format Panel.'}, status=400)
             warehouse = Warehouse.objects.create(
                 name    = data['name'],
-                code    = data['code'],
+                code    = wh_code,
                 address = data.get('address', ''),
             )
             return JsonResponse({'message': 'Warehouse created.', 'warehouse': warehouse_to_dict(warehouse)}, status=201)

@@ -12,6 +12,7 @@ import json
 from .models import SalesOrder, SalesOrderLine, Invoice, CustomerInquiry, Quotation
 from datetime import date
 from inventory.models import Stock, StockMovement
+from master_data.doc_series_utils import generate_next_number
 
 
 # ============================================================
@@ -95,8 +96,11 @@ def sales_order_list_and_create(request):
         data = json.loads(request.body)
         try:
             with transaction.atomic():
+                so_number = generate_next_number('sales_order') or data.get('so_number', '').strip()
+                if not so_number:
+                    return JsonResponse({'message': 'SO number required or enable auto-numbering in Format Panel.'}, status=400)
                 so = SalesOrder.objects.create(
-                    so_number       = data['so_number'],
+                    so_number       = so_number,
                     customer_id     = data['customer_id'],
                     warehouse_id    = data['warehouse_id'],
                     order_date      = data['order_date'],
@@ -236,8 +240,11 @@ def invoice_list_and_create(request):
         data = json.loads(request.body)
         try:
             so = SalesOrder.objects.get(id=data['sales_order_id'])
+            inv_number = generate_next_number('invoice') or data.get('invoice_number', '').strip()
+            if not inv_number:
+                return JsonResponse({'message': 'Invoice number required or enable auto-numbering in Format Panel.'}, status=400)
             invoice = Invoice.objects.create(
-                invoice_number  = data['invoice_number'],
+                invoice_number  = inv_number,
                 sales_order     = so,
                 customer        = so.customer,
                 invoice_date    = data['invoice_date'],

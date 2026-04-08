@@ -31,7 +31,10 @@ python manage.py collectstatic --no-input
 # ── 5. Run database migrations ───────────────────────────────
 python manage.py migrate
 
-# ── 6. Create superuser if not exists ────────────────────────
+# ── 6. Seed document series (safe to run multiple times) ─────
+python manage.py seed_document_series
+
+# ── 7. Create superuser if not exists ────────────────────────
 python manage.py shell -c "
 from django.contrib.auth import get_user_model
 User = get_user_model()

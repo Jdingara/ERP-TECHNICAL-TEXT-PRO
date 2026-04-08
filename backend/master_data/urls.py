@@ -5,8 +5,22 @@
 
 from django.urls import path
 from . import views
+from . import settings_views
 
 urlpatterns = [
+
+    # ── Settings: Financial Year ──────────────────────────────
+    path('settings/financial-years/',                   settings_views.financial_year_list_create,  name='fy-list'),
+    path('settings/financial-years/<int:fy_id>/activate/', settings_views.financial_year_activate,  name='fy-activate'),
+    path('settings/financial-years/<int:fy_id>/delete/',   settings_views.financial_year_delete,    name='fy-delete'),
+
+    # ── Settings: Document Series ─────────────────────────────
+    path('settings/document-series/',                        settings_views.document_series_list,    name='series-list'),
+    path('settings/document-series/<int:series_id>/',        settings_views.document_series_update,  name='series-update'),
+    path('settings/document-series/<int:series_id>/reset/',  settings_views.document_series_reset,   name='series-reset'),
+    path('settings/series-enabled/',                         settings_views.series_enabled_map,      name='series-enabled'),
+
+
     # Units of Measure
     path('units/',              views.unit_of_measure_list_and_create,  name='unit-list'),
 

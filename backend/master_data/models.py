@@ -203,3 +203,98 @@ class Customer(models.Model):
 
     def __str__(self):
         return f"{self.customer_code} - {self.customer_name}"
+
+
+# ============================================================
+# FINANCIAL YEAR
+# Stores company financial years; one is active at a time.
+# When a new year is activated all document counters reset.
+# ============================================================
+class FinancialYear(models.Model):
+    label       = models.CharField(max_length=20, unique=True)   # e.g., "2025-26"
+    start_date  = models.DateField()
+    end_date    = models.DateField()
+    is_active   = models.BooleanField(default=False)
+    created_at  = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'settings_financial_year'
+        ordering = ['-start_date']
+
+    def __str__(self):
+        return self.label
+
+
+# ============================================================
+# DOCUMENT SERIES
+# Format configuration for every auto-numbered document type.
+# e.g., PO-25-26-001  →  prefix=PO, FY=25-26, pad=3, sep=-
+# ============================================================
+class DocumentSeries(models.Model):
+
+    DOCUMENT_TYPES = [
+        # ── Masters ──────────────────────────────────────────
+        ('item',             'Item Code'),
+        ('warehouse',        'Warehouse Code'),
+        ('supplier',         'Supplier Code'),
+        ('customer',         'Customer Code'),
+        ('employee',         'Employee Code'),
+        # ── Purchasing ────────────────────────────────────────
+        ('purchase_order',   'Purchase Order'),
+        ('grn',              'Goods Receipt Note'),
+        # ── Sales ─────────────────────────────────────────────
+        ('inquiry',          'Sales Inquiry'),
+        ('quotation',        'Quotation'),
+        ('sales_order',      'Sales Order'),
+        ('invoice',          'Invoice'),
+        # ── Production ────────────────────────────────────────
+        ('work_order',       'Work Order'),
+        ('batch',            'Production Batch'),
+        # ── Inventory ─────────────────────────────────────────
+        ('stock_adjustment', 'Stock Adjustment'),
+        # ── Medical Textile ───────────────────────────────────
+        ('capa',             'CAPA'),
+        # ── Technical Textile ─────────────────────────────────
+        ('sample',           'Sample'),
+        ('tds',              'Technical Data Sheet'),
+        ('test_report',      'Test Report'),
+        ('rd_project',       'R&D Project'),
+    ]
+
+    PADDING_CHOICES = [
+        (2, '01  — 2 digits'),
+        (3, '001 — 3 digits'),
+        (4, '0001 — 4 digits'),
+        (5, '00001 — 5 digits'),
+    ]
+
+    document_type   = models.CharField(max_length=50, choices=DOCUMENT_TYPES, unique=True)
+    prefix          = models.CharField(max_length=20, blank=True, default='')   # PO, INV, IT …
+    include_fy      = models.BooleanField(default=False)   # include current FY label in number?
+    separator       = models.CharField(max_length=5, default='-')               # - / (blank)
+    padding         = models.IntegerField(default=3, choices=PADDING_CHOICES)   # zero-pad width
+    starting_number = models.IntegerField(default=1)       # first number issued
+    current_number  = models.IntegerField(default=0)       # last number issued (0 = none yet)
+    is_enabled      = models.BooleanField(default=True)    # toggle auto-numbering on/off
+    updated_at      = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'settings_document_series'
+        ordering = ['document_type']
+
+    def __str__(self):
+        return f"{self.get_document_type_display()} — {self.prefix or '(no prefix)'}"
+
+    def preview(self):
+        """Returns what the next generated number will look like (without incrementing)."""
+        parts = []
+        if self.prefix:
+            parts.append(self.prefix)
+        if self.include_fy:
+            fy = FinancialYear.objects.filter(is_active=True).first()
+            if fy:
+                parts.append(fy.label)
+        next_n = max(self.current_number + 1, self.starting_number)
+        parts.append(str(next_n).zfill(self.padding))
+        sep = self.separator or ''
+        return sep.join(parts)

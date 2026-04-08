@@ -10,6 +10,7 @@ from django.db.models import Sum, Count
 import json
 
 from .models import Department, Employee, Attendance, SalaryRecord
+from master_data.doc_series_utils import generate_next_number
 
 
 # ============================================================
@@ -129,8 +130,11 @@ def employee_list_and_create(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
+            emp_code = generate_next_number('employee') or data.get('employee_code', '').strip()
+            if not emp_code:
+                return JsonResponse({'message': 'Employee code required or enable auto-numbering in Format Panel.'}, status=400)
             emp = Employee.objects.create(
-                employee_code   = data['employee_code'],
+                employee_code   = emp_code,
                 first_name      = data['first_name'],
                 last_name       = data.get('last_name', ''),
                 gender          = data.get('gender', 'male'),

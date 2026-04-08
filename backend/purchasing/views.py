@@ -13,6 +13,7 @@ import json
 
 from .models import PurchaseOrder, PurchaseOrderLine, GoodsReceipt, GoodsReceiptLine
 from inventory.models import Stock, StockMovement
+from master_data.doc_series_utils import generate_next_number
 
 
 # ============================================================
@@ -101,8 +102,11 @@ def purchase_order_list_and_create(request):
         data = json.loads(request.body)
         try:
             with transaction.atomic():
+                po_number = generate_next_number('purchase_order') or data.get('po_number', '').strip()
+                if not po_number:
+                    return JsonResponse({'message': 'PO number required or enable auto-numbering in Format Panel.'}, status=400)
                 po = PurchaseOrder.objects.create(
-                    po_number       = data['po_number'],
+                    po_number       = po_number,
                     supplier_id     = data['supplier_id'],
                     warehouse_id    = data['warehouse_id'],
                     order_date      = data['order_date'],
@@ -184,8 +188,11 @@ def goods_receipt_list_and_create(request):
             with transaction.atomic():
                 po = PurchaseOrder.objects.get(id=data['purchase_order_id'])
 
+                grn_number = generate_next_number('grn') or data.get('grn_number', '').strip()
+                if not grn_number:
+                    return JsonResponse({'message': 'GRN number required or enable auto-numbering in Format Panel.'}, status=400)
                 grn = GoodsReceipt.objects.create(
-                    grn_number              = data['grn_number'],
+                    grn_number              = grn_number,
                     purchase_order          = po,
                     receipt_date            = data['receipt_date'],
                     supplier_invoice_number = data.get('supplier_invoice_number', ''),

@@ -19,6 +19,7 @@ import FactoryIcon           from '@mui/icons-material/Factory';
 import ScienceIcon           from '@mui/icons-material/Science';
 import LocalHospitalIcon     from '@mui/icons-material/LocalHospital';
 import AssessmentIcon        from '@mui/icons-material/Assessment';
+import TuneIcon              from '@mui/icons-material/Tune';
 import CategoryIcon          from '@mui/icons-material/Category';
 import ExpandLess            from '@mui/icons-material/ExpandLess';
 import ExpandMore            from '@mui/icons-material/ExpandMore';
@@ -98,6 +99,9 @@ const MENU_ITEMS = [
         { title: 'Finance Report',    path: '/reports/finance' },
         { title: 'HR Report',         path: '/reports/hr' },
     ]},
+    { title: 'Settings', icon: <TuneIcon />, children: [
+        { title: 'Format Panel',      path: '/settings/format-panel' },
+    ]},
 ];
 
 const MODULE_COLORS = {
@@ -111,6 +115,7 @@ const MODULE_COLORS = {
     'Production':        '#f97316',
     'Technical Textile': '#14b8a6',
     'Medical Textile':   '#ec4899',
+    'Settings':          '#64748b',
     'Reports':           '#a78bfa',
 };
 
