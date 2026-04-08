@@ -11,6 +11,7 @@ from django.db.models import Sum
 import json
 
 from .models import Account, AccountType, JournalEntry, JournalEntryLine
+from authentication.audit import log_action, field_diff
 
 
 # ============================================================
@@ -147,6 +148,8 @@ def journal_entry_list_and_create(request):
                         credit_amount   = line_data.get('credit_amount', 0),
                     )
 
+            log_action(request, 'Journal Entry', 'Created', entry.entry_number,
+                       {'description': entry.description, 'lines': len(data.get('lines', []))})
             return JsonResponse({'message': 'Journal entry created.', 'entry': journal_to_dict(entry, include_lines=True)}, status=201)
         except Exception as e:
             return JsonResponse({'message': str(e)}, status=400)
@@ -176,6 +179,7 @@ def journal_entry_detail(request, entry_id):
     if request.method == 'DELETE':
         if entry.status == 'posted':
             return JsonResponse({'message': 'Cannot delete a posted journal entry.'}, status=400)
+        log_action(request, 'Journal Entry', 'Deleted', entry.entry_number, {'description': entry.description})
         entry.delete()
         return JsonResponse({'message': 'Journal entry deleted.'})
 
@@ -200,6 +204,8 @@ def journal_entry_post(request, entry_id):
 
     entry.status = 'posted'
     entry.save()
+    log_action(request, 'Journal Entry', 'Posted', entry.entry_number,
+               {'description': entry.description, 'total_debits': str(entry.total_debits())})
     return JsonResponse({'message': 'Journal entry posted successfully.', 'entry': journal_to_dict(entry)})
 
 

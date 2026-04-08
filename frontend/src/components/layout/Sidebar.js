@@ -26,6 +26,7 @@ import ScienceIcon           from '@mui/icons-material/Science';
 import LocalHospitalIcon     from '@mui/icons-material/LocalHospital';
 import AssessmentIcon        from '@mui/icons-material/Assessment';
 import TuneIcon              from '@mui/icons-material/Tune';
+import HistoryIcon           from '@mui/icons-material/History';
 import CategoryIcon          from '@mui/icons-material/Category';
 import ExpandLess            from '@mui/icons-material/ExpandLess';
 import ExpandMore            from '@mui/icons-material/ExpandMore';
@@ -109,6 +110,7 @@ const MENU_ITEMS = [
     { title: 'Settings', icon: <TuneIcon />, children: [
         { title: 'Format Panel',      path: '/settings/format-panel' },
     ]},
+    { title: 'Activity Log', icon: <HistoryIcon />, path: '/audit/activity-log' },
 ];
 
 const MODULE_COLORS = {
@@ -124,6 +126,7 @@ const MODULE_COLORS = {
     'Medical Textile':   '#ec4899',
     'Settings':          '#64748b',
     'Reports':           '#a78bfa',
+    'Activity Log':      '#0ea5e9',
 };
 
 // ── Horizontal Sidebar (Top / Bottom) ────────────────────────

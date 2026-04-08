@@ -70,6 +70,7 @@ import HRReportPage            from './pages/reports/HRReportPage';
 import SettingsPage            from './pages/settings/SettingsPage';
 import AdminPage               from './pages/admin/AdminPage';
 import ProfilePage             from './pages/profile/ProfilePage';
+import ActivityLogPage         from './pages/audit/ActivityLogPage';
 
 function App() {
     const [currentUser,    setCurrentUser]    = useState(null);
@@ -155,6 +156,7 @@ function App() {
                                     {/* Settings — available to all users */}
                                     <Route path="/settings" element={<SettingsPage />} />
                                     <Route path="/profile"  element={<ProfilePage />} />
+                                    <Route path="/audit/activity-log" element={<ActivityLogPage />} />
 
                                     {/* Admin — staff only */}
                                     <Route path="/admin" element={<AdminPage currentUser={currentUser} />} />

@@ -24,7 +24,7 @@ from hr_payroll.models import Employee
 from medical_textile.models import CAPA, RegulatoryCompliance, ShelfLifeRecord
 from technical_textile.models import Sample, RDProject
 from finance.models import Account
-from .models import Role, UserProfile
+from .models import Role, UserProfile, AuditLog
 
 
 # ============================================================
@@ -472,3 +472,67 @@ def user_detail_view(request, user_id):
         profile.save()
 
     return JsonResponse({'message': f'User "{user.username}" updated.'})
+
+
+# ============================================================
+# AUDIT LOG VIEW
+# ============================================================
+
+@require_http_methods(["GET"])
+def audit_log_list(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'Not logged in.'}, status=401)
+
+    logs = AuditLog.objects.select_related('user').all()
+
+    # Non-admins only see their own logs
+    if not (request.user.is_staff or request.user.is_superuser):
+        logs = logs.filter(user=request.user)
+
+    # Filters
+    module    = request.GET.get('module', '').strip()
+    action    = request.GET.get('action', '').strip()
+    user_id   = request.GET.get('user_id', '').strip()
+    from_date = request.GET.get('from_date', '').strip()
+    to_date   = request.GET.get('to_date', '').strip()
+    search    = request.GET.get('search', '').strip()
+
+    if module:
+        logs = logs.filter(module=module)
+    if action:
+        logs = logs.filter(action=action)
+    if user_id:
+        logs = logs.filter(user_id=user_id)
+    if from_date:
+        logs = logs.filter(timestamp__date__gte=from_date)
+    if to_date:
+        logs = logs.filter(timestamp__date__lte=to_date)
+    if search:
+        logs = logs.filter(object_repr__icontains=search)
+
+    # Cap at 1000 rows
+    logs = logs[:1000]
+
+    result = [{
+        'id':           log.id,
+        'user':         log.user.username if log.user else 'System',
+        'timestamp':    log.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+        'module':       log.module,
+        'action':       log.action,
+        'object_repr':  log.object_repr,
+        'changes':      log.changes,
+    } for log in logs]
+
+    # Distinct module and action lists for filter dropdowns
+    all_modules = list(AuditLog.objects.values_list('module', flat=True).distinct().order_by('module'))
+    all_actions = list(AuditLog.objects.values_list('action', flat=True).distinct().order_by('action'))
+    all_users   = [{'id': u.id, 'username': u.username}
+                   for u in User.objects.filter(audit_logs__isnull=False).distinct().order_by('username')]
+
+    return JsonResponse({
+        'logs':    result,
+        'total':   len(result),
+        'modules': all_modules,
+        'actions': all_actions,
+        'users':   all_users,
+    })

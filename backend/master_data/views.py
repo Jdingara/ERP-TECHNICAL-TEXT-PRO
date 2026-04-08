@@ -11,6 +11,7 @@ import json
 
 from .models import Item, ItemCategory, UnitOfMeasure, Supplier, Customer, Warehouse
 from .doc_series_utils import generate_next_number
+from authentication.audit import log_action, field_diff
 
 
 # ============================================================
@@ -156,6 +157,8 @@ def item_list_and_create(request):
                 minimum_stock       = data.get('minimum_stock', 0),
                 standard_price      = data.get('standard_price', 0),
             )
+            log_action(request, 'Item', 'Created', item.item_code,
+                       {'name': item.item_name, 'type': item.item_type})
             return JsonResponse({'message': 'Item created.', 'item': item_to_dict(item)}, status=201)
         except Exception as e:
             return JsonResponse({'message': str(e)}, status=400)
@@ -174,6 +177,7 @@ def item_detail_update_delete(request, item_id):
 
     if request.method == 'PUT':
         data = json.loads(request.body)
+        before = {'item_name': item.item_name, 'standard_price': str(item.standard_price), 'minimum_stock': str(item.minimum_stock)}
         for field in ['item_name', 'item_type', 'description', 'hsn_code',
                       'yarn_count', 'composition', 'minimum_stock', 'standard_price']:
             if field in data:
@@ -183,9 +187,14 @@ def item_detail_update_delete(request, item_id):
         if 'unit_id' in data:
             item.unit_of_measure_id = data['unit_id']
         item.save()
+        after = {'item_name': item.item_name, 'standard_price': str(item.standard_price), 'minimum_stock': str(item.minimum_stock)}
+        diff = field_diff(before, after)
+        if diff:
+            log_action(request, 'Item', 'Updated', item.item_code, {'changes': diff})
         return JsonResponse({'message': 'Item updated.', 'item': item_to_dict(item)})
 
     if request.method == 'DELETE':
+        log_action(request, 'Item', 'Deleted', item.item_code, {'name': item.item_name})
         item.is_active = False
         item.save()
         return JsonResponse({'message': 'Item deactivated.'})
@@ -228,6 +237,7 @@ def supplier_list_and_create(request):
                 pan_number      = data.get('pan_number', ''),
                 payment_days    = data.get('payment_days', 30),
             )
+            log_action(request, 'Supplier', 'Created', supplier.supplier_code, {'name': supplier.supplier_name})
             return JsonResponse({'message': 'Supplier created.', 'supplier': supplier_to_dict(supplier)}, status=201)
         except Exception as e:
             return JsonResponse({'message': str(e)}, status=400)
@@ -246,14 +256,20 @@ def supplier_detail_update_delete(request, supplier_id):
 
     if request.method == 'PUT':
         data = json.loads(request.body)
+        before = {'supplier_name': supplier.supplier_name, 'phone': supplier.phone}
         for field in ['supplier_name', 'supplier_type', 'contact_person', 'phone',
                       'email', 'address', 'city', 'state', 'country', 'gstin', 'payment_days']:
             if field in data:
                 setattr(supplier, field, data[field])
         supplier.save()
+        after = {'supplier_name': supplier.supplier_name, 'phone': supplier.phone}
+        diff = field_diff(before, after)
+        if diff:
+            log_action(request, 'Supplier', 'Updated', supplier.supplier_code, {'changes': diff})
         return JsonResponse({'message': 'Supplier updated.', 'supplier': supplier_to_dict(supplier)})
 
     if request.method == 'DELETE':
+        log_action(request, 'Supplier', 'Deleted', supplier.supplier_code, {'name': supplier.supplier_name})
         supplier.is_active = False
         supplier.save()
         return JsonResponse({'message': 'Supplier deactivated.'})
@@ -297,6 +313,7 @@ def customer_list_and_create(request):
                 credit_days     = data.get('credit_days', 30),
                 credit_limit    = data.get('credit_limit', 0),
             )
+            log_action(request, 'Customer', 'Created', customer.customer_code, {'name': customer.customer_name})
             return JsonResponse({'message': 'Customer created.', 'customer': customer_to_dict(customer)}, status=201)
         except Exception as e:
             return JsonResponse({'message': str(e)}, status=400)
@@ -315,15 +332,21 @@ def customer_detail_update_delete(request, customer_id):
 
     if request.method == 'PUT':
         data = json.loads(request.body)
+        before = {'customer_name': customer.customer_name, 'phone': customer.phone, 'credit_limit': str(customer.credit_limit)}
         for field in ['customer_name', 'customer_type', 'contact_person', 'phone',
                       'email', 'address', 'city', 'state', 'country', 'gstin',
                       'credit_days', 'credit_limit']:
             if field in data:
                 setattr(customer, field, data[field])
         customer.save()
+        after = {'customer_name': customer.customer_name, 'phone': customer.phone, 'credit_limit': str(customer.credit_limit)}
+        diff = field_diff(before, after)
+        if diff:
+            log_action(request, 'Customer', 'Updated', customer.customer_code, {'changes': diff})
         return JsonResponse({'message': 'Customer updated.', 'customer': customer_to_dict(customer)})
 
     if request.method == 'DELETE':
+        log_action(request, 'Customer', 'Deleted', customer.customer_code, {'name': customer.customer_name})
         customer.is_active = False
         customer.save()
         return JsonResponse({'message': 'Customer deactivated.'})

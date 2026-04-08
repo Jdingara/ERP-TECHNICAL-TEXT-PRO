@@ -19,6 +19,9 @@ urlpatterns = [
     # My profile (any logged-in user)
     path('my-profile/',          views.my_profile_view,       name='my-profile'),
 
+    # Audit log
+    path('audit-logs/',          views.audit_log_list,        name='audit-logs'),
+
     # User management (admin only)
     path('users/',              views.user_list_view,        name='user-list'),
     path('users/<int:user_id>/',views.user_detail_view,      name='user-detail'),

@@ -7,6 +7,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Role(models.Model):
@@ -45,3 +46,23 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} → {self.role.name if self.role else 'No Role'}"
+
+
+# ============================================================
+# AUDIT LOG — tracks every create / update / delete / action
+# ============================================================
+
+class AuditLog(models.Model):
+    user        = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='audit_logs')
+    timestamp   = models.DateTimeField(default=timezone.now, db_index=True)
+    module      = models.CharField(max_length=100, db_index=True)   # e.g. "Sales Order"
+    action      = models.CharField(max_length=50, db_index=True)    # e.g. "Created"
+    object_repr = models.CharField(max_length=200)                  # e.g. "SO-2024-0001"
+    changes     = models.JSONField(default=dict, blank=True)        # before/after data
+
+    class Meta:
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        u = self.user.username if self.user else 'System'
+        return f"[{self.timestamp:%Y-%m-%d %H:%M}] {u} — {self.action} {self.module}: {self.object_repr}"

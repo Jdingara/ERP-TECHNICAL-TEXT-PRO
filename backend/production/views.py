@@ -14,6 +14,7 @@ from datetime import date
 
 from .models import BillOfMaterials, BOMLine, WorkOrder, WorkOrderMaterialConsumption, Batch, QualityCheck, Machine
 from inventory.models import Stock, StockMovement
+from authentication.audit import log_action, field_diff
 
 
 # ============================================================
@@ -107,6 +108,8 @@ def bom_list_and_create(request):
                         waste_percent       = line_data.get('waste_percent', 0),
                         notes               = line_data.get('notes', ''),
                     )
+            log_action(request, 'BOM', 'Created', bom.bom_name,
+                       {'product': bom.finished_product.item_name, 'lines': len(data.get('lines', []))})
             return JsonResponse({'message': 'BOM created.', 'bom': bom_to_dict(bom, include_lines=True)}, status=201)
         except Exception as e:
             return JsonResponse({'message': str(e)}, status=400)
@@ -172,6 +175,8 @@ def work_order_list_and_create(request):
                         planned_quantity = round(float(bom_line.quantity_with_waste) * ratio, 3),
                     )
 
+            log_action(request, 'Work Order', 'Created', wo.work_order_number,
+                       {'product': wo.finished_product.item_name, 'planned_qty': str(planned_qty), 'bom': bom.bom_name})
             return JsonResponse({'message': 'Work order created.', 'work_order': work_order_to_dict(wo, include_lines=True)}, status=201)
         except Exception as e:
             return JsonResponse({'message': str(e)}, status=400)
@@ -193,6 +198,7 @@ def work_order_detail(request, wo_id):
         # Lock: completed/cancelled WO cannot be edited
         if wo.status == 'completed':
             return JsonResponse({'message': 'Cannot edit a completed work order. Batch and stock have been updated.'}, status=400)
+        before = {'status': wo.status, 'notes': wo.notes, 'planned_end_date': str(wo.planned_end_date or '')}
         if 'status' in data:
             wo.status = data['status']
         if 'notes' in data:
@@ -200,11 +206,16 @@ def work_order_detail(request, wo_id):
         if 'planned_end_date' in data:
             wo.planned_end_date = data['planned_end_date'] or None
         wo.save()
+        after = {'status': wo.status, 'notes': wo.notes, 'planned_end_date': str(wo.planned_end_date or '')}
+        diff = field_diff(before, after)
+        if diff:
+            log_action(request, 'Work Order', 'Updated', wo.work_order_number, {'changes': diff})
         return JsonResponse({'message': 'Work order updated.', 'work_order': work_order_to_dict(wo)})
 
     if request.method == 'DELETE':
         if wo.status not in ('draft', 'confirmed'):
             return JsonResponse({'message': f'Cannot delete a {wo.status} work order.'}, status=400)
+        log_action(request, 'Work Order', 'Deleted', wo.work_order_number, {'product': wo.finished_product.item_name})
         wo.delete()
         return JsonResponse({'message': 'Work order deleted.'})
 
@@ -291,6 +302,8 @@ def work_order_complete(request, wo_id):
             wo.status           = 'completed'
             wo.save()
 
+        log_action(request, 'Work Order', 'Completed', wo.work_order_number,
+                   {'product': wo.finished_product.item_name, 'actual_qty': str(actual_qty), 'batch': batch.batch_number})
         return JsonResponse({
             'message': 'Work order completed. Stock updated.',
             'batch_number': batch.batch_number,
@@ -366,6 +379,8 @@ def machine_list_and_create(request):
                 purchase_date = data.get('purchase_date') or None,
                 notes         = data.get('notes', ''),
             )
+            log_action(request, 'Machine', 'Created', machine.machine_code,
+                       {'name': machine.machine_name, 'type': machine.machine_type})
             return JsonResponse({'message': 'Machine created.', 'machine': machine_to_dict(machine)}, status=201)
         except Exception as e:
             return JsonResponse({'message': str(e)}, status=400)
@@ -383,6 +398,7 @@ def machine_detail(request, machine_id):
 
     if request.method == 'PUT':
         data = json.loads(request.body)
+        before = {'status': machine.status, 'location': machine.location}
         for field in ['machine_name', 'machine_type', 'capacity_unit', 'location', 'status', 'notes']:
             if field in data:
                 setattr(machine, field, data[field])
@@ -391,9 +407,14 @@ def machine_detail(request, machine_id):
         if 'purchase_date' in data:
             machine.purchase_date = data['purchase_date'] or None
         machine.save()
+        after = {'status': machine.status, 'location': machine.location}
+        diff = field_diff(before, after)
+        if diff:
+            log_action(request, 'Machine', 'Updated', machine.machine_code, {'changes': diff})
         return JsonResponse({'message': 'Machine updated.', 'machine': machine_to_dict(machine)})
 
     if request.method == 'DELETE':
+        log_action(request, 'Machine', 'Deleted', machine.machine_code, {'name': machine.machine_name})
         machine.delete()
         return JsonResponse({'message': 'Machine deleted.'})
 

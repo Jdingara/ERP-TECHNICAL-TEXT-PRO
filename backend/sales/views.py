@@ -13,6 +13,7 @@ from .models import SalesOrder, SalesOrderLine, Invoice, CustomerInquiry, Quotat
 from datetime import date
 from inventory.models import Stock, StockMovement
 from master_data.doc_series_utils import generate_next_number
+from authentication.audit import log_action, field_diff
 
 
 # ============================================================
@@ -128,6 +129,8 @@ def sales_order_list_and_create(request):
                 so.total_amount = total
                 so.save()
 
+            log_action(request, 'Sales Order', 'Created', so.so_number,
+                       {'customer': so.customer.customer_name, 'total': str(so.total_amount), 'lines': len(data.get('lines', []))})
             return JsonResponse({'message': 'Sales order created.', 'sales_order': so_to_dict(so, include_lines=True)}, status=201)
         except Exception as e:
             return JsonResponse({'message': str(e)}, status=400)
@@ -149,6 +152,7 @@ def sales_order_detail(request, so_id):
         # Lock: delivered or cancelled SO cannot be edited
         if so.status in ('delivered', 'cancelled') and data.get('status') not in ('delivered', 'cancelled'):
             return JsonResponse({'message': f'Cannot edit a {so.status} sales order. It is locked.'}, status=400)
+        before = {'status': so.status, 'delivery_date': str(so.delivery_date or ''), 'notes': so.notes}
         if 'status' in data:
             so.status = data['status']
         if 'delivery_date' in data:
@@ -156,11 +160,16 @@ def sales_order_detail(request, so_id):
         if 'notes' in data:
             so.notes = data['notes']
         so.save()
+        after = {'status': so.status, 'delivery_date': str(so.delivery_date or ''), 'notes': so.notes}
+        diff = field_diff(before, after)
+        if diff:
+            log_action(request, 'Sales Order', 'Updated', so.so_number, {'changes': diff})
         return JsonResponse({'message': 'Sales order updated.', 'sales_order': so_to_dict(so)})
 
     if request.method == 'DELETE':
         if so.status != 'draft':
             return JsonResponse({'message': f'Only draft sales orders can be deleted. This SO is {so.status}.'}, status=400)
+        log_action(request, 'Sales Order', 'Deleted', so.so_number, {'customer': so.customer.customer_name})
         so.delete()
         return JsonResponse({'message': 'Sales order deleted.'})
 
@@ -217,6 +226,8 @@ def sales_order_deliver(request, so_id):
             so.status = 'delivered'
             so.save()
 
+        log_action(request, 'Sales Order', 'Delivered', so.so_number,
+                   {'customer': so.customer.customer_name, 'warehouse': so.warehouse.name})
         return JsonResponse({'message': 'Delivery confirmed. Stock updated.'})
     except ValueError as e:
         return JsonResponse({'message': str(e)}, status=400)
@@ -255,6 +266,8 @@ def invoice_list_and_create(request):
                 notes           = data.get('notes', ''),
                 created_by      = request.user if request.user.is_authenticated else None,
             )
+            log_action(request, 'Invoice', 'Created', invoice.invoice_number,
+                       {'customer': invoice.customer.customer_name, 'total': str(invoice.total_amount), 'so': so.so_number})
             return JsonResponse({'message': 'Invoice created.', 'invoice': invoice_to_dict(invoice)}, status=201)
         except Exception as e:
             return JsonResponse({'message': str(e)}, status=400)
@@ -329,6 +342,8 @@ def inquiry_list_and_create(request):
                 notes               = data.get('notes', ''),
                 created_by          = request.user if request.user.is_authenticated else None,
             )
+            log_action(request, 'Inquiry', 'Created', inq.inquiry_number,
+                       {'customer': inq.customer.customer_name, 'product': inq.product_description})
             return JsonResponse({'message': 'Inquiry created.', 'inquiry': inquiry_to_dict(inq)}, status=201)
         except Exception as e:
             return JsonResponse({'message': str(e)}, status=400)
@@ -346,6 +361,7 @@ def inquiry_detail(request, inquiry_id):
 
     if request.method == 'PUT':
         data = json.loads(request.body)
+        before = {'status': inq.status, 'assigned_to': inq.assigned_to, 'notes': inq.notes}
         for field in ['product_description', 'end_use', 'tensile_requirement', 'coating_required',
                       'coating_type', 'color', 'unit', 'assigned_to', 'notes', 'status']:
             if field in data:
@@ -356,6 +372,10 @@ def inquiry_detail(request, inquiry_id):
         if 'required_by_date' in data:
             inq.required_by_date = data['required_by_date'] or None
         inq.save()
+        after = {'status': inq.status, 'assigned_to': inq.assigned_to, 'notes': inq.notes}
+        diff = field_diff(before, after)
+        if diff:
+            log_action(request, 'Inquiry', 'Updated', inq.inquiry_number, {'changes': diff})
         return JsonResponse({'message': 'Inquiry updated.', 'inquiry': inquiry_to_dict(inq)})
 
 
@@ -447,6 +467,8 @@ def quotation_list_and_create(request):
                 inquiry.status = 'quoted'
                 inquiry.save()
 
+            log_action(request, 'Quotation', 'Created', qt.quotation_number,
+                       {'customer': qt.customer.customer_name, 'total': str(qt.total_amount)})
             return JsonResponse({'message': 'Quotation created.', 'quotation': quotation_to_dict(qt)}, status=201)
         except Exception as e:
             return JsonResponse({'message': str(e)}, status=400)
@@ -467,6 +489,7 @@ def quotation_detail(request, qt_id):
         # Lock: accepted quotations cannot be edited (SO has been raised against it)
         if qt.status == 'accepted':
             return JsonResponse({'message': 'Cannot edit an accepted quotation. A sales order has been raised.'}, status=400)
+        before = {'status': qt.status, 'total_amount': str(qt.total_amount)}
         for field in ['product_description', 'unit', 'spec_notes', 'payment_terms', 'delivery_terms', 'status']:
             if field in data:
                 setattr(qt, field, data[field])
@@ -486,11 +509,16 @@ def quotation_detail(request, qt_id):
         if 'valid_until' in data:
             qt.valid_until = data['valid_until']
         qt.save()
+        after = {'status': qt.status, 'total_amount': str(qt.total_amount)}
+        diff = field_diff(before, after)
+        if diff:
+            log_action(request, 'Quotation', 'Updated', qt.quotation_number, {'changes': diff})
         return JsonResponse({'message': 'Quotation updated.', 'quotation': quotation_to_dict(qt)})
 
     if request.method == 'DELETE':
         if qt.status != 'draft':
             return JsonResponse({'message': f'Only draft quotations can be deleted. This quotation is {qt.status}.'}, status=400)
+        log_action(request, 'Quotation', 'Deleted', qt.quotation_number, {'customer': qt.customer.customer_name})
         qt.delete()
         return JsonResponse({'message': 'Quotation deleted.'})
 
@@ -508,6 +536,8 @@ def invoice_mark_paid(request, invoice_id):
         invoice.paid_amount = invoice.total_amount
         invoice.status = 'paid'
         invoice.save()
+        log_action(request, 'Invoice', 'Marked Paid', invoice.invoice_number,
+                   {'total': str(invoice.total_amount), 'customer': invoice.customer.customer_name})
         return JsonResponse({'message': 'Invoice marked as paid.', 'invoice': invoice_to_dict(invoice)})
     except Invoice.DoesNotExist:
         return JsonResponse({'message': 'Invoice not found.'}, status=404)

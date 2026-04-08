@@ -11,6 +11,7 @@ import json
 
 from .models import Department, Employee, Attendance, SalaryRecord
 from master_data.doc_series_utils import generate_next_number
+from authentication.audit import log_action, field_diff
 
 
 # ============================================================
@@ -158,6 +159,8 @@ def employee_list_and_create(request):
                 pf_number       = data.get('pf_number', ''),
                 esi_number      = data.get('esi_number', ''),
             )
+            log_action(request, 'Employee', 'Created', emp.employee_code,
+                       {'name': emp.full_name, 'designation': emp.designation, 'department': emp.department.name if emp.department else ''})
             return JsonResponse({'message': 'Employee created.', 'employee': employee_to_dict(emp)}, status=201)
         except Exception as e:
             return JsonResponse({'message': str(e)}, status=400)
@@ -175,6 +178,7 @@ def employee_detail_update(request, employee_id):
 
     if request.method == 'PUT':
         data = json.loads(request.body)
+        before = {'status': emp.status, 'designation': emp.designation, 'basic_salary': str(emp.basic_salary)}
         for field in ['first_name', 'last_name', 'phone', 'email', 'address',
                       'designation', 'employment_type', 'status',
                       'basic_salary', 'hra', 'da', 'other_allowance',
@@ -184,6 +188,10 @@ def employee_detail_update(request, employee_id):
         if 'department_id' in data:
             emp.department_id = data['department_id'] or None
         emp.save()
+        after = {'status': emp.status, 'designation': emp.designation, 'basic_salary': str(emp.basic_salary)}
+        diff = field_diff(before, after)
+        if diff:
+            log_action(request, 'Employee', 'Updated', emp.employee_code, {'name': emp.full_name, 'changes': diff})
         return JsonResponse({'message': 'Employee updated.', 'employee': employee_to_dict(emp)})
 
 

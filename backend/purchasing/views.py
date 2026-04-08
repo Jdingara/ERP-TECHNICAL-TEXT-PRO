@@ -14,6 +14,7 @@ import json
 from .models import PurchaseOrder, PurchaseOrderLine, GoodsReceipt, GoodsReceiptLine
 from inventory.models import Stock, StockMovement
 from master_data.doc_series_utils import generate_next_number
+from authentication.audit import log_action, field_diff
 
 
 # ============================================================
@@ -133,6 +134,8 @@ def purchase_order_list_and_create(request):
                 po.total_amount = total
                 po.save()
 
+            log_action(request, 'Purchase Order', 'Created', po.po_number,
+                       {'supplier': po.supplier.supplier_name, 'total': str(po.total_amount)})
             return JsonResponse({'message': 'Purchase order created.', 'purchase_order': po_to_dict(po, include_lines=True)}, status=201)
         except Exception as e:
             return JsonResponse({'message': str(e)}, status=400)
@@ -154,6 +157,7 @@ def purchase_order_detail(request, po_id):
         # Lock: received PO cannot be edited
         if po.status == 'received':
             return JsonResponse({'message': 'Cannot edit a received purchase order. GRN has been confirmed.'}, status=400)
+        before = {'status': po.status, 'expected_date': str(po.expected_date or ''), 'notes': po.notes}
         if 'status' in data:
             po.status = data['status']
         if 'notes' in data:
@@ -161,11 +165,16 @@ def purchase_order_detail(request, po_id):
         if 'expected_date' in data:
             po.expected_date = data['expected_date'] or None
         po.save()
+        after = {'status': po.status, 'expected_date': str(po.expected_date or ''), 'notes': po.notes}
+        diff = field_diff(before, after)
+        if diff:
+            log_action(request, 'Purchase Order', 'Updated', po.po_number, {'changes': diff})
         return JsonResponse({'message': 'Purchase order updated.', 'purchase_order': po_to_dict(po)})
 
     if request.method == 'DELETE':
         if po.status != 'draft':
             return JsonResponse({'message': f'Only draft purchase orders can be deleted. This PO is {po.status}.'}, status=400)
+        log_action(request, 'Purchase Order', 'Deleted', po.po_number, {'supplier': po.supplier.supplier_name})
         po.delete()
         return JsonResponse({'message': 'Purchase order deleted.'})
 
@@ -210,6 +219,8 @@ def goods_receipt_list_and_create(request):
                         received_quantity   = line_data['received_quantity'],
                     )
 
+            log_action(request, 'Goods Receipt', 'Created', grn.grn_number,
+                       {'po': po.po_number, 'supplier': po.supplier.supplier_name})
             return JsonResponse({'message': 'GRN created.', 'grn': grn_to_dict(grn, include_lines=True)}, status=201)
         except Exception as e:
             return JsonResponse({'message': str(e)}, status=400)
@@ -270,6 +281,8 @@ def goods_receipt_confirm(request, grn_id):
             po.status = 'received' if all_received else 'partial'
             po.save()
 
+        log_action(request, 'Goods Receipt', 'Confirmed', grn.grn_number,
+                   {'po': grn.purchase_order.po_number, 'supplier': grn.purchase_order.supplier.supplier_name})
         return JsonResponse({'message': 'GRN confirmed. Stock updated successfully.'})
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=400)
