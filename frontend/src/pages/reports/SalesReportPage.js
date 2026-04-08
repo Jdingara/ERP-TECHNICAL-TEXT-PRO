@@ -9,6 +9,8 @@ import {
     Box, Typography, Grid, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
 } from '@mui/material';
+import { ResizableChartPanel } from '../../components/common/ResizableChartPanel';
+import { ResizablePanelRowInner } from '../../components/common/ResizablePanelRow';
 import { ResizableTable } from '../../components/common/ResizableTable';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -106,11 +108,9 @@ function SalesReportPage() {
                 )}
             </Paper>
 
-            <Grid container spacing={3} mb={3}>
+            <ResizablePanelRowInner storageKey="salesreport_charts" defaultPercents={[50,50]}>
                 {/* Top Customers */}
-                <Grid item xs={12} md={6}>
-                    <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Top 5 Customers by Order Value</Typography>
+                <ResizableChartPanel storageKey="salesreport_top_5_customers_by_order_" title="Top 5 Customers by Order Value" defaultHeight={280}>
                         <ResizableTable storageKey="salesreport">
                 <TableContainer>
                             <Table size="small">
@@ -135,13 +135,10 @@ function SalesReportPage() {
                             </Table>
                         </TableContainer>
             </ResizableTable>
-                    </Paper>
-                </Grid>
+                    </ResizableChartPanel>
 
                 {/* Status Breakdown */}
-                <Grid item xs={12} md={6}>
-                    <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Orders by Status</Typography>
+                <ResizableChartPanel storageKey="salesreport_orders_by_status" title="Orders by Status" defaultHeight={280}>
                         {data.sales_by_status.map(s => (
                             <Box key={s.status} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
                                 <Chip label={s.status.toUpperCase()} size="small" color={STATUS_COLOR[s.status] || 'default'} />
@@ -151,9 +148,8 @@ function SalesReportPage() {
                                 </Box>
                             </Box>
                         ))}
-                    </Paper>
-                </Grid>
-            </Grid>
+                    </ResizableChartPanel>
+            </ResizablePanelRowInner>
 
             {/* Recent Orders */}
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>

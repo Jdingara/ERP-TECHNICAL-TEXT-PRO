@@ -9,6 +9,8 @@ import {
     Box, Typography, Grid, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
 } from '@mui/material';
+import { ResizableChartPanel } from '../../components/common/ResizableChartPanel';
+import { ResizablePanelRowInner } from '../../components/common/ResizablePanelRow';
 import { ResizableTable } from '../../components/common/ResizableTable';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -85,15 +87,13 @@ function InventoryReportPage() {
                 <Grid item xs={6} md={6}><KpiCard title="Low Stock Items" value={data.low_stock_count} color="#e53935" /></Grid>
             </Grid>
 
-            <Grid container spacing={3} mb={4}>
+            <ResizablePanelRowInner storageKey="inventoryreport_charts" defaultPercents={[50,50]}>
                 {/* Stock by Item Type Pie */}
-                <Grid item xs={12} md={5}>
-                    <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Stock by Item Type</Typography>
+                <ResizableChartPanel storageKey="inventoryreport_stock_by_item_type" title="Stock by Item Type" defaultHeight={280}>
                         {data.stock_by_type.length === 0 ? (
                             <Typography color="text.secondary" align="center" py={4}>No stock data yet</Typography>
                         ) : (
-                            <ResponsiveContainer width="100%" height={240}>
+                            <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie data={data.stock_by_type} dataKey="total_items" nameKey="item_type"
                                         cx="50%" cy="50%" outerRadius={80} label={({ item_type, total_items }) => `${item_type}: ${total_items}`}>
@@ -103,17 +103,14 @@ function InventoryReportPage() {
                                 </PieChart>
                             </ResponsiveContainer>
                         )}
-                    </Paper>
-                </Grid>
+                    </ResizableChartPanel>
 
                 {/* Movement Summary */}
-                <Grid item xs={12} md={7}>
-                    <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Stock Movements (Last 30 Days)</Typography>
+                <ResizableChartPanel storageKey="inventoryreport_stock_movements__last_30_" title="Stock Movements (Last 30 Days)" defaultHeight={280}>
                         {data.movement_summary.length === 0 ? (
                             <Typography color="text.secondary" align="center" py={4}>No movements in last 30 days</Typography>
                         ) : (
-                            <ResponsiveContainer width="100%" height={240}>
+                            <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={data.movement_summary} layout="vertical">
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis type="number" />
@@ -123,9 +120,8 @@ function InventoryReportPage() {
                                 </BarChart>
                             </ResponsiveContainer>
                         )}
-                    </Paper>
-                </Grid>
-            </Grid>
+                    </ResizableChartPanel>
+            </ResizablePanelRowInner>
 
             {/* Low Stock Alert Table */}
             {data.low_stock_items.length > 0 && (

@@ -9,6 +9,8 @@ import {
     Box, Typography, Grid, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
 } from '@mui/material';
+import { ResizableChartPanel } from '../../components/common/ResizableChartPanel';
+import { ResizablePanelRowInner } from '../../components/common/ResizablePanelRow';
 import { ResizableTable } from '../../components/common/ResizableTable';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -89,15 +91,13 @@ function HRReportPage() {
                 <Grid item xs={6} md={6}><KpiCard title="Total Departments" value={data.total_departments} color="#2e7d32" /></Grid>
             </Grid>
 
-            <Grid container spacing={3} mb={3}>
+            <ResizablePanelRowInner storageKey="hrreport_charts" defaultPercents={[50,50]}>
                 {/* Employees by Department */}
-                <Grid item xs={12} md={6}>
-                    <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Employees by Department</Typography>
+                <ResizableChartPanel storageKey="hrreport_employees_by_department" title="Employees by Department" defaultHeight={280}>
                         {data.employees_by_dept.length === 0 ? (
                             <Typography color="text.secondary" align="center" py={4}>No department data yet</Typography>
                         ) : (
-                            <ResponsiveContainer width="100%" height={250}>
+                            <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={data.employees_by_dept} layout="vertical">
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis type="number" allowDecimals={false} />
@@ -107,17 +107,14 @@ function HRReportPage() {
                                 </BarChart>
                             </ResponsiveContainer>
                         )}
-                    </Paper>
-                </Grid>
+                    </ResizableChartPanel>
 
                 {/* Attendance This Month */}
-                <Grid item xs={12} md={6}>
-                    <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Attendance This Month</Typography>
+                <ResizableChartPanel storageKey="hrreport_attendance_this_month" title="Attendance This Month" defaultHeight={280}>
                         {data.attendance_this_month.length === 0 ? (
                             <Typography color="text.secondary" align="center" py={4}>No attendance records this month</Typography>
                         ) : (
-                            <ResponsiveContainer width="100%" height={250}>
+                            <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie data={data.attendance_this_month} dataKey="count" nameKey="status"
                                         cx="50%" cy="50%" outerRadius={85}
@@ -130,9 +127,8 @@ function HRReportPage() {
                                 </PieChart>
                             </ResponsiveContainer>
                         )}
-                    </Paper>
-                </Grid>
-            </Grid>
+                    </ResizableChartPanel>
+            </ResizablePanelRowInner>
 
             {/* Salary Summary */}
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, mb: 3 }}>

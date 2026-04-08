@@ -9,6 +9,8 @@ import {
     Box, Typography, Grid, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
 } from '@mui/material';
+import { ResizableChartPanel } from '../../components/common/ResizableChartPanel';
+import { ResizablePanelRowInner } from '../../components/common/ResizablePanelRow';
 import { ResizableTable } from '../../components/common/ResizableTable';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -94,15 +96,13 @@ function ProductionReportPage() {
                 <Grid item xs={6} md={4}><KpiCard title="Total Batches" value={data.total_batches} color="#6a1b9a" /></Grid>
             </Grid>
 
-            <Grid container spacing={3} mb={4}>
+            <ResizablePanelRowInner storageKey="productionreport_charts" defaultPercents={[50,50]}>
                 {/* Monthly Production Chart */}
-                <Grid item xs={12} md={8}>
-                    <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Monthly Production Output (Last 6 Months)</Typography>
+                <ResizableChartPanel storageKey="productionreport_monthly_production_output" title="Monthly Production Output (Last 6 Months)" defaultHeight={280}>
                         {data.monthly_production.length === 0 ? (
                             <Typography color="text.secondary" align="center" py={4}>No production data yet</Typography>
                         ) : (
-                            <ResponsiveContainer width="100%" height={250}>
+                            <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={data.monthly_production}>
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="month" tick={{ fontSize: 12 }} />
@@ -112,22 +112,18 @@ function ProductionReportPage() {
                                 </BarChart>
                             </ResponsiveContainer>
                         )}
-                    </Paper>
-                </Grid>
+                    </ResizableChartPanel>
 
                 {/* Work Order Status */}
-                <Grid item xs={12} md={4}>
-                    <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Work Orders by Status</Typography>
+                <ResizableChartPanel storageKey="productionreport_work_orders_by_status" title="Work Orders by Status" defaultHeight={280}>
                         {data.wo_by_status.map(s => (
                             <Box key={s.status} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
                                 <Chip label={s.status.replace('_',' ').toUpperCase()} size="small" color={STATUS_COLOR[s.status] || 'default'} />
                                 <Typography fontWeight="bold">{s.count}</Typography>
                             </Box>
                         ))}
-                    </Paper>
-                </Grid>
-            </Grid>
+                    </ResizableChartPanel>
+            </ResizablePanelRowInner>
 
             {/* Top Produced Items */}
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, mb: 3 }}>

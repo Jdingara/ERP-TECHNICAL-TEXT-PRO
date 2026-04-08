@@ -9,6 +9,8 @@ import {
     Box, Typography, Grid, Paper, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
 } from '@mui/material';
+import { ResizableChartPanel } from '../../components/common/ResizableChartPanel';
+import { ResizablePanelRowInner } from '../../components/common/ResizablePanelRow';
 import { ResizableTable } from '../../components/common/ResizableTable';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -87,15 +89,13 @@ function FinanceReportPage() {
                 <Grid item xs={6} md={4}><KpiCard title="Posted Entries" value={data.posted_entries} color="#2e7d32" /></Grid>
             </Grid>
 
-            <Grid container spacing={3} mb={3}>
+            <ResizablePanelRowInner storageKey="financereport_charts" defaultPercents={[50,50]}>
                 {/* Accounts by Category Pie */}
-                <Grid item xs={12} md={5}>
-                    <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Accounts by Category</Typography>
+                <ResizableChartPanel storageKey="financereport_accounts_by_category" title="Accounts by Category" defaultHeight={280}>
                         {data.accounts_by_category.length === 0 ? (
                             <Typography color="text.secondary" align="center" py={4}>No accounts yet</Typography>
                         ) : (
-                            <ResponsiveContainer width="100%" height={240}>
+                            <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie data={data.accounts_by_category} dataKey="account_count"
                                         nameKey="category" cx="50%" cy="50%" outerRadius={85}
@@ -106,17 +106,14 @@ function FinanceReportPage() {
                                 </PieChart>
                             </ResponsiveContainer>
                         )}
-                    </Paper>
-                </Grid>
+                    </ResizableChartPanel>
 
                 {/* Monthly Journal Entry Activity */}
-                <Grid item xs={12} md={7}>
-                    <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Journal Entries — Last 6 Months</Typography>
+                <ResizableChartPanel storageKey="financereport_journal_entries___last_6_" title="Journal Entries — Last 6 Months" defaultHeight={280}>
                         {data.monthly_entries.length === 0 ? (
                             <Typography color="text.secondary" align="center" py={4}>No journal entries yet</Typography>
                         ) : (
-                            <ResponsiveContainer width="100%" height={240}>
+                            <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={data.monthly_entries}>
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="month" tick={{ fontSize: 12 }} />
@@ -126,9 +123,8 @@ function FinanceReportPage() {
                                 </BarChart>
                             </ResponsiveContainer>
                         )}
-                    </Paper>
-                </Grid>
-            </Grid>
+                    </ResizableChartPanel>
+            </ResizablePanelRowInner>
 
             {/* Account Balances by Category */}
             <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, mb: 3 }}>
