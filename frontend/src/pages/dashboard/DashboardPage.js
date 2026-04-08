@@ -62,28 +62,30 @@ function GaugeChart({ value, color, label, sub }) {
     const pct = Math.min(100, Math.max(0, parseFloat(value) || 0));
     const gaugeData = [{ value: pct, fill: color }];
     return (
-        <Box sx={{ textAlign: 'center', position: 'relative' }}>
-            <ResponsiveContainer width="100%" height={120}>
-                <RadialBarChart
-                    cx="50%" cy="90%"
-                    innerRadius="75%" outerRadius="105%"
-                    startAngle={180} endAngle={0}
-                    data={gaugeData}>
-                    <RadialBar
-                        background={{ fill: '#eeeeee' }}
-                        dataKey="value"
-                        cornerRadius={8}
-                        isAnimationActive
-                    />
-                </RadialBarChart>
-            </ResponsiveContainer>
-            <Box sx={{ position: 'absolute', bottom: 10, left: 0, right: 0 }}>
-                <Typography variant="h5" fontWeight="bold" color={color} lineHeight={1}>
-                    {pct.toFixed(0)}%
-                </Typography>
-                <Typography fontSize={11} color="text.secondary" fontWeight={600}>{label}</Typography>
-                {sub && <Typography fontSize={10} color="text.secondary">{sub}</Typography>}
+        <Box sx={{ textAlign: 'center' }}>
+            <Box sx={{ position: 'relative', height: 140 }}>
+                <ResponsiveContainer width="100%" height={140}>
+                    <RadialBarChart
+                        cx="50%" cy="85%"
+                        innerRadius="70%" outerRadius="100%"
+                        startAngle={180} endAngle={0}
+                        data={gaugeData}>
+                        <RadialBar
+                            background={{ fill: '#eeeeee' }}
+                            dataKey="value"
+                            cornerRadius={8}
+                            isAnimationActive
+                        />
+                    </RadialBarChart>
+                </ResponsiveContainer>
+                <Box sx={{ position: 'absolute', bottom: 4, left: 0, right: 0 }}>
+                    <Typography variant="h4" fontWeight="bold" color={color} lineHeight={1}>
+                        {pct.toFixed(0)}%
+                    </Typography>
+                </Box>
             </Box>
+            <Typography fontSize={12} color="text.secondary" fontWeight={600} mt={0.5}>{label}</Typography>
+            {sub && <Typography fontSize={11} color="text.secondary">{sub}</Typography>}
         </Box>
     );
 }
@@ -165,12 +167,12 @@ function MetricCard({ title, value, badge, badgeColor = 'default', sub, icon, co
 }
 
 // ─── Chart panel ─────────────────────────────────────────────
-function Panel({ title, subtitle, children, height = 240 }) {
+function Panel({ title, subtitle, children, height = 300 }) {
     return (
-        <Paper sx={{ p: 2, borderRadius: 2, boxShadow: 2, height: '100%' }}>
-            <Typography variant="subtitle2" fontWeight="bold" color={C.navy} fontSize={13}>{title}</Typography>
+        <Paper sx={{ p: 2.5, borderRadius: 2, boxShadow: 2, height: '100%' }}>
+            <Typography variant="subtitle2" fontWeight="bold" color={C.navy} fontSize={14}>{title}</Typography>
             {subtitle && <Typography variant="caption" color="text.secondary">{subtitle}</Typography>}
-            <Box mt={1} height={height}>{children}</Box>
+            <Box mt={1.5} height={height}>{children}</Box>
         </Paper>
     );
 }
@@ -289,7 +291,7 @@ function DashboardPage() {
 
             {/* ═══ HEADER BANNER ═══════════════════════════════ */}
             <Box sx={{
-                background: 'linear-gradient(135deg, #0d1b4b 0%, #1a237e 60%, #283593 100%)',
+                background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.dark || '#0d1b4b'} 0%, ${theme.palette.primary.main} 60%, ${theme.palette.primary.light || theme.palette.primary.main} 100%)`,
                 borderRadius: 2.5, p: 2.5, mb: 2.5, color: 'white',
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             }}>
@@ -386,11 +388,11 @@ function DashboardPage() {
             <Grid container spacing={2} mb={0.5}>
 
                 {/* ComposedChart: Revenue bars + Order line */}
-                <Grid item xs={12} md={7}>
+                <Grid item xs={12} md={8}>
                     <Panel
                         title="Monthly Revenue & Order Volume"
                         subtitle="Last 6 months — bars = revenue · line = order count"
-                        height={230}>
+                        height={320}>
                         <ResponsiveContainer width="100%" height="100%">
                             <ComposedChart data={monthlyRev} margin={{ top: 5, right: 25, left: 10, bottom: 0 }}>
                                 <defs>
@@ -417,14 +419,14 @@ function DashboardPage() {
                 </Grid>
 
                 {/* Gauges + AR quick view */}
-                <Grid item xs={12} md={5}>
+                <Grid item xs={12} md={4}>
                     <Paper sx={{ p: 2, borderRadius: 2, boxShadow: 2, height: '100%' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                             <SpeedIcon sx={{ color: C.navy, fontSize: 18 }} />
                             <Typography fontWeight="bold" color={C.navy} fontSize={13}>Performance Gauges</Typography>
                         </Box>
 
-                        <Grid container spacing={1}>
+                        <Grid container spacing={2}>
                             <Grid item xs={6}>
                                 <GaugeChart
                                     value={collectionRate}
@@ -473,8 +475,8 @@ function DashboardPage() {
             <Grid container spacing={2} mb={0.5}>
 
                 {/* AR Aging — Horizontal BarChart */}
-                <Grid item xs={12} md={5}>
-                    <Panel title="AR Aging Breakdown" subtitle="Outstanding receivables by age bucket" height={190}>
+                <Grid item xs={12} md={4}>
+                    <Panel title="AR Aging Breakdown" subtitle="Outstanding receivables by age bucket" height={260}>
                         {arAgingData.every(d => d.value === 0) ? (
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                                 <Typography color="text.secondary" fontSize={12}>No outstanding AR</Typography>
@@ -500,7 +502,7 @@ function DashboardPage() {
 
                 {/* SO Status Donut */}
                 <Grid item xs={12} md={4}>
-                    <Panel title="Sales Order Status" subtitle="All orders — status breakdown" height={190}>
+                    <Panel title="Sales Order Status" subtitle="All orders — status breakdown" height={260}>
                         {soStatusPie.length === 0 ? (
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                                 <Typography color="text.secondary" fontSize={12}>No sales orders yet</Typography>
@@ -524,7 +526,7 @@ function DashboardPage() {
 
                 {/* Stock Health Donut */}
                 <Grid item xs={12} md={3}>
-                    <Panel title="Stock Health" subtitle="Normal vs low stock items" height={190}>
+                    <Panel title="Stock Health" subtitle="Normal vs low stock items" height={260}>
                         {data.total_stock_items === 0 ? (
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                                 <Typography color="text.secondary" fontSize={12}>No stock data</Typography>
@@ -553,7 +555,7 @@ function DashboardPage() {
 
                 {/* P&L Bar */}
                 <Grid item xs={12} md={4}>
-                    <Panel title="P&L Summary" subtitle="Posted journal entries — income vs expense" height={210}>
+                    <Panel title="P&L Summary" subtitle="Posted journal entries — income vs expense" height={280}>
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={plData} margin={{ top: 5, right: 10, left: 5, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -570,7 +572,7 @@ function DashboardPage() {
 
                 {/* Module Activity */}
                 <Grid item xs={12} md={8}>
-                    <Panel title="Live Module Activity" subtitle="Open / active records across all modules" height={210}>
+                    <Panel title="Live Module Activity" subtitle="Open / active records across all modules" height={280}>
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={moduleData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
