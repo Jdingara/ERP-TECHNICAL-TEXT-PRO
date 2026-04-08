@@ -10,46 +10,28 @@ import {
     Box, Typography, Button, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Paper, Chip,
     Dialog, DialogTitle, DialogContent, DialogActions,
-    TextField, MenuItem, Select, InputLabel, FormControl,
-    Alert, Divider, IconButton
+    IconButton
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useColumnResize } from '../../components/common/useColumnResize';
 
-const EMPTY_LINE = { raw_material_id: '', quantity: '', waste_percent: 0, notes: '' };
-
 function BOMListPage() {
     const theme = useTheme();
+    const navigate = useNavigate();
     const { widths, Resizer } = useColumnResize("bom_list", [100, 180, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 80]);
     const [boms, setBoms]               = useState([]);
-    const [items, setItems]             = useState([]);
-    const [dialogOpen, setDialogOpen]   = useState(false);
     const [viewDialog, setViewDialog]   = useState(false);
     const [selectedBom, setSelectedBom] = useState(null);
-    const [message, setMessage]         = useState('');
-    const [messageType, setMessageType] = useState('success');
 
-    const [bomName, setBomName]                     = useState('');
-    const [finishedProductId, setFinishedProductId] = useState('');
-    const [quantityProduced, setQuantityProduced]   = useState(100);
-    const [notes, setNotes]                         = useState('');
-    const [lines, setLines]                         = useState([{ ...EMPTY_LINE }]);
-
-    useEffect(() => { fetchBoms(); fetchItems(); }, []);
+    useEffect(() => { fetchBoms(); }, []);
 
     const fetchBoms = async () => {
         const res = await fetch('/api/production/bom/', { credentials: 'include' });
         const data = await res.json();
         setBoms(data.boms || []);
-    };
-
-    const fetchItems = async () => {
-        const res = await fetch('/api/master-data/items/', { credentials: 'include' });
-        const data = await res.json();
-        setItems(data.items || []);
     };
 
     const handleViewBom = async (bomId) => {
@@ -59,40 +41,6 @@ function BOMListPage() {
         setViewDialog(true);
     };
 
-    const addLine = () => setLines(prev => [...prev, { ...EMPTY_LINE }]);
-    const removeLine = (i) => setLines(prev => prev.filter((_, idx) => idx !== i));
-    const updateLine = (i, field, value) => setLines(prev => prev.map((l, idx) => idx === i ? { ...l, [field]: value } : l));
-
-    const handleSave = async () => {
-        if (!finishedProductId || !bomName) {
-            setMessage('Please fill in BOM Name and Finished Product.'); setMessageType('error'); return;
-        }
-        const payload = {
-            bom_name: bomName, finished_product_id: finishedProductId,
-            quantity_produced: quantityProduced, notes,
-            lines: lines.filter(l => l.raw_material_id).map(l => ({
-                raw_material_id: l.raw_material_id,
-                quantity: l.quantity,
-                waste_percent: l.waste_percent || 0,
-                notes: l.notes,
-            })),
-        };
-        const res = await fetch('/api/production/bom/', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            credentials: 'include', body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-        if (res.ok) {
-            setMessage('BOM created successfully.'); setMessageType('success');
-            setDialogOpen(false); fetchBoms();
-        } else {
-            setMessage(data.message || 'Error.'); setMessageType('error');
-        }
-    };
-
-    const finishedGoods = items.filter(i => ['finished_goods', 'semi_finished'].includes(i.item_type));
-    const rawMaterials  = items.filter(i => i.item_type === 'raw_material');
-
     return (
         <Box>
             <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Bill of Materials</Typography>
@@ -100,11 +48,9 @@ function BOMListPage() {
                 Recipe for each product — what raw materials are needed and how much
             </Typography>
 
-            {message && <Alert severity={messageType} sx={{ mb: 2 }} onClose={() => setMessage('')}>{message}</Alert>}
-
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
                 <Button variant="contained" startIcon={<AddIcon />}
-                    onClick={() => { setDialogOpen(true); setBomName(''); setFinishedProductId(''); setLines([{ ...EMPTY_LINE }]); }}
+                    onClick={() => navigate('/production/bill-of-materials/new')}
                     sx={{ backgroundColor: 'primary.main' }}>
                     Create BOM
                 </Button>
@@ -145,87 +91,7 @@ function BOMListPage() {
                 </Table>
             </TableContainer>
 
-            {/* Create BOM Dialog */}
-            <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="lg" fullWidth>
-                <DialogTitle sx={{ color: 'white' }}>Create Bill of Materials</DialogTitle>
-                <DialogContent sx={{ pt: 3 }}>
-                    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, mb: 3, mt: 1 }}>
-                        <TextField label="BOM Name *" value={bomName} onChange={(e) => setBomName(e.target.value)} sx={{ gridColumn: 'span 2' }} />
-                        <TextField label="Quantity Produced" type="number" value={quantityProduced} onChange={(e) => setQuantityProduced(e.target.value)} />
-                        <FormControl sx={{ gridColumn: 'span 2' }}>
-                            <InputLabel>Finished Product *</InputLabel>
-                            <Select value={finishedProductId} label="Finished Product *" onChange={(e) => setFinishedProductId(e.target.value)}>
-                                {finishedGoods.map(i => <MenuItem key={i.id} value={i.id}>{i.item_code} — {i.item_name}</MenuItem>)}
-                            </Select>
-                        </FormControl>
-                        <TextField label="Notes" value={notes} onChange={(e) => setNotes(e.target.value)} />
-                    </Box>
-                    <Divider sx={{ mb: 2 }} />
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography fontWeight="bold" color="primary">Raw Materials Required</Typography>
-                        <Button size="small" startIcon={<AddIcon />} onClick={addLine} variant="outlined">Add Material</Button>
-                    </Box>
-                    <Table size="small">
-                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
-                            <TableRow>
-                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[5], backgroundColor: theme.palette.primary.main }}>Raw Material *<Resizer index={5} /></TableCell>
-                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[6], backgroundColor: theme.palette.primary.main }}>Quantity *<Resizer index={6} /></TableCell>
-                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[7], backgroundColor: theme.palette.primary.main }}>Waste % (for spinning)<Resizer index={7} /></TableCell>
-                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[8], backgroundColor: theme.palette.primary.main }}>Qty incl. Waste<Resizer index={8} /></TableCell>
-                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[9], backgroundColor: theme.palette.primary.main }}>Notes<Resizer index={9} /></TableCell>
-                                <TableCell></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {lines.map((line, i) => {
-                                const qtyWithWaste = (parseFloat(line.quantity || 0) * (1 + parseFloat(line.waste_percent || 0) / 100)).toFixed(3);
-                                return (
-                                    <TableRow key={i}>
-                                        <TableCell sx={{ minWidth: 220 }}>
-                                            <FormControl fullWidth size="small">
-                                                <Select value={line.raw_material_id}
-                                                    onChange={(e) => updateLine(i, 'raw_material_id', e.target.value)} displayEmpty>
-                                                    <MenuItem value="">-- Select --</MenuItem>
-                                                    {rawMaterials.map(item => (
-                                                        <MenuItem key={item.id} value={item.id}>{item.item_code} — {item.item_name}</MenuItem>
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
-                                        </TableCell>
-                                        <TableCell sx={{ width: 100 }}>
-                                            <TextField size="small" type="number" value={line.quantity}
-                                                onChange={(e) => updateLine(i, 'quantity', e.target.value)} />
-                                        </TableCell>
-                                        <TableCell sx={{ width: 130 }}>
-                                            <TextField size="small" type="number" value={line.waste_percent}
-                                                onChange={(e) => updateLine(i, 'waste_percent', e.target.value)}
-                                                InputProps={{ endAdornment: '%' }} />
-                                        </TableCell>
-                                        <TableCell sx={{ width: 100 }}>
-                                            <strong style={{ color: '#e65100' }}>{qtyWithWaste}</strong>
-                                        </TableCell>
-                                        <TableCell>
-                                            <TextField size="small" value={line.notes}
-                                                onChange={(e) => updateLine(i, 'notes', e.target.value)} />
-                                        </TableCell>
-                                        <TableCell>
-                                            <IconButton size="small" color="error" onClick={() => removeLine(i)} disabled={lines.length === 1}>
-                                                <DeleteIcon fontSize="small" />
-                                            </IconButton>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
-                </DialogContent>
-                <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>Save BOM</Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* View BOM Dialog */}
+            {/* View BOM Dialog — kept intact */}
             {selectedBom && (
                 <Dialog open={viewDialog} onClose={() => setViewDialog(false)} maxWidth="md" fullWidth>
                     <DialogTitle sx={{ color: 'white' }}>

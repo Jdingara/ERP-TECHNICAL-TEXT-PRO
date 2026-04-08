@@ -6,27 +6,21 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-    Box, Typography, Button, TextField, Table, TableBody,
+    Box, Typography, Button, Table, TableBody,
     TableCell, TableContainer, TableHead, TableRow, Paper,
-    IconButton, Dialog, DialogTitle, DialogContent,
-    DialogActions, Alert
+    IconButton
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
+import { useNavigate } from 'react-router-dom';
 import { useColumnResize } from '../../components/common/useColumnResize';
-
-const EMPTY_FORM = { code: '', name: '', address: '' };
 
 function WarehouseListPage() {
     const theme = useTheme();
+    const navigate = useNavigate();
     const { widths, Resizer } = useColumnResize("warehouse_list", [100, 180, 150, 80]);
-    const [warehouses, setWarehouses]   = useState([]);
-    const [dialogOpen, setDialogOpen]   = useState(false);
-    const [formData, setFormData]       = useState(EMPTY_FORM);
-    const [editingId, setEditingId]     = useState(null);
-    const [message, setMessage]         = useState('');
-    const [messageType, setMessageType] = useState('success');
+    const [warehouses, setWarehouses] = useState([]);
 
     useEffect(() => { fetchWarehouses(); }, []);
 
@@ -36,32 +30,6 @@ function WarehouseListPage() {
         setWarehouses(data.warehouses || []);
     };
 
-    const handleOpenAdd = () => { setFormData(EMPTY_FORM); setEditingId(null); setDialogOpen(true); };
-    const handleOpenEdit = (w) => { setFormData({ code: w.code, name: w.name, address: w.address }); setEditingId(w.id); setDialogOpen(true); };
-
-    const handleSave = async () => {
-        const url = editingId
-            ? `/api/master-data/warehouses/${editingId}/`
-            : '/api/master-data/warehouses/';
-        const method = editingId ? 'PUT' : 'POST';
-        const res = await fetch(url, {
-            method, headers: { 'Content-Type': 'application/json' },
-            credentials: 'include', body: JSON.stringify(formData),
-        });
-        const data = await res.json();
-        if (res.ok) {
-            setMessage(editingId ? 'Warehouse updated.' : 'Warehouse created.');
-            setMessageType('success');
-            setDialogOpen(false);
-            fetchWarehouses();
-        } else {
-            setMessage(data.message || 'Error saving warehouse.');
-            setMessageType('error');
-        }
-    };
-
-    const handleChange = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
-
     return (
         <Box>
             <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Warehouses</Typography>
@@ -69,10 +37,8 @@ function WarehouseListPage() {
                 Manage stock storage locations
             </Typography>
 
-            {message && <Alert severity={messageType} sx={{ mb: 2 }} onClose={() => setMessage('')}>{message}</Alert>}
-
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-                <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd}
+                <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/master-data/warehouses/add')}
                     sx={{ backgroundColor: 'primary.main' }}>Add Warehouse</Button>
             </Box>
 
@@ -100,7 +66,7 @@ function WarehouseListPage() {
                                     <TableCell>{w.name}</TableCell>
                                     <TableCell>{w.address || '—'}</TableCell>
                                     <TableCell>
-                                        <IconButton size="small" onClick={() => handleOpenEdit(w)} sx={{ color: 'primary.main' }}>
+                                        <IconButton size="small" onClick={() => navigate(`/master-data/warehouses/edit/${w.id}`)} sx={{ color: 'primary.main' }}>
                                             <EditIcon fontSize="small" />
                                         </IconButton>
                                     </TableCell>
@@ -110,28 +76,6 @@ function WarehouseListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-
-            <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ color: 'white' }}>
-                    {editingId ? 'Edit Warehouse' : 'Add New Warehouse'}
-                </DialogTitle>
-                <DialogContent sx={{ pt: 3 }}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-                        <TextField label="Warehouse Code * (e.g. WH-01)" value={formData.code}
-                            onChange={(e) => handleChange('code', e.target.value)} disabled={!!editingId} />
-                        <TextField label="Warehouse Name *" value={formData.name}
-                            onChange={(e) => handleChange('name', e.target.value)} />
-                        <TextField label="Address" value={formData.address}
-                            onChange={(e) => handleChange('address', e.target.value)} multiline rows={2} />
-                    </Box>
-                </DialogContent>
-                <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>
-                        {editingId ? 'Update' : 'Save Warehouse'}
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </Box>
     );
 }

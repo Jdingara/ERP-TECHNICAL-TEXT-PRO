@@ -9,91 +9,28 @@ import { useState, useEffect } from 'react';
 import {
     Box, Typography, Button, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Paper, Chip,
-    Dialog, DialogTitle, DialogContent, DialogActions,
-    TextField, IconButton, Alert, Divider, Tooltip, Stack,
+    IconButton, Alert, Tooltip, Stack,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import AddIcon    from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Autocomplete } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { useColumnResize } from '../../components/common/useColumnResize';
-
-const EMPTY_LINE = { account_id: '', account_label: '', description: '', debit_amount: '', credit_amount: '' };
 
 function JournalEntryListPage() {
     const theme = useTheme();
+    const navigate = useNavigate();
     const { widths, Resizer } = useColumnResize("journalentry_list", [100, 180, 150, 150, 150, 150, 150, 150, 150, 150, 150, 80]);
     const [entries, setEntries]         = useState([]);
-    const [accounts, setAccounts]       = useState([]);
-    const [dialogOpen, setDialogOpen]   = useState(false);
     const [message, setMessage]         = useState('');
     const [messageType, setMessageType] = useState('success');
 
-    // Form state
-    const [entryNumber, setEntryNumber] = useState('');
-    const [entryDate, setEntryDate]     = useState(new Date().toISOString().split('T')[0]);
-    const [description, setDescription] = useState('');
-    const [reference, setReference]     = useState('');
-    const [lines, setLines]             = useState([{ ...EMPTY_LINE }, { ...EMPTY_LINE }]);
-
-    useEffect(() => { fetchEntries(); fetchAccounts(); }, []);
+    useEffect(() => { fetchEntries(); }, []);
 
     const fetchEntries = async () => {
         const res = await fetch('/api/finance/journal-entries/', { credentials: 'include' });
         const data = await res.json();
         setEntries(data.journal_entries || []);
-    };
-
-    const fetchAccounts = async () => {
-        const res = await fetch('/api/finance/accounts/', { credentials: 'include' });
-        const data = await res.json();
-        setAccounts(data.accounts || []);
-    };
-
-    const generateEntryNumber = () => {
-        const date = new Date();
-        return `JE-${date.getFullYear()}${String(date.getMonth()+1).padStart(2,'0')}-${String(Math.floor(Math.random()*10000)).padStart(4,'0')}`;
-    };
-
-    const openDialog = () => {
-        setEntryNumber(generateEntryNumber());
-        setEntryDate(new Date().toISOString().split('T')[0]);
-        setDescription('');
-        setReference('');
-        setLines([{ ...EMPTY_LINE }, { ...EMPTY_LINE }]);
-        setDialogOpen(true);
-    };
-
-    const addLine = () => setLines(prev => [...prev, { ...EMPTY_LINE }]);
-    const removeLine = (i) => setLines(prev => prev.filter((_, idx) => idx !== i));
-    const updateLine = (i, field, value) => setLines(prev => prev.map((l, idx) => idx === i ? { ...l, [field]: value } : l));
-
-    const totalDebits  = lines.reduce((s, l) => s + parseFloat(l.debit_amount || 0), 0);
-    const totalCredits = lines.reduce((s, l) => s + parseFloat(l.credit_amount || 0), 0);
-    const isBalanced   = Math.abs(totalDebits - totalCredits) < 0.01;
-
-    const handleSave = async () => {
-        const payload = {
-            entry_number: entryNumber, entry_date: entryDate,
-            description, reference,
-            lines: lines.filter(l => l.account_id).map(l => ({
-                account_id:     l.account_id,
-                description:    l.description,
-                debit_amount:   l.debit_amount || 0,
-                credit_amount:  l.credit_amount || 0,
-            })),
-        };
-        const res = await fetch('/api/finance/journal-entries/', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            credentials: 'include', body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-        if (res.ok) {
-            setMessage('Journal entry created.'); setMessageType('success');
-            setDialogOpen(false); fetchEntries();
-        } else {
-            setMessage(data.message || 'Error.'); setMessageType('error');
-        }
     };
 
     const handlePost = async (entryId) => {
@@ -116,8 +53,6 @@ function JournalEntryListPage() {
         else { setMessage(data.message || 'Delete failed.'); setMessageType('error'); }
     };
 
-    const accountOptions = accounts.map(a => ({ id: a.id, label: `${a.account_code} — ${a.account_name}` }));
-
     return (
         <Box>
             <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Journal Entries</Typography>
@@ -128,7 +63,7 @@ function JournalEntryListPage() {
             {message && <Alert severity={messageType} sx={{ mb: 2 }} onClose={() => setMessage('')}>{message}</Alert>}
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-                <Button variant="contained" startIcon={<AddIcon />} onClick={openDialog}
+                <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/finance/journal-entries/new')}
                     sx={{ backgroundColor: 'primary.main' }}>New Journal Entry</Button>
             </Box>
 
@@ -187,89 +122,6 @@ function JournalEntryListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-
-            {/* New Journal Entry Dialog */}
-            <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="lg" fullWidth>
-                <DialogTitle sx={{ color: 'white' }}>New Journal Entry</DialogTitle>
-                <DialogContent sx={{ pt: 3 }}>
-                    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 2, mb: 3, mt: 1 }}>
-                        <TextField label="Entry Number" value={entryNumber} onChange={(e) => setEntryNumber(e.target.value)} />
-                        <TextField label="Date *" type="date" value={entryDate} onChange={(e) => setEntryDate(e.target.value)} InputLabelProps={{ shrink: true }} />
-                        <TextField label="Description *" value={description} onChange={(e) => setDescription(e.target.value)} sx={{ gridColumn: 'span 2' }} />
-                        <TextField label="Reference" value={reference} onChange={(e) => setReference(e.target.value)} />
-                    </Box>
-
-                    <Divider sx={{ mb: 2 }} />
-
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography fontWeight="bold" color="primary">Entry Lines</Typography>
-                        <Button size="small" startIcon={<AddIcon />} onClick={addLine} variant="outlined">Add Line</Button>
-                    </Box>
-
-                    <Table size="small">
-                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
-                            <TableRow>
-                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[8], backgroundColor: theme.palette.primary.main }}>Account *<Resizer index={8} /></TableCell>
-                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[9], backgroundColor: theme.palette.primary.main }}>Description<Resizer index={9} /></TableCell>
-                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[10], backgroundColor: theme.palette.primary.main }}>Debit (₹)<Resizer index={10} /></TableCell>
-                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[11], backgroundColor: theme.palette.primary.main }}>Credit (₹)<Resizer index={11} /></TableCell>
-                                <TableCell></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {lines.map((line, i) => (
-                                <TableRow key={i}>
-                                    <TableCell sx={{ minWidth: 280 }}>
-                                        <Autocomplete
-                                            size="small"
-                                            options={accountOptions}
-                                            value={accountOptions.find(a => a.id === line.account_id) || null}
-                                            onChange={(_, val) => updateLine(i, 'account_id', val?.id || '')}
-                                            renderInput={(params) => <TextField {...params} placeholder="Select account" />}
-                                        />
-                                    </TableCell>
-                                    <TableCell>
-                                        <TextField size="small" value={line.description}
-                                            onChange={(e) => updateLine(i, 'description', e.target.value)} />
-                                    </TableCell>
-                                    <TableCell align="right" sx={{ width: 130 }}>
-                                        <TextField size="small" type="number" value={line.debit_amount}
-                                            onChange={(e) => updateLine(i, 'debit_amount', e.target.value)} />
-                                    </TableCell>
-                                    <TableCell align="right" sx={{ width: 130 }}>
-                                        <TextField size="small" type="number" value={line.credit_amount}
-                                            onChange={(e) => updateLine(i, 'credit_amount', e.target.value)} />
-                                    </TableCell>
-                                    <TableCell>
-                                        <IconButton size="small" color="error" onClick={() => removeLine(i)}
-                                            disabled={lines.length <= 2}>
-                                            <DeleteIcon fontSize="small" />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            {/* Totals row */}
-                            <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                                <TableCell colSpan={2}><strong>Total</strong></TableCell>
-                                <TableCell align="right"><strong style={{ color: 'primary.main' }}>{totalDebits.toFixed(2)}</strong></TableCell>
-                                <TableCell align="right"><strong style={{ color: 'primary.main' }}>{totalCredits.toFixed(2)}</strong></TableCell>
-                                <TableCell>
-                                    {isBalanced
-                                        ? <Chip label="Balanced" color="success" size="small" />
-                                        : <Chip label="Not Balanced" color="error" size="small" />
-                                    }
-                                </TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </DialogContent>
-                <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: 'primary.main' }}>
-                        Save Journal Entry
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </Box>
     );
 }

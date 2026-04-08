@@ -8,14 +8,13 @@ import { useState, useEffect } from 'react';
 import {
     Box, Typography, Button, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Paper, Chip, Alert,
-    CircularProgress, IconButton, Tooltip, Stack, Dialog,
-    DialogTitle, DialogContent, DialogActions, TextField,
-    MenuItem, Select, FormControl, InputLabel, Grid,
+    CircularProgress, IconButton, Tooltip, Stack, Grid,
 } from '@mui/material';
 import PrintIcon        from '@mui/icons-material/Print';
 import PaymentIcon      from '@mui/icons-material/Payment';
 import AddIcon          from '@mui/icons-material/Add';
 import ReceiptIcon      from '@mui/icons-material/Receipt';
+import { useNavigate } from 'react-router-dom';
 import { useColumnResize } from '../../components/common/useColumnResize';
 import { printInvoice } from '../../utils/printUtils';
 
@@ -27,19 +26,12 @@ const STATUS_COLOR = {
 };
 
 function SalesInvoicePage() {
-    const { widths, Resizer } = useColumnResize("salesinvoice", [100, 180, 150, 80]);
-    const [invoices, setInvoices]     = useState([]);
-    const [loading,  setLoading]      = useState(true);
-    const [msg,      setMsg]          = useState('');
-    const [msgType,  setMsgType]      = useState('success');
-    const [openDlg,  setOpenDlg]      = useState(false);
-
-    // Create dialog form state
-    const [soList,   setSoList]       = useState([]);
-    const [form,     setForm]         = useState({
-        sales_order_id: '', invoice_date: '', due_date: '',
-        tax_amount: '0', notes: '',
-    });
+    useColumnResize("salesinvoice", [100, 180, 150, 80]);
+    const navigate = useNavigate();
+    const [invoices, setInvoices] = useState([]);
+    const [loading,  setLoading]  = useState(true);
+    const [msg,      setMsg]      = useState('');
+    const [msgType,  setMsgType]  = useState('success');
 
     useEffect(() => { fetchInvoices(); }, []);
 
@@ -51,62 +43,6 @@ function SalesInvoicePage() {
             setInvoices(json.invoices || []);
         } catch { setInvoices([]); }
         finally  { setLoading(false); }
-    };
-
-    const fetchSOs = async () => {
-        try {
-            const res  = await fetch('/api/sales/orders/?status=delivered', { credentials: 'include' });
-            const json = await res.json();
-            setSoList(json.sales_orders || []);
-        } catch { setSoList([]); }
-    };
-
-    const openCreate = () => {
-        fetchSOs();
-        setForm({ sales_order_id: '', invoice_date: '', due_date: '', tax_amount: '0', notes: '' });
-        setOpenDlg(true);
-    };
-
-    const handleCreate = async () => {
-        if (!form.sales_order_id || !form.invoice_date || !form.due_date) {
-            setMsg('Sales order, invoice date and due date are required.');
-            setMsgType('error');
-            return;
-        }
-        try {
-            const so       = soList.find(s => s.id === parseInt(form.sales_order_id));
-            const subtotal = parseFloat(so?.total_amount || 0);
-            const tax      = parseFloat(form.tax_amount || 0);
-
-            // Auto-generate invoice number
-            const today   = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-            const inv_num = `INV-${today}-${String(invoices.length + 1).padStart(3, '0')}`;
-
-            const res = await fetch('/api/sales/invoices/', {
-                method:      'POST',
-                credentials: 'include',
-                headers:     { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    invoice_number:  inv_num,
-                    sales_order_id:  parseInt(form.sales_order_id),
-                    invoice_date:    form.invoice_date,
-                    due_date:        form.due_date,
-                    subtotal:        subtotal,
-                    tax_amount:      tax,
-                    total_amount:    subtotal + tax,
-                    notes:           form.notes,
-                }),
-            });
-            const json = await res.json();
-            if (!res.ok) throw new Error(json.message || 'Failed to create invoice');
-            setMsg('Invoice created successfully.');
-            setMsgType('success');
-            setOpenDlg(false);
-            fetchInvoices();
-        } catch (e) {
-            setMsg(e.message);
-            setMsgType('error');
-        }
     };
 
     const handleMarkPaid = async (inv) => {
@@ -146,7 +82,7 @@ function SalesInvoicePage() {
                         </Typography>
                     </Box>
                 </Box>
-                <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}
+                <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/sales/invoices/new')}
                     sx={{ backgroundColor: '#e65100', '&:hover': { backgroundColor: '#bf360c' } }}>
                     Create Invoice
                 </Button>
@@ -157,10 +93,10 @@ function SalesInvoicePage() {
             {/* Summary Cards */}
             <Grid container spacing={2} mb={3}>
                 {[
-                    { label: 'Total Invoiced', value: fmtCur(invoices.reduce((s, i) => s + parseFloat(i.total_amount || 0), 0)), color: 'primary.main' },
-                    { label: 'Total Collected', value: fmtCur(invoices.filter(i => i.status === 'paid').reduce((s, i) => s + parseFloat(i.total_amount || 0), 0)), color: '#2e7d32' },
-                    { label: 'Outstanding AR', value: fmtCur(invoices.filter(i => i.status !== 'paid').reduce((s, i) => s + parseFloat(i.balance_due || 0), 0)), color: '#e65100' },
-                    { label: 'Overdue', value: invoices.filter(i => i.status === 'overdue').length + ' invoice(s)', color: '#c62828' },
+                    { label: 'Total Invoiced',   value: fmtCur(invoices.reduce((s, i) => s + parseFloat(i.total_amount || 0), 0)), color: 'primary.main' },
+                    { label: 'Total Collected',  value: fmtCur(invoices.filter(i => i.status === 'paid').reduce((s, i) => s + parseFloat(i.total_amount || 0), 0)), color: '#2e7d32' },
+                    { label: 'Outstanding AR',   value: fmtCur(invoices.filter(i => i.status !== 'paid').reduce((s, i) => s + parseFloat(i.balance_due || 0), 0)), color: '#e65100' },
+                    { label: 'Overdue',          value: invoices.filter(i => i.status === 'overdue').length + ' invoice(s)', color: '#c62828' },
                 ].map(c => (
                     <Grid item xs={12} sm={6} md={3} key={c.label}>
                         <Paper sx={{ p: 2, borderRadius: 2, borderLeft: `4px solid ${c.color}` }}>
@@ -232,55 +168,6 @@ function SalesInvoicePage() {
                     </TableBody>
                 </Table>
             </TableContainer>
-
-            {/* Create Invoice Dialog */}
-            <Dialog open={openDlg} onClose={() => setOpenDlg(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>Create Sales Invoice</DialogTitle>
-                <DialogContent>
-                    <Stack spacing={2.5} mt={1}>
-                        <FormControl fullWidth size="small">
-                            <InputLabel>Sales Order (Delivered)</InputLabel>
-                            <Select
-                                value={form.sales_order_id}
-                                label="Sales Order (Delivered)"
-                                onChange={e => setForm(f => ({ ...f, sales_order_id: e.target.value }))}>
-                                {soList.map(so => (
-                                    <MenuItem key={so.id} value={so.id}>
-                                        {so.so_number} — {so.customer_name} (₹ {parseFloat(so.total_amount).toLocaleString('en-IN')})
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <Grid container spacing={2}>
-                            <Grid item xs={6}>
-                                <TextField fullWidth size="small" type="date" label="Invoice Date"
-                                    InputLabelProps={{ shrink: true }}
-                                    value={form.invoice_date}
-                                    onChange={e => setForm(f => ({ ...f, invoice_date: e.target.value }))} />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField fullWidth size="small" type="date" label="Due Date"
-                                    InputLabelProps={{ shrink: true }}
-                                    value={form.due_date}
-                                    onChange={e => setForm(f => ({ ...f, due_date: e.target.value }))} />
-                            </Grid>
-                        </Grid>
-                        <TextField fullWidth size="small" type="number" label="Tax Amount (₹)"
-                            value={form.tax_amount}
-                            onChange={e => setForm(f => ({ ...f, tax_amount: e.target.value }))} />
-                        <TextField fullWidth size="small" multiline rows={2} label="Notes"
-                            value={form.notes}
-                            onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
-                    </Stack>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenDlg(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleCreate}
-                        sx={{ backgroundColor: '#e65100' }}>
-                        Create Invoice
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </Box>
     );
 }

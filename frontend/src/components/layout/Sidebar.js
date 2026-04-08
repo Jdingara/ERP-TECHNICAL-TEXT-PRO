@@ -50,8 +50,8 @@ const MENU_ITEMS = [
         { title: 'Warehouses',        path: '/master-data/warehouses' },
     ]},
     { title: 'Inventory', icon: <InventoryIcon />, children: [
-        { title: 'Stock List', path: '/inventory/stock-list' },
-        // Stock Movement hidden — accessed via "Add Movement" button on Stock List
+        { title: 'Stock List',     path: '/inventory/stock-list' },
+        { title: 'Stock Movement', path: '/inventory/stock-movement' },
     ]},
     { title: 'Purchasing', icon: <ShoppingCartIcon />, children: [
         { title: 'Purchase Orders', path: '/purchasing/purchase-orders' },

@@ -7,11 +7,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
     Box, Typography, Button, Paper, Table, TableHead, TableRow,
-    TableCell, TableBody, Chip, Dialog, DialogTitle, DialogContent,
-    DialogActions, TextField, MenuItem, IconButton, Tooltip,
-    InputAdornment, Stack, FormControlLabel, Switch, Divider,
+    TableCell, TableBody, Chip, IconButton, Tooltip,
+    InputAdornment, Stack,
 } from '@mui/material';
+import { TextField } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 import { useColumnResize } from '../../components/common/useColumnResize';
 import AddIcon        from '@mui/icons-material/Add';
 import EditIcon       from '@mui/icons-material/Edit';
@@ -27,18 +28,6 @@ const STATUS_CHOICES = [
     { value: 'lost',          label: 'Lost',           color: 'error' },
 ];
 
-const END_USE_CHOICES = [
-    'geotextile','agrotextile','filtration','automotive','medical','protective','industrial','other'
-];
-
-const EMPTY_FORM = {
-    customer_id: '', received_date: '', product_description: '',
-    end_use: 'other', gsm_required: '', width_cm: '',
-    tensile_requirement: '', coating_required: false, coating_type: '',
-    color: '', quantity_required: '', unit: 'meters',
-    target_price: '', required_by_date: '', assigned_to: '', notes: '',
-};
-
 function StatusChip({ status }) {
     const s = STATUS_CHOICES.find(x => x.value === status);
     return <Chip label={s?.label || status} color={s?.color || 'default'} size="small" />;
@@ -46,89 +35,25 @@ function StatusChip({ status }) {
 
 export default function InquiryListPage() {
     const theme = useTheme();
+    const navigate = useNavigate();
     const { widths, Resizer } = useColumnResize('inquiry_list', [120, 160, 200, 120, 90, 110, 110, 90]);
-    const [inquiries,   setInquiries]   = useState([]);
-    const [customers,   setCustomers]   = useState([]);
-    const [loading,     setLoading]     = useState(true);
-    const [search,      setSearch]      = useState('');
+    const [inquiries,    setInquiries]    = useState([]);
+    const [loading,      setLoading]      = useState(true);
+    const [search,       setSearch]       = useState('');
     const [statusFilter, setStatusFilter] = useState('');
-    const [dialogOpen,  setDialogOpen]  = useState(false);
-    const [editTarget,  setEditTarget]  = useState(null);
-    const [form,        setForm]        = useState(EMPTY_FORM);
-    const [saving,      setSaving]      = useState(false);
-    const [error,       setError]       = useState('');
 
     const load = useCallback(async () => {
         setLoading(true);
         const url = statusFilter
             ? `/api/sales/inquiries/?status=${statusFilter}`
             : '/api/sales/inquiries/';
-        const [inqRes, custRes] = await Promise.all([
-            fetch(url, { credentials: 'include' }),
-            fetch('/api/master-data/customers/', { credentials: 'include' }),
-        ]);
-        const inqData  = await inqRes.json();
-        const custData = await custRes.json();
+        const res     = await fetch(url, { credentials: 'include' });
+        const inqData = await res.json();
         setInquiries(inqData.inquiries || []);
-        setCustomers(custData.customers || []);
         setLoading(false);
     }, [statusFilter]);
 
     useEffect(() => { load(); }, [load]);
-
-    const openCreate = () => {
-        setEditTarget(null);
-        setForm(EMPTY_FORM);
-        setError('');
-        setDialogOpen(true);
-    };
-
-    const openEdit = (inq) => {
-        setEditTarget(inq);
-        setForm({
-            customer_id:         inq.customer_id,
-            received_date:       inq.received_date,
-            product_description: inq.product_description,
-            end_use:             inq.end_use,
-            gsm_required:        inq.gsm_required,
-            width_cm:            inq.width_cm,
-            tensile_requirement: inq.tensile_requirement,
-            coating_required:    inq.coating_required,
-            coating_type:        inq.coating_type,
-            color:               inq.color,
-            quantity_required:   inq.quantity_required,
-            unit:                inq.unit,
-            target_price:        inq.target_price,
-            required_by_date:    inq.required_by_date,
-            status:              inq.status,
-            assigned_to:         inq.assigned_to,
-            notes:               inq.notes,
-        });
-        setError('');
-        setDialogOpen(true);
-    };
-
-    const handleSave = async () => {
-        setSaving(true);
-        setError('');
-        try {
-            const url    = editTarget ? `/api/sales/inquiries/${editTarget.id}/` : '/api/sales/inquiries/';
-            const method = editTarget ? 'PUT' : 'POST';
-            const res    = await fetch(url, {
-                method,
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form),
-            });
-            const data = await res.json();
-            if (!res.ok) { setError(data.message || 'Save failed.'); return; }
-            setDialogOpen(false);
-            load();
-        } catch { setError('Network error.'); }
-        finally { setSaving(false); }
-    };
-
-    const tf = (k) => ({ value: form[k], onChange: (e) => setForm(p => ({ ...p, [k]: e.target.value })) });
 
     const filtered = inquiries.filter(i =>
         i.inquiry_number.toLowerCase().includes(search.toLowerCase()) ||
@@ -149,7 +74,7 @@ export default function InquiryListPage() {
                         </Typography>
                     </Box>
                 </Box>
-                <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>
+                <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/sales/inquiries/new')}>
                     New Inquiry
                 </Button>
             </Box>
@@ -216,7 +141,9 @@ export default function InquiryListPage() {
                                 <TableCell><StatusChip status={inq.status} /></TableCell>
                                 <TableCell align="right">
                                     <Tooltip title="Edit">
-                                        <IconButton size="small" onClick={() => openEdit(inq)}><EditIcon fontSize="small" /></IconButton>
+                                        <IconButton size="small" onClick={() => navigate(`/sales/inquiries/edit/${inq.id}`)}>
+                                            <EditIcon fontSize="small" />
+                                        </IconButton>
                                     </Tooltip>
                                 </TableCell>
                             </TableRow>
@@ -224,86 +151,6 @@ export default function InquiryListPage() {
                     </TableBody>
                 </Table>
             </Paper>
-
-            {/* Create / Edit Dialog */}
-            <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="md">
-                <DialogTitle fontWeight={700}>
-                    {editTarget ? `Edit — ${editTarget.inquiry_number}` : 'New Customer Inquiry'}
-                </DialogTitle>
-                <DialogContent dividers>
-                    <Stack spacing={2} mt={0.5}>
-                        {error && <Typography color="error" fontSize={13}>{error}</Typography>}
-
-                        <Typography variant="subtitle2" color="text.secondary" fontWeight={700}>COMMERCIAL INFO</Typography>
-                        <Box display="flex" gap={2}>
-                            <TextField select label="Customer *" value={form.customer_id}
-                                onChange={e => setForm(p => ({ ...p, customer_id: e.target.value }))} fullWidth>
-                                {customers.map(c => <MenuItem key={c.id} value={c.id}>{c.customer_name}</MenuItem>)}
-                            </TextField>
-                            <TextField label="Received Date *" {...tf('received_date')} type="date"
-                                fullWidth InputLabelProps={{ shrink: true }} />
-                        </Box>
-                        <TextField label="Product Description *" {...tf('product_description')} fullWidth />
-                        <Box display="flex" gap={2}>
-                            <TextField select label="End Use" {...tf('end_use')} fullWidth>
-                                {END_USE_CHOICES.map(u => (
-                                    <MenuItem key={u} value={u}>{u.charAt(0).toUpperCase() + u.slice(1)}</MenuItem>
-                                ))}
-                            </TextField>
-                            <TextField label="Required By" {...tf('required_by_date')} type="date"
-                                fullWidth InputLabelProps={{ shrink: true }} />
-                        </Box>
-                        <Box display="flex" gap={2}>
-                            <TextField label="Quantity Required *" {...tf('quantity_required')} type="number" fullWidth />
-                            <TextField label="Unit" {...tf('unit')} fullWidth />
-                            <TextField label="Target Price / Unit" {...tf('target_price')} type="number" fullWidth />
-                        </Box>
-
-                        <Divider />
-                        <Typography variant="subtitle2" color="text.secondary" fontWeight={700}>TECHNICAL SPECIFICATIONS</Typography>
-                        <Box display="flex" gap={2}>
-                            <TextField label="GSM Required" {...tf('gsm_required')} type="number" fullWidth />
-                            <TextField label="Width (cm)" {...tf('width_cm')} type="number" fullWidth />
-                            <TextField label="Color" {...tf('color')} fullWidth />
-                        </Box>
-                        <TextField label="Tensile Strength Requirement" {...tf('tensile_requirement')} fullWidth />
-                        <Box display="flex" gap={2} alignItems="center">
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={form.coating_required}
-                                        onChange={e => setForm(p => ({ ...p, coating_required: e.target.checked }))}
-                                    />
-                                }
-                                label="Coating Required"
-                            />
-                            {form.coating_required && (
-                                <TextField label="Coating Type" {...tf('coating_type')} fullWidth />
-                            )}
-                        </Box>
-
-                        <Divider />
-                        <Typography variant="subtitle2" color="text.secondary" fontWeight={700}>TRACKING</Typography>
-                        <Box display="flex" gap={2}>
-                            <TextField label="Assigned To" {...tf('assigned_to')} fullWidth />
-                            {editTarget && (
-                                <TextField select label="Status" {...tf('status')} fullWidth>
-                                    {STATUS_CHOICES.map(s => (
-                                        <MenuItem key={s.value} value={s.value}>{s.label}</MenuItem>
-                                    ))}
-                                </TextField>
-                            )}
-                        </Box>
-                        <TextField label="Notes" {...tf('notes')} fullWidth multiline rows={2} />
-                    </Stack>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} disabled={saving}>
-                        {saving ? 'Saving…' : editTarget ? 'Update' : 'Create Inquiry'}
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </Box>
     );
 }

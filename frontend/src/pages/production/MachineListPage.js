@@ -7,11 +7,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
     Box, Typography, Button, Paper, Table, TableHead, TableRow,
-    TableCell, TableBody, Chip, Dialog, DialogTitle, DialogContent,
-    DialogActions, TextField, MenuItem, IconButton, Tooltip,
-    InputAdornment, Stack,
+    TableCell, TableBody, Chip, IconButton, Tooltip,
+    InputAdornment, Stack, TextField, MenuItem,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 import { useColumnResize } from '../../components/common/useColumnResize';
 import AddIcon             from '@mui/icons-material/Add';
 import EditIcon            from '@mui/icons-material/Edit';
@@ -36,12 +36,6 @@ const STATUS_CHOICES = [
     { value: 'breakdown',   label: 'Breakdown',          color: 'error' },
 ];
 
-const EMPTY_FORM = {
-    machine_code: '', machine_name: '', machine_type: 'weaving',
-    capacity: '', capacity_unit: '', location: '', status: 'active',
-    purchase_date: '', notes: '',
-};
-
 function StatusChip({ status }) {
     const s = STATUS_CHOICES.find(x => x.value === status);
     return <Chip label={s?.label || status} color={s?.color || 'default'} size="small" />;
@@ -49,16 +43,12 @@ function StatusChip({ status }) {
 
 export default function MachineListPage() {
     const theme = useTheme();
+    const navigate = useNavigate();
     const { widths, Resizer } = useColumnResize('machine_list', [110, 180, 130, 110, 130, 110, 90]);
-    const [machines,  setMachines]  = useState([]);
-    const [loading,   setLoading]   = useState(true);
-    const [search,    setSearch]    = useState('');
+    const [machines,   setMachines]   = useState([]);
+    const [loading,    setLoading]    = useState(true);
+    const [search,     setSearch]     = useState('');
     const [typeFilter, setTypeFilter] = useState('');
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [editTarget, setEditTarget] = useState(null);   // null = create, object = edit
-    const [form,      setForm]      = useState(EMPTY_FORM);
-    const [saving,    setSaving]    = useState(false);
-    const [error,     setError]     = useState('');
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -73,57 +63,11 @@ export default function MachineListPage() {
 
     useEffect(() => { load(); }, [load]);
 
-    const openCreate = () => {
-        setEditTarget(null);
-        setForm(EMPTY_FORM);
-        setError('');
-        setDialogOpen(true);
-    };
-
-    const openEdit = (m) => {
-        setEditTarget(m);
-        setForm({
-            machine_code:  m.machine_code,
-            machine_name:  m.machine_name,
-            machine_type:  m.machine_type,
-            capacity:      m.capacity,
-            capacity_unit: m.capacity_unit,
-            location:      m.location,
-            status:        m.status,
-            purchase_date: m.purchase_date,
-            notes:         m.notes,
-        });
-        setError('');
-        setDialogOpen(true);
-    };
-
-    const handleSave = async () => {
-        setSaving(true);
-        setError('');
-        try {
-            const url    = editTarget ? `/api/production/machines/${editTarget.id}/` : '/api/production/machines/';
-            const method = editTarget ? 'PUT' : 'POST';
-            const res    = await fetch(url, {
-                method,
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form),
-            });
-            const data = await res.json();
-            if (!res.ok) { setError(data.message || 'Save failed.'); return; }
-            setDialogOpen(false);
-            load();
-        } catch { setError('Network error.'); }
-        finally { setSaving(false); }
-    };
-
     const handleDelete = async (id) => {
         if (!window.confirm('Delete this machine?')) return;
         await fetch(`/api/production/machines/${id}/`, { method: 'DELETE', credentials: 'include' });
         load();
     };
-
-    const f = (k) => ({ value: form[k], onChange: (e) => setForm(p => ({ ...p, [k]: e.target.value })) });
 
     const filtered = machines.filter(m =>
         m.machine_code.toLowerCase().includes(search.toLowerCase()) ||
@@ -144,7 +88,7 @@ export default function MachineListPage() {
                         </Typography>
                     </Box>
                 </Box>
-                <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>
+                <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/production/machines/add')}>
                     Add Machine
                 </Button>
             </Box>
@@ -198,10 +142,14 @@ export default function MachineListPage() {
                                 <TableCell align="right">
                                     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                                         <Tooltip title="Edit">
-                                            <IconButton size="small" onClick={() => openEdit(m)}><EditIcon fontSize="small" /></IconButton>
+                                            <IconButton size="small" onClick={() => navigate(`/production/machines/edit/${m.id}`)}>
+                                                <EditIcon fontSize="small" />
+                                            </IconButton>
                                         </Tooltip>
                                         <Tooltip title="Delete">
-                                            <IconButton size="small" color="error" onClick={() => handleDelete(m.id)}><DeleteIcon fontSize="small" /></IconButton>
+                                            <IconButton size="small" color="error" onClick={() => handleDelete(m.id)}>
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
                                         </Tooltip>
                                     </Stack>
                                 </TableCell>
@@ -210,43 +158,6 @@ export default function MachineListPage() {
                     </TableBody>
                 </Table>
             </Paper>
-
-            {/* Create / Edit Dialog */}
-            <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="sm">
-                <DialogTitle fontWeight={700}>{editTarget ? 'Edit Machine' : 'Add Machine'}</DialogTitle>
-                <DialogContent dividers>
-                    <Stack spacing={2} mt={0.5}>
-                        {error && <Typography color="error" fontSize={13}>{error}</Typography>}
-                        <Box display="flex" gap={2}>
-                            <TextField label="Machine Code *" {...f('machine_code')} fullWidth
-                                disabled={!!editTarget} />
-                            <TextField label="Machine Name *" {...f('machine_name')} fullWidth />
-                        </Box>
-                        <Box display="flex" gap={2}>
-                            <TextField select label="Type *" {...f('machine_type')} fullWidth>
-                                {MACHINE_TYPES.map(t => <MenuItem key={t.value} value={t.value}>{t.label}</MenuItem>)}
-                            </TextField>
-                            <TextField select label="Status" {...f('status')} fullWidth>
-                                {STATUS_CHOICES.map(s => <MenuItem key={s.value} value={s.value}>{s.label}</MenuItem>)}
-                            </TextField>
-                        </Box>
-                        <Box display="flex" gap={2}>
-                            <TextField label="Capacity" {...f('capacity')} type="number" fullWidth />
-                            <TextField label="Capacity Unit (e.g. kg/hr)" {...f('capacity_unit')} fullWidth />
-                        </Box>
-                        <TextField label="Location" {...f('location')} fullWidth />
-                        <TextField label="Purchase Date" {...f('purchase_date')} type="date"
-                            fullWidth InputLabelProps={{ shrink: true }} />
-                        <TextField label="Notes" {...f('notes')} fullWidth multiline rows={2} />
-                    </Stack>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave} disabled={saving}>
-                        {saving ? 'Saving…' : editTarget ? 'Update' : 'Create'}
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </Box>
     );
 }
