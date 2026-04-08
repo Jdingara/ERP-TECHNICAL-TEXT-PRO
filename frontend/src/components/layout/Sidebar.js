@@ -7,9 +7,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Box, List, ListItem, ListItemButton,
     ListItemIcon, ListItemText, Collapse, Typography,
-    Menu, MenuItem,
+    Menu, MenuItem, Tooltip, IconButton,
 } from '@mui/material';
 import { useSettings, getShades } from '../../context/SettingsContext';
+import ChevronLeftIcon   from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon  from '@mui/icons-material/ChevronRight';
+import PushPinIcon       from '@mui/icons-material/PushPin';
+import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 
 import DashboardIcon         from '@mui/icons-material/Dashboard';
 import InventoryIcon         from '@mui/icons-material/Inventory';
@@ -256,13 +260,41 @@ function Sidebar({ permissions, isAdmin }) {
     const BG_ACTIVE = shades.activeAlpha;
     const fs        = makeFs(settings.fontSize);
 
+    // Collapse / Pin — persisted in localStorage
+    const [collapsed, setCollapsed] = useState(
+        () => JSON.parse(localStorage.getItem('sidebar_collapsed') || 'false')
+    );
+    const [pinned, setPinned] = useState(
+        () => JSON.parse(localStorage.getItem('sidebar_pinned') || 'false')
+    );
+    // Popover for icon-only mode (collapsed sub-menus)
+    const [popoverEl,   setPopoverEl]   = useState(null);
+    const [popoverMenu, setPopoverMenu] = useState(null);
+
+    const toggleCollapse = () => {
+        if (pinned) return; // pinned = always visible
+        const next = !collapsed;
+        setCollapsed(next);
+        localStorage.setItem('sidebar_collapsed', JSON.stringify(next));
+        if (next) setOpen({}); // close all groups when collapsing
+    };
+    const togglePin = () => {
+        const next = !pinned;
+        setPinned(next);
+        localStorage.setItem('sidebar_pinned', JSON.stringify(next));
+        if (next && collapsed) { // unpin while collapsed → expand
+            setCollapsed(false);
+            localStorage.setItem('sidebar_collapsed', 'false');
+        }
+    };
+
     const canSee = (path) =>
         isAdmin || permissions === 'all' ||
         (Array.isArray(permissions) && permissions.includes(path));
 
     // Only show menu groups that have at least one visible page
     const visibleMenu = MENU_ITEMS.map(item => {
-        if (item.children.length === 0) return item; // Dashboard always shown
+        if (item.children.length === 0) return item;
         const visibleChildren = item.children.filter(c => canSee(c.path));
         return visibleChildren.length > 0 ? { ...item, children: visibleChildren } : null;
     }).filter(Boolean);
@@ -287,43 +319,88 @@ function Sidebar({ permissions, isAdmin }) {
         );
     }
 
+    const W = collapsed ? 64 : 252;
+
     return (
         <Box sx={{
-            width: 252, minWidth: 252, height: '100vh',
+            width: W, minWidth: W, height: '100vh',
             backgroundColor: BG, display: 'flex', flexDirection: 'column',
             overflowX: 'hidden',
             borderRight: `1px solid ${DIVIDER}`,
+            transition: 'width 0.22s ease, min-width 0.22s ease',
         }}>
 
-            {/* Logo */}
+            {/* Logo + collapse/pin controls */}
             <Box sx={{
-                px: 2.5, py: 2.5,
+                px: collapsed ? 1 : 2,
+                py: 1.5,
                 backgroundColor: shades.sidebarHeader,
                 borderBottom: `1px solid ${DIVIDER}`,
+                display: 'flex', alignItems: 'center',
+                justifyContent: collapsed ? 'center' : 'space-between',
+                minHeight: 64,
             }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                {/* Logo icon always visible */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, overflow: 'hidden' }}>
                     <Box sx={{
-                        width: 36, height: 36, borderRadius: 1.5,
+                        width: 34, height: 34, borderRadius: 1.5, flexShrink: 0,
                         background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT}aa)`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         boxShadow: `0 4px 12px ${ACCENT}55`,
                     }}>
-                        <Typography fontWeight="bold" color="white" fontSize={fs(16)}>S</Typography>
+                        <Typography fontWeight={700} color="white" fontSize={fs(15)}>S</Typography>
                     </Box>
-                    <Box>
-                        <Typography fontWeight={700} color={TEXT_PRI} fontSize={fs(16)} lineHeight={1.2}>
-                            SASI ERP
-                        </Typography>
-                        <Typography color={TEXT_SEC} fontSize={fs(10)} letterSpacing={0.5}>
-                            MEDICAL · TECHNICAL TEXTILE
-                        </Typography>
-                    </Box>
+                    {!collapsed && (
+                        <Box sx={{ overflow: 'hidden' }}>
+                            <Typography fontWeight={700} color={TEXT_PRI} fontSize={fs(15)} lineHeight={1.2} noWrap>
+                                SASI ERP
+                            </Typography>
+                            <Typography color={TEXT_SEC} fontSize={fs(9.5)} letterSpacing={0.5} noWrap>
+                                MEDICAL · TECHNICAL TEXTILE
+                            </Typography>
+                        </Box>
+                    )}
                 </Box>
+
+                {/* Controls: collapse + pin */}
+                {!collapsed && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3, flexShrink: 0 }}>
+                        {/* Pin button */}
+                        <Tooltip title={pinned ? 'Unpin sidebar' : 'Pin sidebar (always visible)'} placement="bottom">
+                            <IconButton size="small" onClick={togglePin}
+                                sx={{ color: pinned ? ACCENT : TEXT_SEC, p: 0.5,
+                                    '&:hover': { backgroundColor: BG_HOVER } }}>
+                                {pinned ? <PushPinIcon sx={{ fontSize: 16 }} /> : <PushPinOutlinedIcon sx={{ fontSize: 16 }} />}
+                            </IconButton>
+                        </Tooltip>
+                        {/* Collapse button */}
+                        {!pinned && (
+                            <Tooltip title="Collapse sidebar" placement="bottom">
+                                <IconButton size="small" onClick={toggleCollapse}
+                                    sx={{ color: TEXT_SEC, p: 0.5,
+                                        '&:hover': { backgroundColor: BG_HOVER } }}>
+                                    <ChevronLeftIcon sx={{ fontSize: 18 }} />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+                    </Box>
+                )}
+
+                {/* Expand button when collapsed */}
+                {collapsed && (
+                    <Tooltip title="Expand sidebar" placement="right">
+                        <IconButton size="small" onClick={toggleCollapse}
+                            sx={{ color: TEXT_SEC, p: 0.3, mt: 0.5,
+                                '&:hover': { backgroundColor: BG_HOVER } }}>
+                            <ChevronRightIcon sx={{ fontSize: 18 }} />
+                        </IconButton>
+                    </Tooltip>
+                )}
             </Box>
 
             {/* Nav — scrollable */}
             <List sx={{
-                px: 1, py: 1.5, flexGrow: 1,
+                px: collapsed ? 0.5 : 1, py: 1.5, flexGrow: 1,
                 overflowY: 'auto', overflowX: 'hidden',
                 '&::-webkit-scrollbar': { width: 4 },
                 '&::-webkit-scrollbar-track': { background: 'transparent' },
@@ -334,6 +411,36 @@ function Sidebar({ permissions, isAdmin }) {
                     const groupOpen   = open[item.title];
                     const groupActive = isGroupActive(item);
 
+                    // ── COLLAPSED: icon-only mode ──
+                    if (collapsed) {
+                        return (
+                            <Box key={item.title} mb={0.3}>
+                                <Tooltip title={item.title} placement="right" arrow>
+                                    <ListItemButton
+                                        onClick={(e) => {
+                                            if (item.children.length === 0) navigate(item.path);
+                                            else { setPopoverEl(e.currentTarget); setPopoverMenu(item); }
+                                        }}
+                                        sx={{
+                                            borderRadius: 1.5, py: 0.9, px: 1,
+                                            justifyContent: 'center',
+                                            backgroundColor: groupActive ? BG_ACTIVE : 'transparent',
+                                            borderLeft: groupActive ? `3px solid ${color}` : '3px solid transparent',
+                                            '&:hover': { backgroundColor: BG_HOVER },
+                                        }}>
+                                        <ListItemIcon sx={{
+                                            minWidth: 0, color: groupActive ? color : TEXT_SEC,
+                                            '& svg': { fontSize: fs(20) },
+                                        }}>
+                                            {item.icon}
+                                        </ListItemIcon>
+                                    </ListItemButton>
+                                </Tooltip>
+                            </Box>
+                        );
+                    }
+
+                    // ── EXPANDED: full mode ──
                     return (
                         <Box key={item.title} mb={0.3}>
                             <ListItem disablePadding>
@@ -412,6 +519,48 @@ function Sidebar({ permissions, isAdmin }) {
                     );
                 })}
             </List>
+
+            {/* Popover sub-menu for collapsed icon mode */}
+            <Menu
+                anchorEl={popoverEl}
+                open={Boolean(popoverEl)}
+                onClose={() => { setPopoverEl(null); setPopoverMenu(null); }}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                slotProps={{ paper: { sx: {
+                    backgroundColor: shades.sidebarBg,
+                    border: `1px solid ${DIVIDER}`,
+                    borderRadius: 2, minWidth: 210, py: 0.5, ml: 0.5,
+                }}}}
+            >
+                {popoverMenu && (
+                    <Box sx={{ px: 2, py: 1, borderBottom: `1px solid ${DIVIDER}`, mb: 0.5 }}>
+                        <Typography fontSize={fs(11)} fontWeight={700} color={MODULE_COLORS[popoverMenu.title] || ACCENT}
+                            letterSpacing={0.5} sx={{ textTransform: 'uppercase' }}>
+                            {popoverMenu.title}
+                        </Typography>
+                    </Box>
+                )}
+                {popoverMenu?.children.map(child => {
+                    const active = isActive(child.path);
+                    const color  = MODULE_COLORS[popoverMenu.title] || ACCENT;
+                    return (
+                        <MenuItem key={child.path}
+                            onClick={() => { navigate(child.path); setPopoverEl(null); setPopoverMenu(null); }}
+                            sx={{
+                                fontSize: fs(13), py: 0.9, px: 2,
+                                color:           active ? TEXT_PRI : TEXT_SEC,
+                                fontWeight:      active ? 600 : 400,
+                                backgroundColor: active ? shades.activeAlpha : 'transparent',
+                                borderLeft:      active ? `3px solid ${color}` : '3px solid transparent',
+                                '&:hover': { backgroundColor: BG_HOVER, color: TEXT_PRI },
+                            }}>
+                            <FiberManualRecordIcon sx={{ fontSize: active ? fs(7) : fs(5), mr: 1.5, color: active ? color : TEXT_SEC }} />
+                            {child.title}
+                        </MenuItem>
+                    );
+                })}
+            </Menu>
 
             {/* Bottom tag */}
             <Box sx={{
