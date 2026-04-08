@@ -2,7 +2,7 @@
 // FILE: components/layout/Sidebar.js
 // ============================================================
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Box, List, ListItem, ListItemButton,
@@ -131,6 +131,7 @@ const MODULE_COLORS = {
 function HorizontalSidebar({ visibleMenu, navigate, location, accent, isBottom }) {
     const [anchorEl,   setAnchorEl]   = useState(null);
     const [activeMenu, setActiveMenu] = useState(null);
+    const scrollRef = useRef(null);
 
     const isGroupActive = (item) =>
         (item.children || []).some(c => location.pathname === c.path) ||
@@ -138,6 +139,26 @@ function HorizontalSidebar({ visibleMenu, navigate, location, accent, isBottom }
 
     const handleOpen  = (e, item) => { setAnchorEl(e.currentTarget); setActiveMenu(item); };
     const handleClose = ()        => { setAnchorEl(null); setActiveMenu(null); };
+
+    const scrollBy = (dir) => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollBy({ left: dir * 200, behavior: 'smooth' });
+        }
+    };
+
+    const scrollBtnStyle = {
+        flexShrink: 0,
+        width: 28, height: 28,
+        borderRadius: '50%',
+        border: '1px solid rgba(255,255,255,0.18)',
+        backgroundColor: 'rgba(255,255,255,0.08)',
+        color: '#cbd5e1',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer',
+        fontSize: 18,
+        userSelect: 'none',
+        transition: 'background 0.15s',
+    };
 
     return (
         <div style={{
@@ -172,12 +193,26 @@ function HorizontalSidebar({ visibleMenu, navigate, location, accent, isBottom }
             {/* ── Divider ── */}
             <div style={{ width: 1, height: 28, backgroundColor: 'rgba(255,255,255,0.15)', marginLeft: 12, marginRight: 12, flexShrink: 0 }} />
 
+            {/* ── Scroll Left button ── */}
+            <div
+                style={scrollBtnStyle}
+                onClick={() => scrollBy(-1)}
+                onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.18)'}
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'}
+            >
+                <ChevronLeftIcon style={{ fontSize: 18 }} />
+            </div>
+
             {/* ── Nav items ── */}
-            <div style={{
-                display: 'flex', alignItems: 'center', flexGrow: 1,
-                overflowX: 'auto', gap: 4,
-                scrollbarWidth: 'none',
-            }}>
+            <div
+                ref={scrollRef}
+                style={{
+                    display: 'flex', alignItems: 'center', flexGrow: 1,
+                    overflowX: 'auto', gap: 4,
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                    padding: '0 6px',
+                }}>
                 {visibleMenu.map(item => {
                     const color       = MODULE_COLORS[item.title] || accent;
                     const groupActive = isGroupActive(item);
@@ -236,6 +271,16 @@ function HorizontalSidebar({ visibleMenu, navigate, location, accent, isBottom }
                         </div>
                     );
                 })}
+            </div>
+
+            {/* ── Scroll Right button ── */}
+            <div
+                style={scrollBtnStyle}
+                onClick={() => scrollBy(1)}
+                onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.18)'}
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'}
+            >
+                <ChevronRightIcon style={{ fontSize: 18 }} />
             </div>
 
             {/* ── Dropdown ── */}
