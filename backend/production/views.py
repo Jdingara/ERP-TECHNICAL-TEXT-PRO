@@ -207,9 +207,7 @@ def work_order_detail(request, wo_id):
             wo.planned_end_date = data['planned_end_date'] or None
         wo.save()
         after = {'status': wo.status, 'notes': wo.notes, 'planned_end_date': str(wo.planned_end_date or '')}
-        diff = field_diff(before, after)
-        if diff:
-            log_action(request, 'Work Order', 'Updated', wo.work_order_number, {'changes': diff})
+        log_action(request, 'Work Order', 'Updated', wo.work_order_number, {'changes': field_diff(before, after)})
         return JsonResponse({'message': 'Work order updated.', 'work_order': work_order_to_dict(wo)})
 
     if request.method == 'DELETE':
@@ -398,8 +396,9 @@ def machine_detail(request, machine_id):
 
     if request.method == 'PUT':
         data = json.loads(request.body)
-        before = {'status': machine.status, 'location': machine.location}
-        for field in ['machine_name', 'machine_type', 'capacity_unit', 'location', 'status', 'notes']:
+        _fields = ['machine_name', 'machine_type', 'capacity_unit', 'location', 'status', 'notes']
+        before = {f: str(getattr(machine, f, '') or '') for f in _fields}
+        for field in _fields:
             if field in data:
                 setattr(machine, field, data[field])
         if 'capacity' in data:
@@ -407,10 +406,8 @@ def machine_detail(request, machine_id):
         if 'purchase_date' in data:
             machine.purchase_date = data['purchase_date'] or None
         machine.save()
-        after = {'status': machine.status, 'location': machine.location}
-        diff = field_diff(before, after)
-        if diff:
-            log_action(request, 'Machine', 'Updated', machine.machine_code, {'changes': diff})
+        after = {f: str(getattr(machine, f, '') or '') for f in _fields}
+        log_action(request, 'Machine', 'Updated', machine.machine_code, {'changes': field_diff(before, after)})
         return JsonResponse({'message': 'Machine updated.', 'machine': machine_to_dict(machine)})
 
     if request.method == 'DELETE':

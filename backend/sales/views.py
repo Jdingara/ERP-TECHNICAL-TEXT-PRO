@@ -161,9 +161,7 @@ def sales_order_detail(request, so_id):
             so.notes = data['notes']
         so.save()
         after = {'status': so.status, 'delivery_date': str(so.delivery_date or ''), 'notes': so.notes}
-        diff = field_diff(before, after)
-        if diff:
-            log_action(request, 'Sales Order', 'Updated', so.so_number, {'changes': diff})
+        log_action(request, 'Sales Order', 'Updated', so.so_number, {'changes': field_diff(before, after)})
         return JsonResponse({'message': 'Sales order updated.', 'sales_order': so_to_dict(so)})
 
     if request.method == 'DELETE':
@@ -361,7 +359,8 @@ def inquiry_detail(request, inquiry_id):
 
     if request.method == 'PUT':
         data = json.loads(request.body)
-        before = {'status': inq.status, 'assigned_to': inq.assigned_to, 'notes': inq.notes}
+        _fields = ['status', 'assigned_to', 'notes', 'product_description', 'end_use', 'tensile_requirement', 'coating_type', 'color', 'unit']
+        before = {f: str(getattr(inq, f, '') or '') for f in _fields}
         for field in ['product_description', 'end_use', 'tensile_requirement', 'coating_required',
                       'coating_type', 'color', 'unit', 'assigned_to', 'notes', 'status']:
             if field in data:
@@ -372,10 +371,8 @@ def inquiry_detail(request, inquiry_id):
         if 'required_by_date' in data:
             inq.required_by_date = data['required_by_date'] or None
         inq.save()
-        after = {'status': inq.status, 'assigned_to': inq.assigned_to, 'notes': inq.notes}
-        diff = field_diff(before, after)
-        if diff:
-            log_action(request, 'Inquiry', 'Updated', inq.inquiry_number, {'changes': diff})
+        after = {f: str(getattr(inq, f, '') or '') for f in _fields}
+        log_action(request, 'Inquiry', 'Updated', inq.inquiry_number, {'changes': field_diff(before, after)})
         return JsonResponse({'message': 'Inquiry updated.', 'inquiry': inquiry_to_dict(inq)})
 
 
@@ -489,7 +486,9 @@ def quotation_detail(request, qt_id):
         # Lock: accepted quotations cannot be edited (SO has been raised against it)
         if qt.status == 'accepted':
             return JsonResponse({'message': 'Cannot edit an accepted quotation. A sales order has been raised.'}, status=400)
-        before = {'status': qt.status, 'total_amount': str(qt.total_amount)}
+        _fields = ['status', 'product_description', 'unit', 'spec_notes', 'payment_terms', 'delivery_terms']
+        before = {f: str(getattr(qt, f, '') or '') for f in _fields}
+        before['total_amount'] = str(qt.total_amount)
         for field in ['product_description', 'unit', 'spec_notes', 'payment_terms', 'delivery_terms', 'status']:
             if field in data:
                 setattr(qt, field, data[field])
@@ -509,10 +508,9 @@ def quotation_detail(request, qt_id):
         if 'valid_until' in data:
             qt.valid_until = data['valid_until']
         qt.save()
-        after = {'status': qt.status, 'total_amount': str(qt.total_amount)}
-        diff = field_diff(before, after)
-        if diff:
-            log_action(request, 'Quotation', 'Updated', qt.quotation_number, {'changes': diff})
+        after = {f: str(getattr(qt, f, '') or '') for f in _fields}
+        after['total_amount'] = str(qt.total_amount)
+        log_action(request, 'Quotation', 'Updated', qt.quotation_number, {'changes': field_diff(before, after)})
         return JsonResponse({'message': 'Quotation updated.', 'quotation': quotation_to_dict(qt)})
 
     if request.method == 'DELETE':

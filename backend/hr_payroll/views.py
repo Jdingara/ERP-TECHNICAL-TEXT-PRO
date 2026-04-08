@@ -178,7 +178,8 @@ def employee_detail_update(request, employee_id):
 
     if request.method == 'PUT':
         data = json.loads(request.body)
-        before = {'status': emp.status, 'designation': emp.designation, 'basic_salary': str(emp.basic_salary)}
+        _fields = ['first_name', 'last_name', 'phone', 'email', 'address', 'designation', 'employment_type', 'status', 'basic_salary', 'hra', 'da', 'other_allowance', 'bank_name', 'bank_account', 'pan_number']
+        before = {f: str(getattr(emp, f, '') or '') for f in _fields}
         for field in ['first_name', 'last_name', 'phone', 'email', 'address',
                       'designation', 'employment_type', 'status',
                       'basic_salary', 'hra', 'da', 'other_allowance',
@@ -188,10 +189,8 @@ def employee_detail_update(request, employee_id):
         if 'department_id' in data:
             emp.department_id = data['department_id'] or None
         emp.save()
-        after = {'status': emp.status, 'designation': emp.designation, 'basic_salary': str(emp.basic_salary)}
-        diff = field_diff(before, after)
-        if diff:
-            log_action(request, 'Employee', 'Updated', emp.employee_code, {'name': emp.full_name, 'changes': diff})
+        after = {f: str(getattr(emp, f, '') or '') for f in _fields}
+        log_action(request, 'Employee', 'Updated', emp.employee_code, {'name': emp.full_name, 'changes': field_diff(before, after)})
         return JsonResponse({'message': 'Employee updated.', 'employee': employee_to_dict(emp)})
 
 

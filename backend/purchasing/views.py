@@ -166,9 +166,7 @@ def purchase_order_detail(request, po_id):
             po.expected_date = data['expected_date'] or None
         po.save()
         after = {'status': po.status, 'expected_date': str(po.expected_date or ''), 'notes': po.notes}
-        diff = field_diff(before, after)
-        if diff:
-            log_action(request, 'Purchase Order', 'Updated', po.po_number, {'changes': diff})
+        log_action(request, 'Purchase Order', 'Updated', po.po_number, {'changes': field_diff(before, after)})
         return JsonResponse({'message': 'Purchase order updated.', 'purchase_order': po_to_dict(po)})
 
     if request.method == 'DELETE':

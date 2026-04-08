@@ -177,7 +177,7 @@ def item_detail_update_delete(request, item_id):
 
     if request.method == 'PUT':
         data = json.loads(request.body)
-        before = {'item_name': item.item_name, 'standard_price': str(item.standard_price), 'minimum_stock': str(item.minimum_stock)}
+        before = {f: str(getattr(item, f, '') or '') for f in ['item_name', 'item_type', 'description', 'hsn_code', 'yarn_count', 'composition', 'minimum_stock', 'standard_price']}
         for field in ['item_name', 'item_type', 'description', 'hsn_code',
                       'yarn_count', 'composition', 'minimum_stock', 'standard_price']:
             if field in data:
@@ -187,10 +187,8 @@ def item_detail_update_delete(request, item_id):
         if 'unit_id' in data:
             item.unit_of_measure_id = data['unit_id']
         item.save()
-        after = {'item_name': item.item_name, 'standard_price': str(item.standard_price), 'minimum_stock': str(item.minimum_stock)}
-        diff = field_diff(before, after)
-        if diff:
-            log_action(request, 'Item', 'Updated', item.item_code, {'changes': diff})
+        after = {f: str(getattr(item, f, '') or '') for f in ['item_name', 'item_type', 'description', 'hsn_code', 'yarn_count', 'composition', 'minimum_stock', 'standard_price']}
+        log_action(request, 'Item', 'Updated', item.item_code, {'changes': field_diff(before, after)})
         return JsonResponse({'message': 'Item updated.', 'item': item_to_dict(item)})
 
     if request.method == 'DELETE':
@@ -256,16 +254,14 @@ def supplier_detail_update_delete(request, supplier_id):
 
     if request.method == 'PUT':
         data = json.loads(request.body)
-        before = {'supplier_name': supplier.supplier_name, 'phone': supplier.phone}
-        for field in ['supplier_name', 'supplier_type', 'contact_person', 'phone',
-                      'email', 'address', 'city', 'state', 'country', 'gstin', 'payment_days']:
+        _fields = ['supplier_name', 'supplier_type', 'contact_person', 'phone', 'email', 'address', 'city', 'state', 'country', 'gstin', 'payment_days']
+        before = {f: str(getattr(supplier, f, '') or '') for f in _fields}
+        for field in _fields:
             if field in data:
                 setattr(supplier, field, data[field])
         supplier.save()
-        after = {'supplier_name': supplier.supplier_name, 'phone': supplier.phone}
-        diff = field_diff(before, after)
-        if diff:
-            log_action(request, 'Supplier', 'Updated', supplier.supplier_code, {'changes': diff})
+        after = {f: str(getattr(supplier, f, '') or '') for f in _fields}
+        log_action(request, 'Supplier', 'Updated', supplier.supplier_code, {'changes': field_diff(before, after)})
         return JsonResponse({'message': 'Supplier updated.', 'supplier': supplier_to_dict(supplier)})
 
     if request.method == 'DELETE':
@@ -332,17 +328,14 @@ def customer_detail_update_delete(request, customer_id):
 
     if request.method == 'PUT':
         data = json.loads(request.body)
-        before = {'customer_name': customer.customer_name, 'phone': customer.phone, 'credit_limit': str(customer.credit_limit)}
-        for field in ['customer_name', 'customer_type', 'contact_person', 'phone',
-                      'email', 'address', 'city', 'state', 'country', 'gstin',
-                      'credit_days', 'credit_limit']:
+        _fields = ['customer_name', 'customer_type', 'contact_person', 'phone', 'email', 'address', 'city', 'state', 'country', 'gstin', 'credit_days', 'credit_limit']
+        before = {f: str(getattr(customer, f, '') or '') for f in _fields}
+        for field in _fields:
             if field in data:
                 setattr(customer, field, data[field])
         customer.save()
-        after = {'customer_name': customer.customer_name, 'phone': customer.phone, 'credit_limit': str(customer.credit_limit)}
-        diff = field_diff(before, after)
-        if diff:
-            log_action(request, 'Customer', 'Updated', customer.customer_code, {'changes': diff})
+        after = {f: str(getattr(customer, f, '') or '') for f in _fields}
+        log_action(request, 'Customer', 'Updated', customer.customer_code, {'changes': field_diff(before, after)})
         return JsonResponse({'message': 'Customer updated.', 'customer': customer_to_dict(customer)})
 
     if request.method == 'DELETE':
