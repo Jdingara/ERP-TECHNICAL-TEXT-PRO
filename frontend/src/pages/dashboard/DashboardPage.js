@@ -8,7 +8,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Box, Grid, Card, CardContent, Typography, Chip,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Paper, Alert, CircularProgress, Button, Divider,
+    Paper, Alert, CircularProgress, Button, Divider, useTheme,
 } from '@mui/material';
 import TrendingUpIcon       from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon     from '@mui/icons-material/TrendingDown';
@@ -39,7 +39,7 @@ import {
 
 // ─── Color palette ──────────────────────────────────────────
 const C = {
-    navy:   'primary.main',
+    navy:   '#6366f1',   // fallback; live accent color applied via useTheme in DashboardPage
     green:  '#2e7d32',
     orange: '#e65100',
     red:    '#c62828',
@@ -211,6 +211,8 @@ const CurTip = ({ active, payload, label }) => {
 // ════════════════════════════════════════════════════════════
 function DashboardPage() {
     const navigate = useNavigate();
+    const theme    = useTheme();
+    const accentColor = theme.palette.primary.main;
     const [data,        setData]        = useState(null);
     const [loading,     setLoading]     = useState(true);
     const [error,       setError]       = useState('');
@@ -275,7 +277,7 @@ function DashboardPage() {
     ];
 
     const moduleData = [
-        { name: 'Stock',    value: data.total_stock_items    || 0, fill: C.navy   },
+        { name: 'Stock',    value: data.total_stock_items    || 0, fill: accentColor },
         { name: 'Open POs', value: data.open_purchase_orders || 0, fill: C.green  },
         { name: 'Open SOs', value: data.open_sales_orders    || 0, fill: C.orange },
         { name: 'Work Ord', value: data.active_work_orders   || 0, fill: C.purple },
@@ -287,7 +289,7 @@ function DashboardPage() {
     const medAlerts = (data.open_capas || 0) + (data.expiring_certs || 0) + (data.near_expiry_batches || 0);
 
     const colRateColor = collectionRate >= 80 ? C.green : collectionRate >= 50 ? C.amber : C.red;
-    const fulfillColor = fulfillmentRate >= 70 ? C.green : fulfillmentRate >= 40 ? C.amber : C.navy;
+    const fulfillColor = fulfillmentRate >= 70 ? C.green : fulfillmentRate >= 40 ? C.amber : accentColor;
 
     return (
         <Box sx={{ pb: 5 }}>
@@ -351,7 +353,7 @@ function DashboardPage() {
                         value: fmtK(data.total_invoiced),
                         sub: fmtCur(data.total_invoiced),
                         icon: <ReceiptIcon />,
-                        gradient: `linear-gradient(135deg, #0d1b4b 0%, ${C.navy} 100%)`,
+                        gradient: `linear-gradient(135deg, #0d1b4b 0%, ${accentColor} 100%)`,
                         sparkData: monthlyRev,
                     },
                     {
@@ -397,8 +399,8 @@ function DashboardPage() {
                         <ComposedChart data={monthlyRev} margin={{ top: 5, right: 25, left: 10, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%"  stopColor={C.navy} stopOpacity={0.85} />
-                                    <stop offset="95%" stopColor={C.navy} stopOpacity={0.15} />
+                                    <stop offset="5%"  stopColor={accentColor} stopOpacity={0.85} />
+                                    <stop offset="95%" stopColor={accentColor} stopOpacity={0.15} />
                                 </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
