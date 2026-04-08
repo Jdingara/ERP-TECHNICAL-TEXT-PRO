@@ -29,6 +29,7 @@ import RefreshIcon          from '@mui/icons-material/Refresh';
 import SpeedIcon            from '@mui/icons-material/Speed';
 import { ResizableTable } from '../../components/common/ResizableTable';
 import { ResizableChartPanel } from '../../components/common/ResizableChartPanel';
+import { ResizablePanelRowInner } from '../../components/common/ResizablePanelRow';
 import { useNavigate }      from 'react-router-dom';
 import {
     AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -387,208 +388,153 @@ function DashboardPage() {
 
             {/* ═══ SECTION 2 — REVENUE TREND + GAUGES ═════════ */}
             <SectionLabel color={C.blue}>Revenue & Performance</SectionLabel>
-            <Grid container spacing={2} mb={0.5}>
+            <ResizablePanelRowInner storageKey="dash_s2" defaultPercents={[67, 33]}>
+                <ResizableChartPanel storageKey="dash_revenue"
+                    title="Monthly Revenue & Order Volume"
+                    subtitle="Last 6 months — bars = revenue · line = order count"
+                    defaultHeight={320}>
+                    <ResponsiveContainer width="100%" height="100%">
+                        <ComposedChart data={monthlyRev} margin={{ top: 5, right: 25, left: 10, bottom: 0 }}>
+                            <defs>
+                                <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%"  stopColor={C.navy} stopOpacity={0.85} />
+                                    <stop offset="95%" stopColor={C.navy} stopOpacity={0.15} />
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                            <YAxis yAxisId="rev" orientation="left" tickFormatter={v => fmtK(v)} tick={{ fontSize: 10 }} width={58} />
+                            <YAxis yAxisId="ord" orientation="right" allowDecimals={false} tick={{ fontSize: 10 }} width={30} />
+                            <Tooltip content={<CurTip />} />
+                            <Bar yAxisId="rev" dataKey="revenue" name="Revenue" fill="url(#revGrad)" radius={[4, 4, 0, 0]} />
+                            <Line yAxisId="ord" dataKey="orders" name="Orders (count)" stroke={C.orange} strokeWidth={2.5} dot={{ r: 4, fill: C.orange }} type="monotone" />
+                        </ComposedChart>
+                    </ResponsiveContainer>
+                </ResizableChartPanel>
 
-                {/* ComposedChart: Revenue bars + Order line */}
-                <Grid item xs={12} md={8}>
-                    <ResizableChartPanel storageKey="dash_monthly_revenue_and_order_volu"
-                        title="Monthly Revenue & Order Volume"
-                        subtitle="Last 6 months — bars = revenue · line = order count"
-                        height={320}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <ComposedChart data={monthlyRev} margin={{ top: 5, right: 25, left: 10, bottom: 0 }}>
-                                <defs>
-                                    <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%"  stopColor={C.navy} stopOpacity={0.85} />
-                                        <stop offset="95%" stopColor={C.navy} stopOpacity={0.15} />
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                                <YAxis yAxisId="rev" orientation="left"
-                                    tickFormatter={v => fmtK(v)} tick={{ fontSize: 10 }} width={58} />
-                                <YAxis yAxisId="ord" orientation="right"
-                                    allowDecimals={false} tick={{ fontSize: 10 }} width={30} />
-                                <Tooltip content={<CurTip />} />
-                                <Bar yAxisId="rev" dataKey="revenue" name="Revenue"
-                                    fill="url(#revGrad)" radius={[4, 4, 0, 0]} />
-                                <Line yAxisId="ord" dataKey="orders" name="Orders (count)"
-                                    stroke={C.orange} strokeWidth={2.5}
-                                    dot={{ r: 4, fill: C.orange }} type="monotone" />
-                            </ComposedChart>
-                        </ResponsiveContainer>
-                    </ResizableChartPanel>
-                </Grid>
-
-                {/* Gauges + AR quick view */}
-                <Grid item xs={12} md={4}>
-                    <Paper sx={{ p: 2, borderRadius: 2, boxShadow: 2, height: '100%' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                            <SpeedIcon sx={{ color: C.navy, fontSize: 18 }} />
-                            <Typography fontWeight="bold" color={C.navy} fontSize={13}>Performance Gauges</Typography>
-                        </Box>
-
-                        <Grid container spacing={2}>
-                            <Grid item xs={6}>
-                                <GaugeChart
-                                    value={collectionRate}
-                                    color={colRateColor}
-                                    label="Collection Rate"
-                                    sub={`${fmtK(data.total_paid)} collected`}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <GaugeChart
-                                    value={fulfillmentRate}
-                                    color={fulfillColor}
-                                    label="Order Fulfillment"
-                                    sub={`${deliveredSO} of ${totalSO} delivered`}
-                                />
-                            </Grid>
+                <Paper sx={{ p: 2, borderRadius: 2, boxShadow: 2, height: '100%' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                        <SpeedIcon sx={{ color: C.navy, fontSize: 18 }} />
+                        <Typography fontWeight="bold" color={C.navy} fontSize={13}>Performance Gauges</Typography>
+                    </Box>
+                    <Grid container spacing={2}>
+                        <Grid item xs={6}>
+                            <GaugeChart value={collectionRate} color={colRateColor} label="Collection Rate" sub={`${fmtK(data.total_paid)} collected`} />
                         </Grid>
-
-                        {/* AR Quick View strip */}
-                        <Box sx={{ mt: 1.5, p: 1.5, backgroundColor: '#f5f7ff', borderRadius: 1.5, border: '1px solid #e8eaf6' }}>
-                            <Typography fontSize={10} fontWeight={700} color="text.secondary" letterSpacing={0.8} mb={1}>
-                                AR AGING SNAPSHOT
-                            </Typography>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                {[
-                                    { label: 'Current', value: data.ar_aging?.current  || 0, color: C.green  },
-                                    { label: '1–30d',   value: data.ar_aging?.days_30  || 0, color: C.amber  },
-                                    { label: '31–60d',  value: data.ar_aging?.days_60  || 0, color: C.orange },
-                                    { label: '60d+',    value: data.ar_aging?.days_90p || 0, color: C.red    },
-                                ].map(b => (
-                                    <Box key={b.label} sx={{ textAlign: 'center' }}>
-                                        <Typography fontSize={13} fontWeight="bold" color={b.color}>
-                                            {fmtK(b.value)}
-                                        </Typography>
-                                        <Typography fontSize={10} color="text.secondary">{b.label}</Typography>
-                                    </Box>
-                                ))}
-                            </Box>
+                        <Grid item xs={6}>
+                            <GaugeChart value={fulfillmentRate} color={fulfillColor} label="Order Fulfillment" sub={`${deliveredSO} of ${totalSO} delivered`} />
+                        </Grid>
+                    </Grid>
+                    <Box sx={{ mt: 1.5, p: 1.5, backgroundColor: 'action.hover', borderRadius: 1.5, border: '1px solid', borderColor: 'divider' }}>
+                        <Typography fontSize={10} fontWeight={700} color="text.secondary" letterSpacing={0.8} mb={1}>AR AGING SNAPSHOT</Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            {[
+                                { label: 'Current', value: data.ar_aging?.current  || 0, color: C.green  },
+                                { label: '1–30d',   value: data.ar_aging?.days_30  || 0, color: C.amber  },
+                                { label: '31–60d',  value: data.ar_aging?.days_60  || 0, color: C.orange },
+                                { label: '60d+',    value: data.ar_aging?.days_90p || 0, color: C.red    },
+                            ].map(b => (
+                                <Box key={b.label} sx={{ textAlign: 'center' }}>
+                                    <Typography fontSize={13} fontWeight="bold" color={b.color}>{fmtK(b.value)}</Typography>
+                                    <Typography fontSize={10} color="text.secondary">{b.label}</Typography>
+                                </Box>
+                            ))}
                         </Box>
-                    </Paper>
-                </Grid>
-            </Grid>
+                    </Box>
+                </Paper>
+            </ResizablePanelRowInner>
 
             {/* ═══ SECTION 3 — AR AGING + SO STATUS + STOCK ═══ */}
             <SectionLabel color={C.red}>Accounts Receivable &amp; Stock</SectionLabel>
-            <Grid container spacing={2} mb={0.5}>
+            <ResizablePanelRowInner storageKey="dash_s3" defaultPercents={[40, 33, 27]}>
+                <ResizableChartPanel storageKey="dash_ar_aging" title="AR Aging Breakdown" subtitle="Outstanding receivables by age bucket" defaultHeight={260}>
+                    {arAgingData.every(d => d.value === 0) ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                            <Typography color="text.secondary" fontSize={12}>No outstanding AR</Typography>
+                        </Box>
+                    ) : (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart layout="vertical" data={arAgingData} margin={{ top: 5, right: 60, left: 10, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f0f0f0" />
+                                <XAxis type="number" tickFormatter={v => fmtK(v)} tick={{ fontSize: 10 }} />
+                                <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={48} />
+                                <Tooltip content={<CurTip />} />
+                                <Bar dataKey="value" name="Amount" radius={[0, 5, 5, 0]}>
+                                    {arAgingData.map((d, i) => <Cell key={i} fill={d.fill} />)}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    )}
+                </ResizableChartPanel>
 
-                {/* AR Aging — Horizontal BarChart */}
-                <Grid item xs={12} md={4}>
-                    <ResizableChartPanel storageKey="dash_ar_aging_breakdown" title="AR Aging Breakdown" subtitle="Outstanding receivables by age bucket" height={260}>
-                        {arAgingData.every(d => d.value === 0) ? (
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                                <Typography color="text.secondary" fontSize={12}>No outstanding AR</Typography>
-                            </Box>
-                        ) : (
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart
-                                    layout="vertical"
-                                    data={arAgingData}
-                                    margin={{ top: 5, right: 60, left: 10, bottom: 5 }}>
-                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f0f0f0" />
-                                    <XAxis type="number" tickFormatter={v => fmtK(v)} tick={{ fontSize: 10 }} />
-                                    <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={48} />
-                                    <Tooltip content={<CurTip />} />
-                                    <Bar dataKey="value" name="Amount" radius={[0, 5, 5, 0]}>
-                                        {arAgingData.map((d, i) => <Cell key={i} fill={d.fill} />)}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
-                        )}
-                    </ResizableChartPanel>
-                </Grid>
+                <ResizableChartPanel storageKey="dash_so_status" title="Sales Order Status" subtitle="All orders — status breakdown" defaultHeight={260}>
+                    {soStatusPie.length === 0 ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                            <Typography color="text.secondary" fontSize={12}>No sales orders yet</Typography>
+                        </Box>
+                    ) : (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie data={soStatusPie} cx="50%" cy="50%" innerRadius={52} outerRadius={75} dataKey="value" paddingAngle={3} label={({ value }) => value > 0 ? value : ''}>
+                                    {soStatusPie.map((d, i) => <Cell key={i} fill={d.fill} />)}
+                                </Pie>
+                                <Legend iconSize={10} wrapperStyle={{ fontSize: 10 }} />
+                                <Tooltip />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    )}
+                </ResizableChartPanel>
 
-                {/* SO Status Donut */}
-                <Grid item xs={12} md={4}>
-                    <ResizableChartPanel storageKey="dash_sales_order_status" title="Sales Order Status" subtitle="All orders — status breakdown" height={260}>
-                        {soStatusPie.length === 0 ? (
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                                <Typography color="text.secondary" fontSize={12}>No sales orders yet</Typography>
-                            </Box>
-                        ) : (
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie data={soStatusPie} cx="50%" cy="50%"
-                                        innerRadius={52} outerRadius={75}
-                                        dataKey="value" paddingAngle={3}
-                                        label={({ value }) => value > 0 ? value : ''}>
-                                        {soStatusPie.map((d, i) => <Cell key={i} fill={d.fill} />)}
-                                    </Pie>
-                                    <Legend iconSize={10} wrapperStyle={{ fontSize: 10 }} />
-                                    <Tooltip />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        )}
-                    </ResizableChartPanel>
-                </Grid>
-
-                {/* Stock Health Donut */}
-                <Grid item xs={12} md={3}>
-                    <ResizableChartPanel storageKey="dash_stock_health" title="Stock Health" subtitle="Normal vs low stock items" height={260}>
-                        {data.total_stock_items === 0 ? (
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                                <Typography color="text.secondary" fontSize={12}>No stock data</Typography>
-                            </Box>
-                        ) : (
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie data={stockPie} cx="50%" cy="50%"
-                                        innerRadius={45} outerRadius={68}
-                                        dataKey="value" paddingAngle={3}
-                                        label={({ value }) => value > 0 ? value : ''}>
-                                        {stockPie.map((d, i) => <Cell key={i} fill={d.fill} />)}
-                                    </Pie>
-                                    <Legend iconSize={10} wrapperStyle={{ fontSize: 10 }} />
-                                    <Tooltip />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        )}
-                    </ResizableChartPanel>
-                </Grid>
-            </Grid>
+                <ResizableChartPanel storageKey="dash_stock_health" title="Stock Health" subtitle="Normal vs low stock items" defaultHeight={260}>
+                    {data.total_stock_items === 0 ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                            <Typography color="text.secondary" fontSize={12}>No stock data</Typography>
+                        </Box>
+                    ) : (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie data={stockPie} cx="50%" cy="50%" innerRadius={45} outerRadius={68} dataKey="value" paddingAngle={3} label={({ value }) => value > 0 ? value : ''}>
+                                    {stockPie.map((d, i) => <Cell key={i} fill={d.fill} />)}
+                                </Pie>
+                                <Legend iconSize={10} wrapperStyle={{ fontSize: 10 }} />
+                                <Tooltip />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    )}
+                </ResizableChartPanel>
+            </ResizablePanelRowInner>
 
             {/* ═══ SECTION 4 — P&L + MODULE ACTIVITY ══════════ */}
             <SectionLabel color={C.green}>Profit &amp; Loss / Module Activity</SectionLabel>
-            <Grid container spacing={2} mb={0.5}>
+            <ResizablePanelRowInner storageKey="dash_s4" defaultPercents={[33, 67]}>
+                <ResizableChartPanel storageKey="dash_pl" title="P&L Summary" subtitle="Posted journal entries — income vs expense" defaultHeight={280}>
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={plData} margin={{ top: 5, right: 10, left: 5, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                            <YAxis tickFormatter={v => fmtK(v)} tick={{ fontSize: 10 }} width={58} />
+                            <Tooltip content={<CurTip />} />
+                            <Bar dataKey="value" name="Amount" radius={[6, 6, 0, 0]}>
+                                {plData.map((d, i) => <Cell key={i} fill={d.fill} />)}
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </ResizableChartPanel>
 
-                {/* P&L Bar */}
-                <Grid item xs={12} md={4}>
-                    <ResizableChartPanel storageKey="dash_pandl_summary" title="P&L Summary" subtitle="Posted journal entries — income vs expense" height={280}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={plData} margin={{ top: 5, right: 10, left: 5, bottom: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                                <YAxis tickFormatter={v => fmtK(v)} tick={{ fontSize: 10 }} width={58} />
-                                <Tooltip content={<CurTip />} />
-                                <Bar dataKey="value" name="Amount" radius={[6, 6, 0, 0]}>
-                                    {plData.map((d, i) => <Cell key={i} fill={d.fill} />)}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </ResizableChartPanel>
-                </Grid>
-
-                {/* Module Activity */}
-                <Grid item xs={12} md={8}>
-                    <ResizableChartPanel storageKey="dash_live_module_activity" title="Live Module Activity" subtitle="Open / active records across all modules" height={280}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={moduleData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                                <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
-                                <Tooltip />
-                                <Bar dataKey="value" name="Count" radius={[4, 4, 0, 0]}>
-                                    {moduleData.map((d, i) => <Cell key={i} fill={d.fill} />)}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </ResizableChartPanel>
-                </Grid>
-            </Grid>
+                <ResizableChartPanel storageKey="dash_module_activity" title="Live Module Activity" subtitle="Open / active records across all modules" defaultHeight={280}>
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={moduleData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                            <YAxis allowDecimals={false} tick={{ fontSize: 10 }} />
+                            <Tooltip />
+                            <Bar dataKey="value" name="Count" radius={[4, 4, 0, 0]}>
+                                {moduleData.map((d, i) => <Cell key={i} fill={d.fill} />)}
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </ResizableChartPanel>
+            </ResizablePanelRowInner>
 
             {/* ═══ SECTION 5 — OPERATIONS KPI CARDS ═══════════ */}
             <SectionLabel color={C.navy}>Core Operations</SectionLabel>
