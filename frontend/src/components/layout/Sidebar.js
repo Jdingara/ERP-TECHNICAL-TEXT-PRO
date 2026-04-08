@@ -7,6 +7,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Box, List, ListItem, ListItemButton,
     ListItemIcon, ListItemText, Collapse, Typography,
+    Menu, MenuItem,
 } from '@mui/material';
 import { useSettings, getShades } from '../../context/SettingsContext';
 
@@ -118,6 +119,128 @@ const MODULE_COLORS = {
     'Reports':           '#a78bfa',
 };
 
+// ── Horizontal Sidebar (Top / Bottom) ────────────────────────
+function HorizontalSidebar({ visibleMenu, navigate, location, shades, isBottom }) {
+    const [anchorEl,   setAnchorEl]   = useState(null);
+    const [activeMenu, setActiveMenu] = useState(null);
+
+    const ACCENT = shades.accent;
+    const isActive      = (path) => location.pathname === path;
+    const isGroupActive = (item) =>
+        item.children?.some(c => location.pathname === c.path) ||
+        location.pathname === item.path;
+
+    const handleOpen  = (e, item) => { setAnchorEl(e.currentTarget); setActiveMenu(item); };
+    const handleClose = ()         => { setAnchorEl(null); setActiveMenu(null); };
+
+    return (
+        <Box sx={{
+            width: '100%', height: 52, flexShrink: 0,
+            backgroundColor: shades.sidebarHeader,
+            display: 'flex', alignItems: 'center',
+            borderBottom: !isBottom ? `1px solid ${DIVIDER}` : 'none',
+            borderTop:     isBottom ? `1px solid ${DIVIDER}` : 'none',
+            px: 1, zIndex: 100,
+        }}>
+            {/* Logo */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1.5, flexShrink: 0 }}>
+                <Box sx={{
+                    width: 28, height: 28, borderRadius: 1,
+                    background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT}99)`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                    <Typography fontWeight={700} color="white" fontSize={13}>S</Typography>
+                </Box>
+                <Typography fontWeight={700} color={TEXT_PRI} fontSize={14} sx={{ whiteSpace: 'nowrap' }}>
+                    SASI ERP
+                </Typography>
+            </Box>
+
+            {/* Vertical divider */}
+            <Box sx={{ width: 1, height: 28, backgroundColor: DIVIDER, mx: 1, flexShrink: 0 }} />
+
+            {/* Nav items — horizontal scrollable */}
+            <Box sx={{
+                display: 'flex', alignItems: 'center', gap: 0.5,
+                overflowX: 'auto', flexGrow: 1,
+                '&::-webkit-scrollbar': { display: 'none' },
+            }}>
+                {visibleMenu.map(item => {
+                    const color       = MODULE_COLORS[item.title] || ACCENT;
+                    const groupActive = isGroupActive(item);
+                    const isOpen      = activeMenu?.title === item.title && Boolean(anchorEl);
+
+                    return (
+                        <Box key={item.title}>
+                            <Box
+                                onClick={(e) => {
+                                    if (item.children.length === 0) navigate(item.path);
+                                    else isOpen ? handleClose() : handleOpen(e, item);
+                                }}
+                                sx={{
+                                    display: 'flex', alignItems: 'center', gap: 0.6,
+                                    px: 1.5, py: 0.8, borderRadius: 1.5,
+                                    cursor: 'pointer', whiteSpace: 'nowrap',
+                                    backgroundColor: groupActive ? shades.activeAlpha : 'transparent',
+                                    borderBottom: groupActive ? `2px solid ${color}` : '2px solid transparent',
+                                    transition: 'all 0.15s',
+                                    '&:hover': { backgroundColor: BG_HOVER },
+                                }}>
+                                <Box sx={{ color: groupActive ? color : TEXT_SEC, display: 'flex', '& svg': { fontSize: 16 } }}>
+                                    {item.icon}
+                                </Box>
+                                <Typography fontSize={12.5} fontWeight={groupActive ? 600 : 400}
+                                    color={groupActive ? TEXT_PRI : TEXT_SEC}>
+                                    {item.title}
+                                </Typography>
+                                {item.children.length > 0 && (
+                                    <ExpandMore sx={{ color: TEXT_SEC, fontSize: 14 }} />
+                                )}
+                            </Box>
+                        </Box>
+                    );
+                })}
+            </Box>
+
+            {/* Dropdown */}
+            <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+                anchorOrigin={{ vertical: isBottom ? 'top' : 'bottom', horizontal: 'left' }}
+                transformOrigin={{ vertical: isBottom ? 'bottom' : 'top', horizontal: 'left' }}
+                slotProps={{ paper: { sx: {
+                    backgroundColor: shades.sidebarBg,
+                    border: `1px solid ${DIVIDER}`,
+                    borderRadius: 2, minWidth: 210, py: 0.5,
+                }}}}
+            >
+                {activeMenu?.children.map(child => {
+                    const active = isActive(child.path);
+                    const color  = MODULE_COLORS[activeMenu.title] || ACCENT;
+                    return (
+                        <MenuItem
+                            key={child.path}
+                            onClick={() => { navigate(child.path); handleClose(); }}
+                            sx={{
+                                fontSize: 13, py: 0.9, px: 2,
+                                color:           active ? TEXT_PRI : TEXT_SEC,
+                                fontWeight:      active ? 600 : 400,
+                                backgroundColor: active ? shades.activeAlpha : 'transparent',
+                                borderLeft:      active ? `3px solid ${color}` : '3px solid transparent',
+                                '&:hover': { backgroundColor: BG_HOVER, color: TEXT_PRI },
+                            }}>
+                            <FiberManualRecordIcon sx={{ fontSize: active ? 7 : 5, mr: 1.5, color: active ? color : TEXT_SEC }} />
+                            {child.title}
+                        </MenuItem>
+                    );
+                })}
+            </Menu>
+        </Box>
+    );
+}
+
+// ── Vertical Sidebar (Left / Right) ──────────────────────────
 function Sidebar({ permissions, isAdmin }) {
     const navigate = useNavigate();
     const location = useLocation();
@@ -144,6 +267,19 @@ function Sidebar({ permissions, isAdmin }) {
     const isGroupActive = (item) =>
         item.children?.some(c => location.pathname === c.path) ||
         location.pathname === item.path;
+
+    // Top / Bottom → horizontal layout
+    if (settings.sidebarSide === 'top' || settings.sidebarSide === 'bottom') {
+        return (
+            <HorizontalSidebar
+                visibleMenu={visibleMenu}
+                navigate={navigate}
+                location={location}
+                shades={shades}
+                isBottom={settings.sidebarSide === 'bottom'}
+            />
+        );
+    }
 
     return (
         <Box sx={{

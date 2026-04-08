@@ -116,12 +116,16 @@ function MainLayout({ children, currentUser, onLogout, permissions, isAdmin }) {
         <Box sx={{
             display: 'flex', minHeight: '100vh',
             backgroundColor: 'background.default',
-            flexDirection: settings.sidebarSide === 'right' ? 'row-reverse' : 'row',
+            flexDirection:
+                settings.sidebarSide === 'right'  ? 'row-reverse' :
+                settings.sidebarSide === 'top'    ? 'column' :
+                settings.sidebarSide === 'bottom' ? 'column-reverse' :
+                'row',
         }}>
 
             <Sidebar permissions={permissions} isAdmin={isAdmin} />
 
-            <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0 }}>
 
                 {/* ── Top Header ── */}
                 <AppBar position="static" elevation={0} sx={{

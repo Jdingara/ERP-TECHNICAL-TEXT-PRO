@@ -221,14 +221,16 @@ function SettingsPage() {
             </Section>
 
             {/* ── Sidebar Position ── */}
-            <Section title="Sidebar Position" subtitle="Move the navigation sidebar to the left or right side.">
+            <Section title="Sidebar Position" subtitle="Move the navigation sidebar to any side of the screen.">
                 <ToggleButtonGroup
                     value={settings.sidebarSide}
                     exclusive
                     onChange={(_, v) => v && updateSetting('sidebarSide', v)}
                     size="small">
-                    <ToggleButton value="left"  sx={{ px: 3 }}>Left (Default)</ToggleButton>
-                    <ToggleButton value="right" sx={{ px: 3 }}>Right</ToggleButton>
+                    <ToggleButton value="left"   sx={{ px: 3 }}>Left</ToggleButton>
+                    <ToggleButton value="right"  sx={{ px: 3 }}>Right</ToggleButton>
+                    <ToggleButton value="top"    sx={{ px: 3 }}>Top</ToggleButton>
+                    <ToggleButton value="bottom" sx={{ px: 3 }}>Bottom</ToggleButton>
                 </ToggleButtonGroup>
             </Section>
 
