@@ -33,6 +33,10 @@ const TEXT_PRI  = '#f1f5f9';
 const TEXT_SEC  = '#94a3b8';
 const DIVIDER   = 'rgba(255,255,255,0.07)';
 
+// Font scale multiplier — applied to every hardcoded fontSize in the sidebar
+const FONT_SCALE = { small: 0.88, medium: 1, large: 1.13 };
+const makeFs = (fontSizeSetting) => (base) => Math.round(base * (FONT_SCALE[fontSizeSetting] || 1) * 10) / 10;
+
 const MENU_ITEMS = [
     { title: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard', children: [] },
     { title: 'Master Data', icon: <CategoryIcon />, children: [
@@ -120,7 +124,7 @@ const MODULE_COLORS = {
 };
 
 // ── Horizontal Sidebar (Top / Bottom) ────────────────────────
-function HorizontalSidebar({ visibleMenu, navigate, location, shades, isBottom }) {
+function HorizontalSidebar({ visibleMenu, navigate, location, shades, isBottom, fs }) {
     const [anchorEl,   setAnchorEl]   = useState(null);
     const [activeMenu, setActiveMenu] = useState(null);
 
@@ -149,9 +153,9 @@ function HorizontalSidebar({ visibleMenu, navigate, location, shades, isBottom }
                     background: `linear-gradient(135deg, ${ACCENT}, ${ACCENT}99)`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                    <Typography fontWeight={700} color="white" fontSize={13}>S</Typography>
+                    <Typography fontWeight={700} color="white" fontSize={fs(13)}>S</Typography>
                 </Box>
-                <Typography fontWeight={700} color={TEXT_PRI} fontSize={14} sx={{ whiteSpace: 'nowrap' }}>
+                <Typography fontWeight={700} color={TEXT_PRI} fontSize={fs(14)} sx={{ whiteSpace: 'nowrap' }}>
                     SASI ERP
                 </Typography>
             </Box>
@@ -186,15 +190,15 @@ function HorizontalSidebar({ visibleMenu, navigate, location, shades, isBottom }
                                     transition: 'all 0.15s',
                                     '&:hover': { backgroundColor: BG_HOVER },
                                 }}>
-                                <Box sx={{ color: groupActive ? color : TEXT_SEC, display: 'flex', '& svg': { fontSize: 16 } }}>
+                                <Box sx={{ color: groupActive ? color : TEXT_SEC, display: 'flex', '& svg': { fontSize: fs(16) } }}>
                                     {item.icon}
                                 </Box>
-                                <Typography fontSize={12.5} fontWeight={groupActive ? 600 : 400}
+                                <Typography fontSize={fs(12.5)} fontWeight={groupActive ? 600 : 400}
                                     color={groupActive ? TEXT_PRI : TEXT_SEC}>
                                     {item.title}
                                 </Typography>
                                 {item.children.length > 0 && (
-                                    <ExpandMore sx={{ color: TEXT_SEC, fontSize: 14 }} />
+                                    <ExpandMore sx={{ color: TEXT_SEC, fontSize: fs(14) }} />
                                 )}
                             </Box>
                         </Box>
@@ -223,14 +227,14 @@ function HorizontalSidebar({ visibleMenu, navigate, location, shades, isBottom }
                             key={child.path}
                             onClick={() => { navigate(child.path); handleClose(); }}
                             sx={{
-                                fontSize: 13, py: 0.9, px: 2,
+                                fontSize: fs(13), py: 0.9, px: 2,
                                 color:           active ? TEXT_PRI : TEXT_SEC,
                                 fontWeight:      active ? 600 : 400,
                                 backgroundColor: active ? shades.activeAlpha : 'transparent',
                                 borderLeft:      active ? `3px solid ${color}` : '3px solid transparent',
                                 '&:hover': { backgroundColor: BG_HOVER, color: TEXT_PRI },
                             }}>
-                            <FiberManualRecordIcon sx={{ fontSize: active ? 7 : 5, mr: 1.5, color: active ? color : TEXT_SEC }} />
+                            <FiberManualRecordIcon sx={{ fontSize: active ? fs(7) : fs(5), mr: 1.5, color: active ? color : TEXT_SEC }} />
                             {child.title}
                         </MenuItem>
                     );
@@ -250,6 +254,7 @@ function Sidebar({ permissions, isAdmin }) {
     const ACCENT    = shades.accent;
     const BG        = shades.sidebarBg;
     const BG_ACTIVE = shades.activeAlpha;
+    const fs        = makeFs(settings.fontSize);
 
     const canSee = (path) =>
         isAdmin || permissions === 'all' ||
@@ -277,6 +282,7 @@ function Sidebar({ permissions, isAdmin }) {
                 location={location}
                 shades={shades}
                 isBottom={settings.sidebarSide === 'bottom'}
+                fs={fs}
             />
         );
     }
@@ -302,13 +308,13 @@ function Sidebar({ permissions, isAdmin }) {
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         boxShadow: `0 4px 12px ${ACCENT}55`,
                     }}>
-                        <Typography fontWeight="bold" color="white" fontSize={16}>S</Typography>
+                        <Typography fontWeight="bold" color="white" fontSize={fs(16)}>S</Typography>
                     </Box>
                     <Box>
-                        <Typography fontWeight={700} color={TEXT_PRI} fontSize={16} lineHeight={1.2}>
+                        <Typography fontWeight={700} color={TEXT_PRI} fontSize={fs(16)} lineHeight={1.2}>
                             SASI ERP
                         </Typography>
-                        <Typography color={TEXT_SEC} fontSize={10} letterSpacing={0.5}>
+                        <Typography color={TEXT_SEC} fontSize={fs(10)} letterSpacing={0.5}>
                             MEDICAL · TECHNICAL TEXTILE
                         </Typography>
                     </Box>
@@ -346,14 +352,14 @@ function Sidebar({ permissions, isAdmin }) {
                                     <ListItemIcon sx={{
                                         minWidth: 34,
                                         color: groupActive ? color : TEXT_SEC,
-                                        '& svg': { fontSize: 20 },
+                                        '& svg': { fontSize: fs(20) },
                                     }}>
                                         {item.icon}
                                     </ListItemIcon>
                                     <ListItemText
                                         primary={item.title}
                                         slotProps={{ primary: {
-                                            fontSize: 13.5,
+                                            fontSize: fs(13.5),
                                             fontWeight: groupActive ? 600 : 400,
                                             color: groupActive ? TEXT_PRI : TEXT_SEC,
                                             letterSpacing: 0.1,
@@ -361,8 +367,8 @@ function Sidebar({ permissions, isAdmin }) {
                                     />
                                     {item.children.length > 0 && (
                                         groupOpen
-                                            ? <ExpandLess sx={{ color: TEXT_SEC, fontSize: 18 }} />
-                                            : <ExpandMore sx={{ color: TEXT_SEC, fontSize: 18 }} />
+                                            ? <ExpandLess sx={{ color: TEXT_SEC, fontSize: fs(18) }} />
+                                            : <ExpandMore sx={{ color: TEXT_SEC, fontSize: fs(18) }} />
                                     )}
                                 </ListItemButton>
                             </ListItem>
@@ -383,14 +389,14 @@ function Sidebar({ permissions, isAdmin }) {
                                                             '&:hover': { backgroundColor: BG_HOVER },
                                                         }}>
                                                         <FiberManualRecordIcon sx={{
-                                                            fontSize: active ? 8 : 6,
+                                                            fontSize: active ? fs(8) : fs(6),
                                                             color: active ? color : TEXT_SEC,
                                                             mr: 1.5,
                                                         }} />
                                                         <ListItemText
                                                             primary={child.title}
                                                             slotProps={{ primary: {
-                                                                fontSize: 12.5,
+                                                                fontSize: fs(12.5),
                                                                 fontWeight: active ? 600 : 400,
                                                                 color: active ? TEXT_PRI : TEXT_SEC,
                                                             }}}
@@ -417,7 +423,7 @@ function Sidebar({ permissions, isAdmin }) {
                     width: 6, height: 6, borderRadius: '50%',
                     backgroundColor: '#22c55e', boxShadow: '0 0 6px #22c55e',
                 }} />
-                <Typography fontSize={11} color={TEXT_SEC}>v1.0 · Development</Typography>
+                <Typography fontSize={fs(11)} color={TEXT_SEC}>v1.0 · Development</Typography>
             </Box>
         </Box>
     );
