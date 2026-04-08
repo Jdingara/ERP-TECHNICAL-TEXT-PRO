@@ -10,6 +10,7 @@ import {
     TableContainer, TableHead, TableRow, Paper, Chip, Alert,
     IconButton, Tooltip, Stack,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import AddIcon    from '@mui/icons-material/Add';
 import PrintIcon  from '@mui/icons-material/Print';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -28,6 +29,7 @@ const STATUS_COLORS = {
 const canDelete = (po) => po.status === 'draft';
 
 function PurchaseOrderListPage() {
+    const theme = useTheme();
     const { widths, Resizer } = useColumnResize("purchaseorder_list", [100, 180, 150, 150, 150, 150, 150, 80]);
     const [orders,  setOrders]  = useState([]);
     const [message, setMessage] = useState('');
@@ -96,14 +98,14 @@ function PurchaseOrderListPage() {
                 <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[0] }}>PO Number<Resizer index={0} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[1] }}>Supplier<Resizer index={1} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[2] }}>Warehouse<Resizer index={2} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[3] }}>Order Date<Resizer index={3} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[4] }}>Expected Date<Resizer index={4} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[5] }}>Total Amount<Resizer index={5} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[6] }}>Status<Resizer index={6} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[7] }}>Actions<Resizer index={7} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[0], backgroundColor: theme.palette.primary.main }}>PO Number<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[1], backgroundColor: theme.palette.primary.main }}>Supplier<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[2], backgroundColor: theme.palette.primary.main }}>Warehouse<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[3], backgroundColor: theme.palette.primary.main }}>Order Date<Resizer index={3} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[4], backgroundColor: theme.palette.primary.main }}>Expected Date<Resizer index={4} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[5], backgroundColor: theme.palette.primary.main }}>Total Amount<Resizer index={5} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[6], backgroundColor: theme.palette.primary.main }}>Status<Resizer index={6} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[7], backgroundColor: theme.palette.primary.main }}>Actions<Resizer index={7} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

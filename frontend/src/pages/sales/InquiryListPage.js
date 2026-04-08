@@ -11,6 +11,7 @@ import {
     DialogActions, TextField, MenuItem, IconButton, Tooltip,
     InputAdornment, Stack, FormControlLabel, Switch, Divider,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useColumnResize } from '../../components/common/useColumnResize';
 import AddIcon        from '@mui/icons-material/Add';
 import EditIcon       from '@mui/icons-material/Edit';
@@ -44,6 +45,7 @@ function StatusChip({ status }) {
 }
 
 export default function InquiryListPage() {
+    const theme = useTheme();
     const { widths, Resizer } = useColumnResize('inquiry_list', [120, 160, 200, 120, 90, 110, 110, 90]);
     const [inquiries,   setInquiries]   = useState([]);
     const [customers,   setCustomers]   = useState([]);
@@ -188,7 +190,7 @@ export default function InquiryListPage() {
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Inquiry #','Customer','Product Description','End Use','Qty','Date','Status','Actions'].map((h, i) => (
-                                <TableCell key={h} sx={{ color:'white', fontWeight:'bold', whiteSpace:'nowrap', position:'relative', userSelect:'none', backgroundColor:'primary.main', px:2, py:1 }} style={{ width: widths[i] }}>
+                                <TableCell key={h} sx={{ color:'white', fontWeight:'bold', whiteSpace:'nowrap', position:'relative', userSelect:'none', px:2, py:1 }} style={{ width: widths[i], backgroundColor: theme.palette.primary.main }}>
                                     {h}<Resizer index={i} />
                                 </TableCell>
                             ))}

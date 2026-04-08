@@ -10,6 +10,7 @@ import {
     TableCell, TableBody, Chip, TextField, InputAdornment,
     Stack,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import SearchIcon    from '@mui/icons-material/Search';
 import LayersIcon    from '@mui/icons-material/Layers';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
@@ -26,6 +27,7 @@ function expiryStatus(expiryDate) {
 }
 
 export default function BatchListPage() {
+    const theme = useTheme();
     const { widths, Resizer } = useColumnResize('batch_list', [120, 150, 110, 200, 110, 130, 130, 150]);
     const [batches,  setBatches]  = useState([]);
     const [loading,  setLoading]  = useState(true);
@@ -136,7 +138,7 @@ export default function BatchListPage() {
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Batch #','Work Order','Item Code','Item Name','Qty Produced','Production Date','Expiry Date','Shelf Life Status'].map((h, i) => (
-                                <TableCell key={h} sx={{ color:'white', fontWeight:'bold', whiteSpace:'nowrap', position:'relative', userSelect:'none', backgroundColor:'primary.main', px:2, py:1 }} style={{ width: widths[i] }}>
+                                <TableCell key={h} sx={{ color:'white', fontWeight:'bold', whiteSpace:'nowrap', position:'relative', userSelect:'none', px:2, py:1 }} style={{ width: widths[i], backgroundColor: theme.palette.primary.main }}>
                                     {h}<Resizer index={i} />
                                 </TableCell>
                             ))}

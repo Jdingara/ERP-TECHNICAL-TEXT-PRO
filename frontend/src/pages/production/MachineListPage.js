@@ -11,6 +11,7 @@ import {
     DialogActions, TextField, MenuItem, IconButton, Tooltip,
     InputAdornment, Stack,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useColumnResize } from '../../components/common/useColumnResize';
 import AddIcon             from '@mui/icons-material/Add';
 import EditIcon            from '@mui/icons-material/Edit';
@@ -47,6 +48,7 @@ function StatusChip({ status }) {
 }
 
 export default function MachineListPage() {
+    const theme = useTheme();
     const { widths, Resizer } = useColumnResize('machine_list', [110, 180, 130, 110, 130, 110, 90]);
     const [machines,  setMachines]  = useState([]);
     const [loading,   setLoading]   = useState(true);
@@ -171,7 +173,7 @@ export default function MachineListPage() {
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Code','Name','Type','Capacity','Location','Status','Actions'].map((h, i) => (
-                                <TableCell key={h} sx={{ color:'white', fontWeight:'bold', whiteSpace:'nowrap', position:'relative', userSelect:'none', backgroundColor:'primary.main', px:2, py:1 }} style={{ width: widths[i] }}>
+                                <TableCell key={h} sx={{ color:'white', fontWeight:'bold', whiteSpace:'nowrap', position:'relative', userSelect:'none', px:2, py:1 }} style={{ width: widths[i], backgroundColor: theme.palette.primary.main }}>
                                     {h}<Resizer index={i} />
                                 </TableCell>
                             ))}

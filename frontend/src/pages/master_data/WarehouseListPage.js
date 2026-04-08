@@ -11,6 +11,7 @@ import {
     IconButton, Dialog, DialogTitle, DialogContent,
     DialogActions, Alert
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import { useColumnResize } from '../../components/common/useColumnResize';
@@ -18,6 +19,7 @@ import { useColumnResize } from '../../components/common/useColumnResize';
 const EMPTY_FORM = { code: '', name: '', address: '' };
 
 function WarehouseListPage() {
+    const theme = useTheme();
     const { widths, Resizer } = useColumnResize("warehouse_list", [100, 180, 150, 80]);
     const [warehouses, setWarehouses]   = useState([]);
     const [dialogOpen, setDialogOpen]   = useState(false);
@@ -78,10 +80,10 @@ function WarehouseListPage() {
                 <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[0] }}>Code<Resizer index={0} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[1] }}>Warehouse Name<Resizer index={1} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[2] }}>Address<Resizer index={2} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[3] }}>Actions<Resizer index={3} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[0], backgroundColor: theme.palette.primary.main }}>Code<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[1], backgroundColor: theme.palette.primary.main }}>Warehouse Name<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[2], backgroundColor: theme.palette.primary.main }}>Address<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[3], backgroundColor: theme.palette.primary.main }}>Actions<Resizer index={3} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -110,7 +112,7 @@ function WarehouseListPage() {
             </TableContainer>
 
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>
+                <DialogTitle sx={{ color: 'white' }}>
                     {editingId ? 'Edit Warehouse' : 'Add New Warehouse'}
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>

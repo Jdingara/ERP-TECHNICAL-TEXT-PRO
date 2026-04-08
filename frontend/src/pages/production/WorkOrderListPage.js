@@ -15,6 +15,7 @@ import {
     Dialog, DialogTitle, DialogContent, DialogActions,
     TextField, Alert, IconButton, Tooltip, Stack,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon      from '@mui/icons-material/Delete';
 import PrintIcon       from '@mui/icons-material/Print';
@@ -35,6 +36,7 @@ const STATUS_COLOR = {
 const canDelete = (wo) => ['draft', 'confirmed'].includes(wo.status);
 
 function WorkOrderListPage() {
+    const theme = useTheme();
     const { widths, Resizer } = useColumnResize("workorder_list", [100, 180, 150, 150, 150, 150, 80]);
     const navigate = useNavigate();
 
@@ -126,13 +128,13 @@ function WorkOrderListPage() {
                 <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[0] }}>WO Number<Resizer index={0} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[1] }}>BOM / Product<Resizer index={1} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[2] }}>Planned Qty<Resizer index={2} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[3] }}>Actual Qty<Resizer index={3} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[4] }}>Start Date<Resizer index={4} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[5] }}>Status<Resizer index={5} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[6] }}>Actions<Resizer index={6} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[0], backgroundColor: theme.palette.primary.main }}>WO Number<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[1], backgroundColor: theme.palette.primary.main }}>BOM / Product<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[2], backgroundColor: theme.palette.primary.main }}>Planned Qty<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[3], backgroundColor: theme.palette.primary.main }}>Actual Qty<Resizer index={3} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[4], backgroundColor: theme.palette.primary.main }}>Start Date<Resizer index={4} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[5], backgroundColor: theme.palette.primary.main }}>Status<Resizer index={5} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[6], backgroundColor: theme.palette.primary.main }}>Actions<Resizer index={6} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

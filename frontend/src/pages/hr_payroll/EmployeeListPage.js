@@ -11,6 +11,7 @@ import {
     Chip, IconButton, Dialog, DialogTitle, DialogContent,
     DialogActions, MenuItem, Select, InputLabel, FormControl, Alert
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import { useColumnResize } from '../../components/common/useColumnResize';
@@ -33,6 +34,7 @@ const EMPTY_FORM = {
 };
 
 function EmployeeListPage() {
+    const theme = useTheme();
     const { widths, Resizer } = useColumnResize("employee_list", [100, 180, 150, 80]);
     const [employees, setEmployees]     = useState([]);
     const [departments, setDepartments] = useState([]);
@@ -103,7 +105,7 @@ function EmployeeListPage() {
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Code', 'Full Name', 'Department', 'Designation', 'Type', 'Phone', 'Joining Date', 'Gross Salary', 'Status', 'Actions'].map((h, i) => (
-                                <TableCell key={h} sx={{ color: 'white', fontWeight: 'bold', whiteSpace: 'nowrap', position: 'relative', userSelect: 'none', backgroundColor: 'primary.main', px: 2, py: 1 }} style={{ width: widths[i] }}>
+                                <TableCell key={h} sx={{ color: 'white', fontWeight: 'bold', whiteSpace: 'nowrap', position: 'relative', userSelect: 'none', px: 2, py: 1 }} style={{ width: widths[i], backgroundColor: theme.palette.primary.main }}>
                                     {h}<Resizer index={i} />
                                 </TableCell>
                             ))}
@@ -140,7 +142,7 @@ function EmployeeListPage() {
 
             {/* Add/Edit Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>
+                <DialogTitle sx={{ color: 'white' }}>
                     {editingId ? 'Edit Employee' : 'Add New Employee'}
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>

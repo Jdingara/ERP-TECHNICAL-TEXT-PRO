@@ -11,6 +11,7 @@ import {
     Chip, IconButton, Dialog, DialogTitle, DialogContent,
     DialogActions, MenuItem, Select, InputLabel, FormControl, Alert
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import { useColumnResize } from '../../components/common/useColumnResize';
@@ -34,6 +35,7 @@ const EMPTY_FORM = {
 };
 
 function ItemListPage() {
+    const theme = useTheme();
     const { widths, Resizer } = useColumnResize('items_list', [110, 200, 130, 150, 80, 110, 100, 70]);
     const [items, setItems]           = useState([]);
     const [categories, setCategories] = useState([]);
@@ -169,7 +171,7 @@ function ItemListPage() {
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Item Code','Item Name','Type','Category','Unit','Yarn Count','Min Stock','Actions'].map((label, i) => (
-                                <TableCell key={label} sx={{ color: 'white', fontWeight: 'bold', whiteSpace: 'nowrap', position: 'relative', userSelect: 'none', backgroundColor: 'primary.main', px: 2, py: 1 }} style={{ width: widths[i] }}>
+                                <TableCell key={label} sx={{ color: 'white', fontWeight: 'bold', whiteSpace: 'nowrap', position: 'relative', userSelect: 'none', px: 2, py: 1 }} style={{ width: widths[i], backgroundColor: theme.palette.primary.main }}>
                                     {label}<Resizer index={i} />
                                 </TableCell>
                             ))}
@@ -210,7 +212,7 @@ function ItemListPage() {
 
             {/* Add / Edit Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>
+                <DialogTitle sx={{ color: 'white' }}>
                     {editingId ? 'Edit Item' : 'Add New Item'}
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>

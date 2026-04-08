@@ -13,6 +13,7 @@ import {
     TextField, MenuItem, Select, InputLabel, FormControl,
     Alert, Divider, IconButton
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -21,6 +22,7 @@ import { useColumnResize } from '../../components/common/useColumnResize';
 const EMPTY_LINE = { raw_material_id: '', quantity: '', waste_percent: 0, notes: '' };
 
 function BOMListPage() {
+    const theme = useTheme();
     const { widths, Resizer } = useColumnResize("bom_list", [100, 180, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 80]);
     const [boms, setBoms]               = useState([]);
     const [items, setItems]             = useState([]);
@@ -112,11 +114,11 @@ function BOMListPage() {
                 <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[0] }}>BOM Name<Resizer index={0} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[1] }}>Finished Product<Resizer index={1} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[2] }}>Qty Produced<Resizer index={2} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[3] }}>Status<Resizer index={3} /></TableCell>
-                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[4] }}>Actions<Resizer index={4} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[0], backgroundColor: theme.palette.primary.main }}>BOM Name<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[1], backgroundColor: theme.palette.primary.main }}>Finished Product<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[2], backgroundColor: theme.palette.primary.main }}>Qty Produced<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[3], backgroundColor: theme.palette.primary.main }}>Status<Resizer index={3} /></TableCell>
+                            <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[4], backgroundColor: theme.palette.primary.main }}>Actions<Resizer index={4} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -145,7 +147,7 @@ function BOMListPage() {
 
             {/* Create BOM Dialog */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="lg" fullWidth>
-                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>Create Bill of Materials</DialogTitle>
+                <DialogTitle sx={{ color: 'white' }}>Create Bill of Materials</DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
                     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, mb: 3, mt: 1 }}>
                         <TextField label="BOM Name *" value={bomName} onChange={(e) => setBomName(e.target.value)} sx={{ gridColumn: 'span 2' }} />
@@ -166,11 +168,11 @@ function BOMListPage() {
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
-                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[5] }}>Raw Material *<Resizer index={5} /></TableCell>
-                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[6] }}>Quantity *<Resizer index={6} /></TableCell>
-                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[7] }}>Waste % (for spinning)<Resizer index={7} /></TableCell>
-                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[8] }}>Qty incl. Waste<Resizer index={8} /></TableCell>
-                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[9] }}>Notes<Resizer index={9} /></TableCell>
+                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[5], backgroundColor: theme.palette.primary.main }}>Raw Material *<Resizer index={5} /></TableCell>
+                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[6], backgroundColor: theme.palette.primary.main }}>Quantity *<Resizer index={6} /></TableCell>
+                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[7], backgroundColor: theme.palette.primary.main }}>Waste % (for spinning)<Resizer index={7} /></TableCell>
+                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[8], backgroundColor: theme.palette.primary.main }}>Qty incl. Waste<Resizer index={8} /></TableCell>
+                                <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[9], backgroundColor: theme.palette.primary.main }}>Notes<Resizer index={9} /></TableCell>
                                 <TableCell></TableCell>
                             </TableRow>
                         </TableHead>
@@ -226,7 +228,7 @@ function BOMListPage() {
             {/* View BOM Dialog */}
             {selectedBom && (
                 <Dialog open={viewDialog} onClose={() => setViewDialog(false)} maxWidth="md" fullWidth>
-                    <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white' }}>
+                    <DialogTitle sx={{ color: 'white' }}>
                         BOM: {selectedBom.bom_name}
                     </DialogTitle>
                     <DialogContent sx={{ pt: 3 }}>
@@ -237,11 +239,11 @@ function BOMListPage() {
                         <Table size="small">
                             <TableHead sx={{ backgroundColor: 'action.hover' }}>
                                 <TableRow>
-                                    <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[10] }}>Raw Material<Resizer index={10} /></TableCell>
-                                    <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[11] }}>Quantity<Resizer index={11} /></TableCell>
-                                    <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[12] }}>Waste %<Resizer index={12} /></TableCell>
-                                    <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[13] }}>Qty incl. Waste<Resizer index={13} /></TableCell>
-                                    <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',backgroundColor:'primary.main',px:2,py:1 }} style={{ width: widths[14] }}>Unit<Resizer index={14} /></TableCell>
+                                    <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[10], backgroundColor: theme.palette.primary.main }}>Raw Material<Resizer index={10} /></TableCell>
+                                    <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[11], backgroundColor: theme.palette.primary.main }}>Quantity<Resizer index={11} /></TableCell>
+                                    <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[12], backgroundColor: theme.palette.primary.main }}>Waste %<Resizer index={12} /></TableCell>
+                                    <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[13], backgroundColor: theme.palette.primary.main }}>Qty incl. Waste<Resizer index={13} /></TableCell>
+                                    <TableCell sx={{ color:'white',fontWeight:'bold',whiteSpace:'nowrap',position:'relative',userSelect:'none',px:2,py:1 }} style={{ width: widths[14], backgroundColor: theme.palette.primary.main }}>Unit<Resizer index={14} /></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
