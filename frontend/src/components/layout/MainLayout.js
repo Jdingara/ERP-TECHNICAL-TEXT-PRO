@@ -113,7 +113,11 @@ function MainLayout({ children, currentUser, onLogout, permissions, isAdmin }) {
     const initials   = (currentUser?.first_name?.[0] || currentUser?.username?.[0] || 'U').toUpperCase();
 
     return (
-        <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
+        <Box sx={{
+            display: 'flex', minHeight: '100vh',
+            backgroundColor: 'background.default',
+            flexDirection: settings.sidebarSide === 'right' ? 'row-reverse' : 'row',
+        }}>
 
             <Sidebar permissions={permissions} isAdmin={isAdmin} />
 

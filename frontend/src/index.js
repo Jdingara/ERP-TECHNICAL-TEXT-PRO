@@ -7,10 +7,14 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { SettingsProvider, useSettings } from './context/SettingsContext';
 
-const FONT_SIZES = { small: 13, medium: 14.5, large: 16 };
+const FONT_SIZES        = { small: 13,   medium: 14.5, large: 16   };
+const HTML_FONT_SIZES   = { small: '13px', medium: '15px', large: '17px' };
 
 function ThemedApp() {
     const { settings } = useSettings();
+
+    // Apply font size to <html> so all rem-based values scale with it
+    document.documentElement.style.fontSize = HTML_FONT_SIZES[settings.fontSize] || '15px';
 
     const theme = createTheme({
         palette: {
