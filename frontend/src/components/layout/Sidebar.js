@@ -128,111 +128,117 @@ const MODULE_COLORS = {
 };
 
 // ── Horizontal Sidebar (Top / Bottom) ────────────────────────
-function HorizontalSidebar({ visibleMenu, navigate, location, shades, isBottom, fs }) {
+function HorizontalSidebar({ visibleMenu, navigate, location, accent, isBottom }) {
     const [anchorEl,   setAnchorEl]   = useState(null);
     const [activeMenu, setActiveMenu] = useState(null);
 
     const isGroupActive = (item) =>
-        item.children?.some(c => location.pathname === c.path) ||
+        (item.children || []).some(c => location.pathname === c.path) ||
         location.pathname === item.path;
 
     const handleOpen  = (e, item) => { setAnchorEl(e.currentTarget); setActiveMenu(item); };
-    const handleClose = ()         => { setAnchorEl(null); setActiveMenu(null); };
+    const handleClose = ()        => { setAnchorEl(null); setActiveMenu(null); };
 
     return (
-        <Box sx={{
-            width: '100%', height: 56, flexShrink: 0,
-            backgroundColor: shades.sidebarHeader,
-            display: 'flex', alignItems: 'center',
-            boxShadow: isBottom
-                ? '0 -4px 16px rgba(0,0,0,0.35)'
-                : '0 4px 16px rgba(0,0,0,0.35)',
-            px: 2, zIndex: 1200,
+        <div style={{
+            width: '100%',
+            height: 56,
+            flexShrink: 0,
+            backgroundColor: '#1e293b',
+            display: 'flex',
+            alignItems: 'center',
+            boxShadow: isBottom ? '0 -2px 12px rgba(0,0,0,0.4)' : '0 2px 12px rgba(0,0,0,0.4)',
+            paddingLeft: 16,
+            paddingRight: 16,
+            boxSizing: 'border-box',
+            zIndex: 1200,
             position: 'relative',
         }}>
 
             {/* ── Logo ── */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0, mr: 1.5 }}>
-                <Box sx={{
-                    width: 30, height: 30, borderRadius: 1, flexShrink: 0,
-                    background: `linear-gradient(135deg, ${shades.accent}, ${shades.accent}99)`,
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, marginRight: 12 }}>
+                <div style={{
+                    width: 30, height: 30, borderRadius: 6, flexShrink: 0,
+                    background: `linear-gradient(135deg, ${accent}, ${accent}99)`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                    <Typography fontWeight={700} color="white" fontSize={fs(13)}>S</Typography>
-                </Box>
-                <Typography fontWeight={700} fontSize={fs(14)} noWrap
-                    sx={{ color: '#f1f5f9', display: { xs: 'none', sm: 'block' } }}>
+                    <span style={{ fontWeight: 700, color: 'white', fontSize: 14 }}>S</span>
+                </div>
+                <span style={{ fontWeight: 700, fontSize: 14, color: '#f1f5f9', whiteSpace: 'nowrap' }}>
                     SASI ERP
-                </Typography>
-            </Box>
+                </span>
+            </div>
 
             {/* ── Divider ── */}
-            <Box sx={{ width: 1, height: 28, backgroundColor: 'rgba(255,255,255,0.15)', mx: 1.5, flexShrink: 0 }} />
+            <div style={{ width: 1, height: 28, backgroundColor: 'rgba(255,255,255,0.15)', marginLeft: 12, marginRight: 12, flexShrink: 0 }} />
 
-            {/* ── Nav items (horizontal scrollable) ── */}
-            <Box sx={{
+            {/* ── Nav items ── */}
+            <div style={{
                 display: 'flex', alignItems: 'center', flexGrow: 1,
-                overflowX: 'auto', gap: 0.5,
-                '&::-webkit-scrollbar': { display: 'none' },
+                overflowX: 'auto', gap: 4,
+                scrollbarWidth: 'none',
             }}>
                 {visibleMenu.map(item => {
-                    const color       = MODULE_COLORS[item.title] || shades.accent;
+                    const color       = MODULE_COLORS[item.title] || accent;
                     const groupActive = isGroupActive(item);
                     const isOpen      = activeMenu?.title === item.title && Boolean(anchorEl);
+                    const hasChildren = (item.children || []).length > 0;
 
                     return (
-                        <Box
+                        <div
                             key={item.title}
                             onClick={(e) => {
-                                if (item.children.length === 0) navigate(item.path);
+                                if (!hasChildren) navigate(item.path);
                                 else isOpen ? handleClose() : handleOpen(e, item);
                             }}
-                            sx={{
-                                display: 'flex', alignItems: 'center', gap: 0.6,
-                                px: 1.5, py: 0.75,
-                                borderRadius: 1.5,
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: 5,
+                                padding: '6px 12px',
+                                borderRadius: 8,
                                 flexShrink: 0,
                                 cursor: 'pointer',
                                 userSelect: 'none',
-                                backgroundColor: groupActive || isOpen
-                                    ? `${color}25`
-                                    : 'transparent',
-                                borderBottom: groupActive
-                                    ? `2px solid ${color}`
-                                    : '2px solid transparent',
-                                transition: 'all 0.15s',
-                                '&:hover': { backgroundColor: 'rgba(255,255,255,0.10)' },
-                            }}>
+                                backgroundColor: groupActive || isOpen ? `${color}30` : 'transparent',
+                                borderBottom: `2px solid ${groupActive ? color : 'transparent'}`,
+                                transition: 'background 0.15s',
+                                whiteSpace: 'nowrap',
+                            }}
+                            onMouseEnter={e => { if (!groupActive && !isOpen) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'; }}
+                            onMouseLeave={e => { if (!groupActive && !isOpen) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                        >
                             {/* Icon */}
-                            <Box sx={{
+                            <span style={{
                                 display: 'flex', alignItems: 'center',
                                 color: groupActive ? color : '#94a3b8',
-                                '& svg': { fontSize: fs(16) },
+                                fontSize: 16,
                             }}>
                                 {item.icon}
-                            </Box>
+                            </span>
                             {/* Label */}
-                            <Typography
-                                fontSize={fs(12.5)}
-                                fontWeight={groupActive ? 700 : 400}
-                                sx={{ color: groupActive ? '#f1f5f9' : '#cbd5e1', whiteSpace: 'nowrap' }}>
+                            <span style={{
+                                fontSize: 12.5,
+                                fontWeight: groupActive ? 700 : 400,
+                                color: groupActive ? '#ffffff' : '#cbd5e1',
+                            }}>
                                 {item.title}
-                            </Typography>
+                            </span>
                             {/* Arrow */}
-                            {item.children.length > 0 && (
-                                <ExpandMore sx={{
-                                    fontSize: fs(14),
-                                    color: '#94a3b8',
+                            {hasChildren && (
+                                <span style={{
+                                    display: 'flex', alignItems: 'center',
+                                    color: '#94a3b8', fontSize: 14,
                                     transform: isOpen ? 'rotate(180deg)' : 'none',
                                     transition: 'transform 0.2s',
-                                }} />
+                                }}>
+                                    <ExpandMore style={{ fontSize: 14 }} />
+                                </span>
                             )}
-                        </Box>
+                        </div>
                     );
                 })}
-            </Box>
+            </div>
 
-            {/* ── Dropdown sub-menu ── */}
+            {/* ── Dropdown ── */}
             <Menu
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl) && Boolean(activeMenu)}
@@ -241,16 +247,15 @@ function HorizontalSidebar({ visibleMenu, navigate, location, shades, isBottom, 
                 anchorOrigin={{ vertical: isBottom ? 'top' : 'bottom', horizontal: 'left' }}
                 transformOrigin={{ vertical: isBottom ? 'bottom' : 'top', horizontal: 'left' }}
                 slotProps={{ paper: { sx: {
-                    backgroundColor: shades.sidebarBg,
-                    border: '1px solid rgba(255,255,255,0.10)',
+                    backgroundColor: '#1e293b',
+                    border: '1px solid rgba(255,255,255,0.12)',
                     borderRadius: 2,
-                    minWidth: 230,
+                    minWidth: 220,
                     py: 0.5,
-                    boxShadow: '0 12px 40px rgba(0,0,0,0.45)',
                     mt: isBottom ? 0 : 0.5,
+                    boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
                 }}}}
             >
-                {/* Module header in dropdown */}
                 {activeMenu && (
                     <Box sx={{
                         px: 2, py: 1,
@@ -258,45 +263,39 @@ function HorizontalSidebar({ visibleMenu, navigate, location, shades, isBottom, 
                         mb: 0.5,
                         display: 'flex', alignItems: 'center', gap: 1,
                     }}>
-                        <Box sx={{ color: MODULE_COLORS[activeMenu.title] || shades.accent, display: 'flex', '& svg': { fontSize: 16 } }}>
+                        <Box sx={{ color: MODULE_COLORS[activeMenu.title] || accent, display: 'flex', '& svg': { fontSize: 16 } }}>
                             {activeMenu.icon}
                         </Box>
-                        <Typography
-                            fontSize={fs(11)} fontWeight={700} letterSpacing={0.8}
-                            sx={{ color: MODULE_COLORS[activeMenu.title] || shades.accent, textTransform: 'uppercase' }}>
+                        <Typography fontSize={11} fontWeight={700} letterSpacing={0.8}
+                            sx={{ color: MODULE_COLORS[activeMenu.title] || accent, textTransform: 'uppercase' }}>
                             {activeMenu.title}
                         </Typography>
                     </Box>
                 )}
 
-                {/* Sub-items */}
                 {activeMenu?.children.map(child => {
                     const active = location.pathname === child.path;
-                    const color  = MODULE_COLORS[activeMenu.title] || shades.accent;
+                    const color  = MODULE_COLORS[activeMenu.title] || accent;
                     return (
                         <MenuItem
                             key={child.path}
                             onClick={() => { navigate(child.path); handleClose(); }}
                             sx={{
-                                px: 2, py: 1,
-                                fontSize: fs(13),
+                                px: 2, py: 1, fontSize: 13,
                                 fontWeight: active ? 600 : 400,
-                                color:           active ? '#f1f5f9' : '#94a3b8',
-                                backgroundColor: active ? `${color}20` : 'transparent',
+                                color:           active ? '#ffffff' : '#94a3b8',
+                                backgroundColor: active ? `${color}25` : 'transparent',
                                 borderLeft:      active ? `3px solid ${color}` : '3px solid transparent',
                                 gap: 1.5,
-                                '&:hover': { backgroundColor: 'rgba(255,255,255,0.07)', color: '#f1f5f9' },
+                                '&:hover': { backgroundColor: 'rgba(255,255,255,0.08)', color: '#ffffff' },
                             }}>
-                            <FiberManualRecordIcon sx={{
-                                fontSize: active ? fs(7) : fs(5),
-                                color: active ? color : '#64748b',
-                            }} />
+                            <FiberManualRecordIcon sx={{ fontSize: active ? 7 : 5, color: active ? color : '#64748b' }} />
                             {child.title}
                         </MenuItem>
                     );
                 })}
             </Menu>
-        </Box>
+        </div>
     );
 }
 
@@ -364,9 +363,8 @@ function Sidebar({ permissions, isAdmin }) {
                 visibleMenu={visibleMenu}
                 navigate={navigate}
                 location={location}
-                shades={shades}
+                accent={settings.accentColor}
                 isBottom={settings.sidebarSide === 'bottom'}
-                fs={fs}
             />
         );
     }
