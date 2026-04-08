@@ -418,7 +418,8 @@ function Sidebar({ permissions, isAdmin }) {
 
     return (
         <Box sx={{
-            width: W, minWidth: W, height: '100%', minHeight: '100vh',
+            width: W, minWidth: W, height: '100vh',
+            position: 'sticky', top: 0, alignSelf: 'flex-start',
             backgroundColor: BG, display: 'flex', flexDirection: 'column',
             overflowX: 'hidden',
             borderRight: `1px solid ${DIVIDER}`,
