@@ -58,34 +58,34 @@ export function useColumnResize(storageKey, defaultWidths) {
         window.addEventListener('mouseup', onUp);
     }, [widths, storageKey]);
 
+    // Resizer: must be placed INSIDE a <div style={{position:'relative'}}> wrapper in the th cell
     function Resizer({ index }) {
+        const [hovered, setHovered] = useState(false);
         return (
             <div
                 onMouseDown={(e) => startDrag(index, e)}
-                title="Drag to resize column"
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+                title="Drag ↔ to resize this column"
                 style={{
                     position: 'absolute',
-                    right: 0, top: 0, bottom: 0,
+                    right: 0, top: 0,
                     width: 8,
+                    height: '100%',      // confined to the wrapper div, NOT the table
                     cursor: 'col-resize',
                     zIndex: 10,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                }}
-                onMouseEnter={e => {
-                    e.currentTarget.querySelector('.rz-line').style.opacity = '1';
-                }}
-                onMouseLeave={e => {
-                    e.currentTarget.querySelector('.rz-line').style.opacity = '0';
+                    userSelect: 'none',
                 }}
             >
-                <div className="rz-line" style={{
-                    width: 2, height: '60%',
-                    backgroundColor: '#fff',
+                <div style={{
+                    width: 2,
+                    height: '70%',
+                    backgroundColor: hovered ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.25)',
                     borderRadius: 2,
-                    opacity: 0,
-                    transition: 'opacity 0.15s',
+                    transition: 'background 0.15s',
                     pointerEvents: 'none',
                 }} />
             </div>

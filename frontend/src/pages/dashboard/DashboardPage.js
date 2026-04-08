@@ -590,7 +590,7 @@ function DashboardPage() {
                                         <TableCell><strong>{item.item_code}</strong></TableCell>
                                         <TableCell>{item.item_name}</TableCell>
                                         <TableCell>{item.warehouse}</TableCell>
-                                        <TableCell sx={{ color: "white", fontWeight: "bold", position: "relative", overflow: "hidden", whiteSpace: "nowrap" }} style={{ width: widths[0] }}>{item.quantity}<Resizer index={0} /></TableCell>
+                                        <TableCell sx={{ color:"white",fontWeight:"bold",overflow:"hidden",whiteSpace:"nowrap",p:0 }} style={{ width: widths[0] }}><div style={{ position:"relative", padding:"6px 16px", height:"100%", display:"flex", alignItems:"center" }}>{item.quantity}<Resizer index={0} /></div></TableCell>
                                         <TableCell>{item.reorder_level}</TableCell>
                                         <TableCell>
                                             <Chip label="LOW" size="small" color="error" sx={{ fontSize: 10 }} />

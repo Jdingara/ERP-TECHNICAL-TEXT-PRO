@@ -169,8 +169,10 @@ function ItemListPage() {
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
                             {['Item Code','Item Name','Type','Category','Unit','Yarn Count','Min Stock','Actions'].map((label, i) => (
-                                <TableCell key={label} sx={{ color: 'white', fontWeight: 'bold', position: 'relative', overflow: 'hidden', whiteSpace: 'nowrap' }} style={{ width: widths[i] }}>
-                                    {label}<Resizer index={i} />
+                                <TableCell key={label} sx={{ color: 'white', fontWeight: 'bold', overflow: 'hidden', whiteSpace: 'nowrap', p: 0 }} style={{ width: widths[i] }}>
+                                    <div style={{ position: 'relative', padding: '6px 16px', height: '100%', display: 'flex', alignItems: 'center' }}>
+                                        {label}<Resizer index={i} />
+                                    </div>
                                 </TableCell>
                             ))}
                         </TableRow>
