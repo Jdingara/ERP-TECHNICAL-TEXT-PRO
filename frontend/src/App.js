@@ -71,6 +71,8 @@ import SettingsPage            from './pages/settings/SettingsPage';
 import AdminPage               from './pages/admin/AdminPage';
 import ProfilePage             from './pages/profile/ProfilePage';
 import ActivityLogPage         from './pages/audit/ActivityLogPage';
+import ReportMakerPage         from './pages/reports/ReportMakerPage';
+import ReportMakerListPage     from './pages/reports/ReportMakerListPage';
 
 function App() {
     const [currentUser,    setCurrentUser]    = useState(null);
@@ -238,11 +240,13 @@ function App() {
                                     <Route path="/medical-textile/shelf-life"         element={canSee('/medical-textile/shelf-life')         ? <ShelfLifeTrackingPage />   : <Navigate to="/dashboard" />} />
 
                                     {/* Reports */}
-                                    <Route path="/reports/production" element={canSee('/reports/production') ? <ProductionReportPage /> : <Navigate to="/dashboard" />} />
-                                    <Route path="/reports/inventory"  element={canSee('/reports/inventory')  ? <InventoryReportPage />  : <Navigate to="/dashboard" />} />
-                                    <Route path="/reports/sales"      element={canSee('/reports/sales')      ? <SalesReportPage />      : <Navigate to="/dashboard" />} />
-                                    <Route path="/reports/finance"    element={canSee('/reports/finance')    ? <FinanceReportPage />    : <Navigate to="/dashboard" />} />
-                                    <Route path="/reports/hr"         element={canSee('/reports/hr')         ? <HRReportPage />         : <Navigate to="/dashboard" />} />
+                                    <Route path="/reports/production"  element={canSee('/reports/production') ? <ProductionReportPage /> : <Navigate to="/dashboard" />} />
+                                    <Route path="/reports/inventory"   element={canSee('/reports/inventory')  ? <InventoryReportPage />  : <Navigate to="/dashboard" />} />
+                                    <Route path="/reports/sales"       element={canSee('/reports/sales')      ? <SalesReportPage />      : <Navigate to="/dashboard" />} />
+                                    <Route path="/reports/finance"     element={canSee('/reports/finance')    ? <FinanceReportPage />    : <Navigate to="/dashboard" />} />
+                                    <Route path="/reports/hr"          element={canSee('/reports/hr')         ? <HRReportPage />         : <Navigate to="/dashboard" />} />
+                                    <Route path="/reports/maker/list"  element={<ReportMakerListPage />} />
+                                    <Route path="/reports/maker"       element={<ReportMakerPage />} />
 
                                     <Route path="/settings/format-panel" element={canSee('/settings/format-panel') ? <FormatPanelPage /> : <Navigate to="/dashboard" />} />
 

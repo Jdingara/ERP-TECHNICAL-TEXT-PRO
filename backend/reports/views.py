@@ -5,11 +5,18 @@
 #          Reports: Production, Inventory, Sales, Finance, HR
 # ============================================================
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 from django.db.models import Sum, Count, Q, Avg
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
 import datetime
+import json
+import csv
+
+from .models import ReportTemplate
+from .registry import get_sources_meta, run_report
 
 from production.models import WorkOrder, Batch
 from inventory.models import Stock, StockMovement
@@ -375,7 +382,7 @@ def hr_report(request):
         ],
         'recent_salary': [
             {
-                'employee':     f"{s['employee__first_name']} {s['employee__last_name']}",
+                'employee':     f"{s['employee__first_name']} {s['employee__last_name']}".strip(),
                 'emp_code':     s['employee__employee_code'],
                 'period':       f"{s['month']}/{s['year']}",
                 'gross':        float(s['gross_earnings'] or 0),
@@ -384,3 +391,149 @@ def hr_report(request):
             } for s in recent_salary
         ],
     })
+
+
+# ============================================================
+# REPORT MAKER — Sources metadata
+# ============================================================
+
+@require_http_methods(["GET"])
+def maker_sources(request):
+    """Return all available sources with their fields and filter definitions."""
+    return JsonResponse({'sources': get_sources_meta()})
+
+
+# ============================================================
+# REPORT MAKER — Run ad-hoc report
+# ============================================================
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def maker_run(request):
+    """
+    POST body: { source_key, columns: [...], filters: {...} }
+    Returns: { rows: [...], columns: [...], total: N }
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'Not logged in.'}, status=401)
+    try:
+        data       = json.loads(request.body)
+        source_key = data['source_key']
+        columns    = data.get('columns', [])
+        filters    = data.get('filters', {})
+        rows       = run_report(source_key, columns, filters)
+        return JsonResponse({'rows': rows, 'columns': columns, 'total': len(rows)})
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=400)
+
+
+# ============================================================
+# REPORT MAKER — Templates (saved reports)
+# ============================================================
+
+def _template_to_dict(t):
+    return {
+        'id':           t.id,
+        'name':         t.name,
+        'description':  t.description,
+        'source_key':   t.source_key,
+        'columns':      t.columns,
+        'filters':      t.filters,
+        'is_published': t.is_published,
+        'created_by':   t.created_by.username if t.created_by else '',
+        'created_at':   t.created_at.strftime('%Y-%m-%d'),
+        'updated_at':   t.updated_at.strftime('%Y-%m-%d'),
+    }
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def template_list(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'Not logged in.'}, status=401)
+
+    if request.method == 'GET':
+        published_only = request.GET.get('published', '')
+        qs = ReportTemplate.objects.select_related('created_by').all()
+        if published_only:
+            qs = qs.filter(is_published=True)
+        return JsonResponse({'templates': [_template_to_dict(t) for t in qs]})
+
+    data = json.loads(request.body)
+    tmpl = ReportTemplate.objects.create(
+        name         = data['name'],
+        description  = data.get('description', ''),
+        source_key   = data['source_key'],
+        columns      = data.get('columns', []),
+        filters      = data.get('filters', {}),
+        is_published = data.get('is_published', False),
+        created_by   = request.user,
+    )
+    return JsonResponse({'message': 'Report saved.', 'template': _template_to_dict(tmpl)}, status=201)
+
+
+@csrf_exempt
+@require_http_methods(["GET", "PUT", "DELETE"])
+def template_detail(request, tmpl_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'Not logged in.'}, status=401)
+    try:
+        tmpl = ReportTemplate.objects.get(id=tmpl_id)
+    except ReportTemplate.DoesNotExist:
+        return JsonResponse({'message': 'Report not found.'}, status=404)
+
+    if request.method == 'GET':
+        return JsonResponse({'template': _template_to_dict(tmpl)})
+
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        tmpl.name         = data.get('name',         tmpl.name)
+        tmpl.description  = data.get('description',  tmpl.description)
+        tmpl.columns      = data.get('columns',      tmpl.columns)
+        tmpl.filters      = data.get('filters',      tmpl.filters)
+        tmpl.is_published = data.get('is_published', tmpl.is_published)
+        tmpl.save()
+        return JsonResponse({'message': 'Report updated.', 'template': _template_to_dict(tmpl)})
+
+    tmpl.delete()
+    return JsonResponse({'message': 'Report deleted.'})
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def template_run(request, tmpl_id):
+    """Run a saved template, optionally overriding filters."""
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'Not logged in.'}, status=401)
+    try:
+        tmpl = ReportTemplate.objects.get(id=tmpl_id)
+    except ReportTemplate.DoesNotExist:
+        return JsonResponse({'message': 'Report not found.'}, status=404)
+
+    data    = json.loads(request.body) if request.body else {}
+    filters = {**tmpl.filters, **data.get('filters', {})}  # saved filters + overrides
+    rows    = run_report(tmpl.source_key, tmpl.columns, filters)
+    return JsonResponse({'rows': rows, 'columns': tmpl.columns, 'total': len(rows)})
+
+
+@require_http_methods(["GET"])
+def template_export_csv(request, tmpl_id):
+    """Export a saved template as CSV file download."""
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'Not logged in.'}, status=401)
+    try:
+        tmpl = ReportTemplate.objects.get(id=tmpl_id)
+    except ReportTemplate.DoesNotExist:
+        return JsonResponse({'message': 'Report not found.'}, status=404)
+
+    rows = run_report(tmpl.source_key, tmpl.columns, tmpl.filters)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{tmpl.name}.csv"'
+
+    writer = csv.writer(response)
+    if rows:
+        writer.writerow(rows[0].keys())          # header row
+        for row in rows:
+            writer.writerow(row.values())
+    return response

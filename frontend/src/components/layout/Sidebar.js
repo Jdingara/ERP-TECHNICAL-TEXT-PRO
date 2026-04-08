@@ -106,6 +106,7 @@ const MENU_ITEMS = [
         { title: 'Sales Report',      path: '/reports/sales' },
         { title: 'Finance Report',    path: '/reports/finance' },
         { title: 'HR Report',         path: '/reports/hr' },
+        { title: 'Report Maker',      path: '/reports/maker/list' },
     ]},
     { title: 'Settings', icon: <TuneIcon />, children: [
         { title: 'Format Panel',      path: '/settings/format-panel' },
