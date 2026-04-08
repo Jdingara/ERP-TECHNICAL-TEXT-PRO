@@ -144,8 +144,16 @@ function CustomerListPage() {
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
                     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1 }}>
-                        <TextField label="Customer Code *" value={formData.customer_code}
-                            onChange={(e) => handleChange('customer_code', e.target.value)} disabled={!!editingId} />
+                        <TextField
+                            label="Customer Code"
+                            value={editingId ? formData.customer_code : 'Auto-generated'}
+                            disabled
+                            helperText={editingId ? 'Read only — assigned on creation' : 'Auto-assigned when saved'}
+                            sx={{ '& .MuiInputBase-input.Mui-disabled': {
+                                WebkitTextFillColor: editingId ? '#1a1a1a' : '#888',
+                                fontStyle: editingId ? 'normal' : 'italic',
+                            }}}
+                        />
                         <TextField label="Customer Name *" value={formData.customer_name}
                             onChange={(e) => handleChange('customer_name', e.target.value)} />
                         <FormControl>

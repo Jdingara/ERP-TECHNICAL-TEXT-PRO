@@ -149,8 +149,16 @@ function SupplierListPage() {
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
                     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1 }}>
-                        <TextField label="Supplier Code *" value={formData.supplier_code}
-                            onChange={(e) => handleChange('supplier_code', e.target.value)} disabled={!!editingId} />
+                        <TextField
+                            label="Supplier Code"
+                            value={editingId ? formData.supplier_code : 'Auto-generated'}
+                            disabled
+                            helperText={editingId ? 'Read only — assigned on creation' : 'Auto-assigned when saved'}
+                            sx={{ '& .MuiInputBase-input.Mui-disabled': {
+                                WebkitTextFillColor: editingId ? '#1a1a1a' : '#888',
+                                fontStyle: editingId ? 'normal' : 'italic',
+                            }}}
+                        />
                         <TextField label="Supplier Name *" value={formData.supplier_name}
                             onChange={(e) => handleChange('supplier_name', e.target.value)} />
                         <FormControl>

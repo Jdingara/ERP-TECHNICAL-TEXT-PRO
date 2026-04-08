@@ -216,9 +216,16 @@ function ItemListPage() {
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
                     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 1 }}>
-                        <TextField label="Item Code *" value={formData.item_code}
-                            onChange={(e) => handleChange('item_code', e.target.value)}
-                            disabled={!!editingId} />
+                        <TextField
+                            label="Item Code"
+                            value={editingId ? formData.item_code : 'Auto-generated'}
+                            disabled
+                            helperText={editingId ? 'Read only — assigned on creation' : 'Auto-assigned when saved'}
+                            sx={{ '& .MuiInputBase-input.Mui-disabled': {
+                                WebkitTextFillColor: editingId ? '#1a1a1a' : '#888',
+                                fontStyle: editingId ? 'normal' : 'italic',
+                            }}}
+                        />
                         <TextField label="Item Name *" value={formData.item_name}
                             onChange={(e) => handleChange('item_name', e.target.value)} />
 

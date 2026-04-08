@@ -141,7 +141,16 @@ function EmployeeListPage() {
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
                     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, mt: 1 }}>
-                        <TextField label="Employee Code *" value={formData.employee_code} onChange={(e) => handleChange('employee_code', e.target.value)} disabled={!!editingId} />
+                        <TextField
+                            label="Employee Code"
+                            value={editingId ? formData.employee_code : 'Auto-generated'}
+                            disabled
+                            helperText={editingId ? 'Read only — assigned on creation' : 'Auto-assigned when saved'}
+                            sx={{ '& .MuiInputBase-input.Mui-disabled': {
+                                WebkitTextFillColor: editingId ? '#1a1a1a' : '#888',
+                                fontStyle: editingId ? 'normal' : 'italic',
+                            }}}
+                        />
                         <TextField label="First Name *" value={formData.first_name} onChange={(e) => handleChange('first_name', e.target.value)} />
                         <TextField label="Last Name" value={formData.last_name} onChange={(e) => handleChange('last_name', e.target.value)} />
 

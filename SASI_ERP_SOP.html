@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SASI ERP — Standard Operating Procedure</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1a1a2e; }
+
+/* ── COVER PAGE ── */
+.cover {
+  background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #1565c0 100%);
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  padding: 40px; page-break-after: always;
+}
+.cover-logo {
+  width: 100px; height: 100px; border-radius: 20px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 24px; box-shadow: 0 8px 32px rgba(99,102,241,0.5);
+}
+.cover-logo span { font-size: 48px; font-weight: 900; color: white; }
+.cover h1 { font-size: 52px; color: white; font-weight: 900; letter-spacing: 3px; margin-bottom: 8px; }
+.cover h2 { font-size: 22px; color: rgba(255,255,255,0.75); font-weight: 400; margin-bottom: 40px; }
+.cover-divider { width: 80px; height: 4px; background: #6366f1; border-radius: 2px; margin: 0 auto 40px; }
+.cover-badge {
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50px; padding: 10px 28px; color: white; font-size: 14px;
+  margin: 8px; display: inline-block;
+}
+.cover-footer { position: absolute; bottom: 30px; color: rgba(255,255,255,0.5); font-size: 13px; }
+.cover-version { color: rgba(255,255,255,0.6); font-size: 15px; margin-top: 32px; }
+
+/* ── LAYOUT ── */
+.page { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+.section { background: white; border-radius: 16px; padding: 36px; margin-bottom: 32px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
+
+/* ── TOC ── */
+.toc { background: white; border-radius: 16px; padding: 36px; margin-bottom: 32px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
+.toc h2 { font-size: 24px; color: #1a237e; margin-bottom: 20px; border-bottom: 3px solid #6366f1; padding-bottom: 12px; }
+.toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.toc-item {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  border-radius: 10px; border: 1px solid #e8eaf6; cursor: pointer;
+  transition: all 0.2s; text-decoration: none; color: inherit;
+}
+.toc-item:hover { background: #f0f4ff; border-color: #6366f1; }
+.toc-num { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; color: white; flex-shrink: 0; }
+.toc-item span { font-size: 14px; font-weight: 500; }
+
+/* ── SECTION HEADERS ── */
+.sec-header { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 2px solid #f0f4f8; }
+.sec-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+.sec-title { font-size: 26px; font-weight: 800; }
+.sec-sub { font-size: 14px; color: #666; margin-top: 3px; }
+
+/* ── FLOW DIAGRAM ── */
+.flow { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 0; margin: 24px 0; }
+.flow-step {
+  display: flex; flex-direction: column; align-items: center; position: relative;
+}
+.flow-box {
+  width: 130px; min-height: 80px; border-radius: 12px; padding: 12px 10px;
+  text-align: center; font-size: 12px; font-weight: 600; color: white;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: default; line-height: 1.4;
+}
+.flow-box .step-num {
+  width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.3);
+  font-size: 11px; display: flex; align-items: center; justify-content: center;
+  margin-bottom: 6px; font-weight: 700;
+}
+.flow-box .step-page { font-size: 9px; opacity: 0.8; margin-top: 4px; }
+.flow-arrow {
+  display: flex; align-items: center; padding: 0 4px; margin-top: 28px;
+  color: #999; font-size: 22px;
+}
+.flow-down { display: flex; flex-direction: column; align-items: center; padding: 4px 0; color: #999; font-size: 20px; }
+
+/* ── STEP CARDS ── */
+.steps { display: grid; gap: 16px; margin-top: 20px; }
+.step-card {
+  display: flex; gap: 16px; padding: 20px; border-radius: 12px;
+  border: 1px solid #e8eaf6; background: #fafbff; align-items: flex-start;
+}
+.step-card:hover { border-color: #c5cae9; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.step-badge {
+  width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center;
+  justify-content: center; font-weight: 800; font-size: 15px; color: white; flex-shrink: 0;
+}
+.step-body h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.step-body p { font-size: 13px; color: #555; line-height: 1.6; }
+.step-body .nav {
+  display: inline-block; margin-top: 8px; padding: 4px 12px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; background: #e8eaf6; color: #1a237e;
+}
+.step-body .fields {
+  margin-top: 10px; padding: 10px 14px; background: white; border-radius: 8px;
+  border: 1px solid #e0e3ff; font-size: 12px; color: #444;
+}
+.step-body .fields strong { color: #1a237e; display: block; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+.step-body .fields ul { padding-left: 16px; }
+.step-body .fields ul li { margin-bottom: 3px; }
+.step-body .result {
+  margin-top: 8px; padding: 6px 12px; border-radius: 6px; font-size: 12px;
+  background: #e8f5e9; color: #2e7d32; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.step-body .warning {
+  margin-top: 8px; padding: 6px 12px; border-radius: 6px; font-size: 12px;
+  background: #fff3e0; color: #e65100; font-weight: 600;
+}
+
+/* ── SCREEN MOCKUP ── */
+.mockup {
+  border: 2px solid #e0e3ff; border-radius: 12px; overflow: hidden;
+  margin: 20px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+.mockup-bar {
+  background: #1a237e; padding: 10px 16px; display: flex; align-items: center; gap: 8px;
+}
+.mockup-bar .dot { width: 10px; height: 10px; border-radius: 50%; }
+.mockup-bar .url { flex: 1; background: rgba(255,255,255,0.15); border-radius: 4px; padding: 4px 12px; color: rgba(255,255,255,0.8); font-size: 11px; margin-left: 10px; }
+.mockup-body { background: #f8f9ff; padding: 20px; }
+.mockup-header { background: white; border-radius: 8px; padding: 14px 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e0e3ff; }
+.mockup-header h3 { font-size: 16px; color: #1a237e; font-weight: 700; }
+.mockup-btn { padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; color: white; border: none; }
+.mockup-table { background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e0e3ff; }
+.mockup-th { background: #1a237e; color: white; font-size: 11px; padding: 8px 12px; font-weight: 600; display: grid; }
+.mockup-tr { font-size: 11px; padding: 9px 12px; border-bottom: 1px solid #f0f0f0; display: grid; color: #333; }
+.mockup-tr:nth-child(even) { background: #f8f9ff; }
+.chip { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; }
+.chip-green { background: #e8f5e9; color: #2e7d32; }
+.chip-orange { background: #fff3e0; color: #e65100; }
+.chip-blue { background: #e3f2fd; color: #1565c0; }
+.chip-red { background: #ffebee; color: #c62828; }
+.chip-grey { background: #f5f5f5; color: #555; }
+
+/* ── INTEGRATION BOX ── */
+.integration {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e8eaf6 100%);
+  border: 1px solid #ce93d8; border-radius: 12px; padding: 20px; margin: 20px 0;
+}
+.integration h4 { color: #6a1b9a; font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+.integration p { font-size: 13px; color: #444; line-height: 1.6; }
+
+/* ── ROLE TABLE ── */
+.role-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+.role-table th { background: #1a237e; color: white; padding: 10px 14px; text-align: left; }
+.role-table td { padding: 10px 14px; border-bottom: 1px solid #e8eaf6; }
+.role-table tr:nth-child(even) td { background: #f8f9ff; }
+.tick { color: #2e7d32; font-weight: bold; }
+.cross { color: #c62828; }
+
+/* ── COLORS ── */
+.c-sales    { background: #e65100; }
+.c-purchase { background: #2e7d32; }
+.c-prod     { background: #6a1b9a; }
+.c-tech     { background: #00695c; }
+.c-med      { background: #c2185b; }
+.c-fin      { background: #c62828; }
+.c-hr       { background: #00838f; }
+.c-inv      { background: #1565c0; }
+.c-dash     { background: #6366f1; }
+
+.bg-sales    { background: #fff3e0; border-color: #ffb74d; }
+.bg-purchase { background: #e8f5e9; border-color: #81c784; }
+.bg-prod     { background: #f3e5f5; border-color: #ce93d8; }
+.bg-tech     { background: #e0f2f1; border-color: #80cbc4; }
+.bg-med      { background: #fce4ec; border-color: #f48fb1; }
+.bg-fin      { background: #ffebee; border-color: #ef9a9a; }
+
+/* ── PRINT ── */
+@media print {
+  body { background: white; }
+  .section, .toc { box-shadow: none; border: 1px solid #e0e0e0; }
+  .cover { min-height: auto; padding: 60px 40px; }
+}
+
+/* ── PAGE BREAK ── */
+.pb { page-break-before: always; }
+
+/* ── TIPS ── */
+.tip { background: #e3f2fd; border-left: 4px solid #1565c0; border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 12px 0; font-size: 13px; color: #1a237e; }
+.tip strong { display: block; margin-bottom: 4px; }
+.warn-box { background: #fff3e0; border-left: 4px solid #e65100; border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 12px 0; font-size: 13px; color: #bf360c; }
+
+/* ── BIG FLOW ── */
+.big-flow { display: flex; flex-direction: column; gap: 0; align-items: center; margin: 24px 0; }
+.big-flow-row { display: flex; align-items: center; gap: 0; flex-wrap: wrap; justify-content: center; }
+.big-box {
+  min-width: 140px; padding: 14px 18px; border-radius: 12px; text-align: center;
+  color: white; font-weight: 700; font-size: 13px; margin: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2); line-height: 1.4;
+}
+.big-box .bb-icon { font-size: 22px; margin-bottom: 6px; display: block; }
+.big-box .bb-page { font-size: 10px; opacity: 0.8; margin-top: 4px; display: block; }
+.arrow-right { font-size: 28px; color: #bbb; margin: 0 4px; }
+.arrow-down { font-size: 28px; color: #bbb; text-align: center; margin: 2px 0; }
+.branch { display: flex; gap: 16px; justify-content: center; align-items: flex-start; margin: 6px 0; }
+.branch-label { font-size: 11px; font-weight: 700; text-align: center; padding: 4px 10px; border-radius: 12px; margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     COVER PAGE
+══════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-logo"><span>S</span></div>
+  <h1>SASI ERP</h1>
+  <h2>Standard Operating Procedure</h2>
+  <div class="cover-divider"></div>
+  <div>
+    <span class="cover-badge">🏭 Medical Textile</span>
+    <span class="cover-badge">🧵 Technical Textile</span>
+    <span class="cover-badge">📦 Production</span>
+    <span class="cover-badge">💰 Finance</span>
+  </div>
+  <p class="cover-version">Version 1.0 &nbsp;|&nbsp; April 2026 &nbsp;|&nbsp; sasi-erp.onrender.com</p>
+  <div class="cover-footer">Confidential — For Internal Use Only</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TABLE OF CONTENTS
+══════════════════════════════════════════ -->
+<div class="page">
+<div class="toc">
+  <h2>📋 Table of Contents</h2>
+  <div class="toc-grid">
+    <a class="toc-item" href="#overview"><div class="toc-num c-dash">1</div><span>Complete Workflow Overview</span></a>
+    <a class="toc-item" href="#sales"><div class="toc-num c-sales">2</div><span>Sales Flow — Inquiry to Invoice</span></a>
+    <a class="toc-item" href="#purchase"><div class="toc-num c-purchase">3</div><span>Purchase Flow — PO to Stock</span></a>
+    <a class="toc-item" href="#production"><div class="toc-num c-prod">4</div><span>Production Flow — Work Order to Delivery</span></a>
+    <a class="toc-item" href="#technical"><div class="toc-num c-tech">5</div><span>Technical Textile Integration</span></a>
+    <a class="toc-item" href="#medical"><div class="toc-num c-med">6</div><span>Medical Textile Integration</span></a>
+    <a class="toc-item" href="#finance"><div class="toc-num c-fin">7</div><span>Finance & Accounting Flow</span></a>
+    <a class="toc-item" href="#hr"><div class="toc-num c-hr">8</div><span>HR & Payroll Flow</span></a>
+    <a class="toc-item" href="#dashboard"><div class="toc-num c-dash">9</div><span>Dashboard & Reports</span></a>
+    <a class="toc-item" href="#roles"><div class="toc-num" style="background:#555">10</div><span>User Roles & Permissions</span></a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 1 — OVERVIEW
+══════════════════════════════════════════ -->
+<div class="section" id="overview">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#e8eaf6">🗺️</div>
+    <div>
+      <div class="sec-title" style="color:#1a237e">Complete Workflow Overview</div>
+      <div class="sec-sub">End-to-end ERP flow — from customer inquiry to payment received</div>
+    </div>
+  </div>
+
+  <!-- BIG FLOW DIAGRAM -->
+  <div class="big-flow">
+
+    <!-- Row 1: Sales Entry -->
+    <div class="big-flow-row">
+      <div class="big-box c-sales">
+        <span class="bb-icon">📩</span>
+        Customer Inquiry
+        <span class="bb-page">Sales → Inquiries</span>
+      </div>
+      <div class="arrow-right">→</div>
+      <div class="big-box c-sales">
+        <span class="bb-icon">📄</span>
+        Quotation
+        <span class="bb-page">Sales → Quotations</span>
+      </div>
+      <div class="arrow-right">→</div>
+      <div class="big-box c-sales">
+        <span class="bb-icon">🛒</span>
+        Sales Order
+        <span class="bb-page">Sales → Sales Orders</span>
+      </div>
+    </div>
+
+    <div class="arrow-down">↓</div>
+
+    <!-- Row 2: Purchase + Production -->
+    <div class="big-flow-row">
+      <div class="big-box c-purchase">
+        <span class="bb-icon">📦</span>
+        Purchase Order
+        <span class="bb-page">Purchasing → POs</span>
+      </div>
+      <div class="arrow-right">→</div>
+      <div class="big-box c-purchase">
+        <span class="bb-icon">🏪</span>
+        Goods Receipt
+        <span class="bb-page">Purchasing → GRN</span>
+      </div>
+      <div class="arrow-right">→</div>
+      <div class="big-box c-inv">
+        <span class="bb-icon">📊</span>
+        Stock Updated
+        <span class="bb-page">Inventory → Stock</span>
+      </div>
+      <div class="arrow-right">→</div>
+      <div class="big-box c-prod">
+        <span class="bb-icon">⚙️</span>
+        Work Order
+        <span class="bb-page">Production → WOs</span>
+      </div>
+    </div>
+
+    <div class="arrow-down">↓</div>
+
+    <!-- Row 3: Technical OR Medical -->
+    <div style="text-align:center; font-size:13px; color:#666; margin:4px 0;">
+      <strong>Based on product type:</strong>
+    </div>
+    <div class="branch">
+      <div style="text-align:center">
+        <div class="branch-label" style="background:#e0f2f1; color:#00695c">Technical Textile Order</div>
+        <div class="big-box c-tech">
+          <span class="bb-icon">🔬</span>
+          Specs + Testing Lab
+          <span class="bb-page">Technical Textile</span>
+        </div>
+      </div>
+      <div style="text-align:center; padding-top:32px; color:#999; font-size:20px; font-weight:bold">OR</div>
+      <div style="text-align:center">
+        <div class="branch-label" style="background:#fce4ec; color:#c2185b">Medical Textile Order</div>
+        <div class="big-box c-med">
+          <span class="bb-icon">🏥</span>
+          Sterility + Compliance
+          <span class="bb-page">Medical Textile</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">↓</div>
+
+    <!-- Row 4: Quality → Delivery → Invoice -->
+    <div class="big-flow-row">
+      <div class="big-box c-prod">
+        <span class="bb-icon">✅</span>
+        Quality Check
+        <span class="bb-page">Production → QC</span>
+      </div>
+      <div class="arrow-right">→</div>
+      <div class="big-box c-sales">
+        <span class="bb-icon">🚚</span>
+        Delivery
+        <span class="bb-page">Sales Orders → Deliver</span>
+      </div>
+      <div class="arrow-right">→</div>
+      <div class="big-box c-fin">
+        <span class="bb-icon">🧾</span>
+        Invoice
+        <span class="bb-page">Sales → Invoices</span>
+      </div>
+      <div class="arrow-right">→</div>
+      <div class="big-box" style="background:#1b5e20">
+        <span class="bb-icon">💰</span>
+        Payment Received
+        <span class="bb-page">Invoices → Mark Paid</span>
+      </div>
+    </div>
+
+    <div class="arrow-down">↓</div>
+
+    <!-- Row 5: Finance -->
+    <div class="big-flow-row">
+      <div class="big-box c-fin">
+        <span class="bb-icon">📒</span>
+        Journal Entry
+        <span class="bb-page">Finance → Journal</span>
+      </div>
+      <div class="arrow-right">→</div>
+      <div class="big-box c-fin">
+        <span class="bb-icon">⚖️</span>
+        Trial Balance
+        <span class="bb-page">Finance → Trial Balance</span>
+      </div>
+      <div class="arrow-right">→</div>
+      <div class="big-box c-dash">
+        <span class="bb-icon">📈</span>
+        Dashboard P&L
+        <span class="bb-page">Dashboard</span>
+      </div>
+    </div>
+
+  </div><!-- /big-flow -->
+
+  <div class="tip">
+    <strong>💡 Key Principle</strong>
+    Every business transaction flows through this path. The ERP connects all departments — Sales triggers Production, Production needs Stock (Purchase), Quality gates Delivery, Delivery creates Invoice, Invoice feeds Finance.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 2 — SALES FLOW
+══════════════════════════════════════════ -->
+<div class="section pb" id="sales">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#fff3e0">🛒</div>
+    <div>
+      <div class="sec-title" style="color:#e65100">Sales Flow</div>
+      <div class="sec-sub">From customer inquiry to invoice — 6 steps</div>
+    </div>
+  </div>
+
+  <!-- Flow bar -->
+  <div class="flow" style="margin-bottom:28px">
+    <div class="flow-step"><div class="flow-box c-sales"><div class="step-num">1</div>Inquiry<div class="step-page">Sales → Inquiries</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-sales"><div class="step-num">2</div>Quotation<div class="step-page">Sales → Quotations</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-sales"><div class="step-num">3</div>Sales Order<div class="step-page">Sales → Orders</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-sales"><div class="step-num">4</div>Deliver<div class="step-page">SO → Deliver</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-fin"><div class="step-num">5</div>Invoice<div class="step-page">Sales → Invoices</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box" style="background:#1b5e20"><div class="step-num">6</div>Mark Paid<div class="step-page">Invoices → Pay</div></div></div>
+  </div>
+
+  <div class="steps">
+
+    <!-- Step 1 -->
+    <div class="step-card">
+      <div class="step-badge c-sales">1</div>
+      <div class="step-body">
+        <h4>Customer Inquiry</h4>
+        <p>When a customer contacts you asking for a product, record their inquiry here.</p>
+        <span class="nav">📍 Sales → Inquiries → + New Inquiry</span>
+        <div class="fields">
+          <strong>Fields to fill:</strong>
+          <ul>
+            <li>Customer name</li>
+            <li>Product description (e.g. Geotextile 200 GSM)</li>
+            <li>End use (Medical / Geotextile / Agrotextile / etc.)</li>
+            <li>GSM required, Width, Quantity</li>
+            <li>Target price, Required by date</li>
+          </ul>
+        </div>
+        <div class="result">✅ System auto-generates Inquiry Number (INQ-YYYYMMDD-001)</div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-card">
+      <div class="step-badge c-sales">2</div>
+      <div class="step-body">
+        <h4>Quotation</h4>
+        <p>Based on the inquiry, prepare a formal price quotation for the customer.</p>
+        <span class="nav">📍 Sales → Quotations → + New Quotation</span>
+        <div class="fields">
+          <strong>Fields to fill:</strong>
+          <ul>
+            <li>Link to Inquiry (select from dropdown)</li>
+            <li>Unit price, Quantity</li>
+            <li>Valid until date, Lead time (days)</li>
+            <li>Payment terms, Delivery terms</li>
+            <li>Technical specs / notes</li>
+          </ul>
+        </div>
+        <div class="result">✅ System auto-generates Quotation Number (QT-YYYYMMDD-001)</div>
+        <div class="warning">⚠️ Once status = "Sent" — price cannot be changed</div>
+        <p style="margin-top:8px; font-size:12px; color:#666">Use Print button to send PDF quotation to customer</p>
+      </div>
+    </div>
+
+    <!-- Mockup: Quotation Screen -->
+    <div class="mockup">
+      <div class="mockup-bar">
+        <div class="dot" style="background:#ef5350"></div>
+        <div class="dot" style="background:#ffa726"></div>
+        <div class="dot" style="background:#66bb6a"></div>
+        <div class="url">sasi-erp.onrender.com/sales/quotations</div>
+      </div>
+      <div class="mockup-body">
+        <div class="mockup-header">
+          <h3>📄 Quotations</h3>
+          <button class="mockup-btn" style="background:#e65100">+ New Quotation</button>
+        </div>
+        <div class="mockup-table">
+          <div class="mockup-th" style="grid-template-columns:1fr 1.2fr 1fr 0.8fr 1fr 0.8fr">
+            <span>QT Number</span><span>Customer</span><span>Product</span><span>Amount</span><span>Valid Until</span><span>Status</span>
+          </div>
+          <div class="mockup-tr" style="grid-template-columns:1fr 1.2fr 1fr 0.8fr 1fr 0.8fr">
+            <span>QT-20260405-001</span><span>ABC Textiles</span><span>Geo 200 GSM</span><span>₹45,000</span><span>30 Apr 2026</span><span><div class="chip chip-blue">SENT</div></span>
+          </div>
+          <div class="mockup-tr" style="grid-template-columns:1fr 1.2fr 1fr 0.8fr 1fr 0.8fr">
+            <span>QT-20260404-001</span><span>MedCare Ltd</span><span>Non-woven</span><span>₹1,20,000</span><span>25 Apr 2026</span><span><div class="chip chip-green">ACCEPTED</div></span>
+          </div>
+          <div class="mockup-tr" style="grid-template-columns:1fr 1.2fr 1fr 0.8fr 1fr 0.8fr">
+            <span>QT-20260403-001</span><span>Infra Corp</span><span>HDPE Woven</span><span>₹87,500</span><span>20 Apr 2026</span><span><div class="chip chip-grey">DRAFT</div></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-card">
+      <div class="step-badge c-sales">3</div>
+      <div class="step-body">
+        <h4>Sales Order</h4>
+        <p>When customer confirms the quotation, create a Sales Order to officially start the order.</p>
+        <span class="nav">📍 Sales → Create Sales Order</span>
+        <div class="fields">
+          <strong>Fields to fill:</strong>
+          <ul>
+            <li>Customer, Warehouse</li>
+            <li>Order date, Expected delivery date</li>
+            <li>Items + Quantity + Unit price</li>
+          </ul>
+        </div>
+        <div class="result">✅ System auto-generates SO Number (SO-YYYYMMDD-001)</div>
+        <div class="warning">⚠️ Once "Confirmed" — SO is locked for editing</div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step-card">
+      <div class="step-badge c-sales">4</div>
+      <div class="step-body">
+        <h4>Delivery</h4>
+        <p>After production is complete and quality passed, confirm delivery to customer.</p>
+        <span class="nav">📍 Sales → Sales Orders → Click "Deliver" button on the SO</span>
+        <div class="result">✅ Stock automatically reduced from warehouse</div>
+        <div class="result">✅ Stock Movement record created automatically</div>
+        <div class="result">✅ SO status changes to "Delivered"</div>
+        <p style="margin-top:8px; font-size:12px; color:#666">Use Print → Delivery Challan button to print the delivery document</p>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step-card">
+      <div class="step-badge c-fin">5</div>
+      <div class="step-body">
+        <h4>Sales Invoice (AR)</h4>
+        <p>After delivery, create an invoice to bill the customer.</p>
+        <span class="nav">📍 Sales → Invoices (AR) → + Create Invoice</span>
+        <div class="fields">
+          <strong>Fields to fill:</strong>
+          <ul>
+            <li>Select the delivered Sales Order</li>
+            <li>Invoice date</li>
+            <li>Due date (payment deadline)</li>
+            <li>Tax amount (GST)</li>
+          </ul>
+        </div>
+        <div class="result">✅ Invoice auto-calculates total from SO amount + tax</div>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="step-card">
+      <div class="step-badge" style="background:#1b5e20">6</div>
+      <div class="step-body">
+        <h4>Mark Invoice as Paid</h4>
+        <p>When customer pays, mark the invoice as paid to close the AR cycle.</p>
+        <span class="nav">📍 Sales → Invoices → Click 💰 Pay button on the invoice</span>
+        <div class="result">✅ Invoice status → PAID</div>
+        <div class="result">✅ Balance due → ₹0</div>
+        <div class="result">✅ Dashboard Outstanding AR reduces</div>
+      </div>
+    </div>
+
+  </div><!-- /steps -->
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 3 — PURCHASE FLOW
+══════════════════════════════════════════ -->
+<div class="section pb" id="purchase">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#e8f5e9">📦</div>
+    <div>
+      <div class="sec-title" style="color:#2e7d32">Purchase Flow</div>
+      <div class="sec-sub">From purchase order to stock in warehouse — 3 steps</div>
+    </div>
+  </div>
+
+  <div class="flow" style="margin-bottom:28px">
+    <div class="flow-step"><div class="flow-box c-purchase"><div class="step-num">1</div>Purchase Order<div class="step-page">Purchasing → POs</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-purchase"><div class="step-num">2</div>Goods Receipt<div class="step-page">Purchasing → GRN</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-inv"><div class="step-num">3</div>Stock Updated<div class="step-page">Inventory → Stock</div></div></div>
+  </div>
+
+  <div class="steps">
+
+    <div class="step-card">
+      <div class="step-badge c-purchase">1</div>
+      <div class="step-body">
+        <h4>Purchase Order (PO)</h4>
+        <p>When you need to buy raw materials or items from a supplier, raise a PO.</p>
+        <span class="nav">📍 Purchasing → Create Purchase Order</span>
+        <div class="fields">
+          <strong>Fields to fill:</strong>
+          <ul>
+            <li>Supplier, Warehouse (where goods will be received)</li>
+            <li>Order date, Expected delivery date</li>
+            <li>Items + Quantity + Unit price</li>
+          </ul>
+        </div>
+        <div class="result">✅ PO Number auto-generated (PO-YYYYMMDD-001)</div>
+        <p style="margin-top:8px; font-size:12px; color:#666">Print PO to send to supplier</p>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-purchase">2</div>
+      <div class="step-body">
+        <h4>Goods Receipt Note (GRN)</h4>
+        <p>When goods arrive from supplier, record the receipt against the PO.</p>
+        <span class="nav">📍 Purchasing → Goods Receipt (GRN) → + New GRN</span>
+        <div class="fields">
+          <strong>Fields to fill:</strong>
+          <ul>
+            <li>Select Purchase Order</li>
+            <li>Receipt date</li>
+            <li>Received quantities per item</li>
+            <li>Notes (if any damage or shortage)</li>
+          </ul>
+        </div>
+        <div class="result">✅ Stock automatically added to warehouse</div>
+        <div class="result">✅ Stock Movement record created</div>
+        <div class="result">✅ PO status updates to Partial or Received</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-inv">3</div>
+      <div class="step-body">
+        <h4>Verify Stock</h4>
+        <p>After GRN, verify the stock has been correctly updated.</p>
+        <span class="nav">📍 Inventory → Stock List</span>
+        <div class="fields">
+          <strong>What to check:</strong>
+          <ul>
+            <li>Item quantity increased correctly</li>
+            <li>Correct warehouse received the stock</li>
+            <li>Stock Movement shows the GRN entry</li>
+          </ul>
+        </div>
+        <div class="result">✅ Stock is now available for production Work Orders</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 4 — PRODUCTION FLOW
+══════════════════════════════════════════ -->
+<div class="section pb" id="production">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#f3e5f5">⚙️</div>
+    <div>
+      <div class="sec-title" style="color:#6a1b9a">Production Flow</div>
+      <div class="sec-sub">From work order to finished goods — 5 steps</div>
+    </div>
+  </div>
+
+  <div class="flow" style="margin-bottom:28px; flex-wrap:wrap;">
+    <div class="flow-step"><div class="flow-box c-prod"><div class="step-num">1</div>Bill of Materials<div class="step-page">Production → BOM</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-prod"><div class="step-num">2</div>Work Order<div class="step-page">Production → WOs</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-prod"><div class="step-num">3</div>Batch Created<div class="step-page">Production → Batches</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-prod"><div class="step-num">4</div>Quality Check<div class="step-page">Production → QC</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-inv"><div class="step-num">5</div>Finished Stock<div class="step-page">Inventory</div></div></div>
+  </div>
+
+  <div class="steps">
+
+    <div class="step-card">
+      <div class="step-badge c-prod">1</div>
+      <div class="step-body">
+        <h4>Bill of Materials (BOM)</h4>
+        <p>Define what raw materials are needed to make each finished product. Do this once per product.</p>
+        <span class="nav">📍 Production → Bill of Materials → + New BOM</span>
+        <div class="fields">
+          <strong>Fields to fill:</strong>
+          <ul>
+            <li>Finished product (output item)</li>
+            <li>Output quantity</li>
+            <li>Raw materials list + quantities needed</li>
+          </ul>
+        </div>
+        <div class="result">✅ BOM is reused for every work order of this product</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-prod">2</div>
+      <div class="step-body">
+        <h4>Work Order</h4>
+        <p>Create a work order to start production for a Sales Order.</p>
+        <span class="nav">📍 Production → Create Work Order</span>
+        <div class="fields">
+          <strong>Fields to fill:</strong>
+          <ul>
+            <li>Select BOM (Bill of Materials)</li>
+            <li>Link to Sales Order (reference)</li>
+            <li>Planned quantity</li>
+            <li>Assign machine</li>
+            <li>Planned start and end date</li>
+          </ul>
+        </div>
+        <div class="result">✅ WO Number auto-generated (WO-YYYYMMDD-001)</div>
+        <div class="warning">⚠️ Confirm the WO to lock and start production</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-prod">3</div>
+      <div class="step-body">
+        <h4>Batch Tracking</h4>
+        <p>Record each production batch for traceability (especially important for medical textile).</p>
+        <span class="nav">📍 Production → Batch List → + New Batch</span>
+        <div class="fields">
+          <strong>Fields to fill:</strong>
+          <ul>
+            <li>Work Order reference</li>
+            <li>Batch number</li>
+            <li>Production date</li>
+            <li>Quantity produced</li>
+          </ul>
+        </div>
+        <div class="result">✅ Every batch is traceable from raw material to delivery</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-prod">4</div>
+      <div class="step-body">
+        <h4>Quality Check</h4>
+        <p>Inspect the produced goods before allowing delivery to customer.</p>
+        <span class="nav">📍 Production → Quality Checks → + New QC</span>
+        <div class="fields">
+          <strong>Fields to fill:</strong>
+          <ul>
+            <li>Work Order / Batch reference</li>
+            <li>Inspector name</li>
+            <li>Check parameters (GSM, width, tensile strength)</li>
+            <li>Result: PASS or FAIL</li>
+            <li>Notes / defects found</li>
+          </ul>
+        </div>
+        <div class="result">✅ PASS → proceed to delivery</div>
+        <div class="warning">⚠️ FAIL → rework or reject batch</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 5 — TECHNICAL TEXTILE
+══════════════════════════════════════════ -->
+<div class="section pb" id="technical">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#e0f2f1">🔬</div>
+    <div>
+      <div class="sec-title" style="color:#00695c">Technical Textile Integration</div>
+      <div class="sec-sub">For Geotextile, Agrotextile, Industrial textile orders</div>
+    </div>
+  </div>
+
+  <div class="integration">
+    <h4>🔗 When does Technical Textile connect?</h4>
+    <p>After Work Order is created → Before Quality Check and Delivery → Technical specs must be defined and testing lab results recorded for all technical textile products.</p>
+  </div>
+
+  <div class="steps">
+
+    <div class="step-card">
+      <div class="step-badge c-tech">1</div>
+      <div class="step-body">
+        <h4>Product Categories</h4>
+        <p>Define your textile product categories (Geotextile, Agrotextile, HDPE, PP, etc.)</p>
+        <span class="nav">📍 Technical Textile → Product Categories</span>
+        <div class="result">✅ One-time setup — reused for all orders</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-tech">2</div>
+      <div class="step-body">
+        <h4>Performance Specifications</h4>
+        <p>Define technical specs for each product: GSM range, tensile strength, elongation, CBR, UV resistance, etc.</p>
+        <span class="nav">📍 Technical Textile → Performance Specs</span>
+        <div class="fields">
+          <strong>Key specs for textile:</strong>
+          <ul>
+            <li>GSM (grams per square meter)</li>
+            <li>Width (cm)</li>
+            <li>Tensile strength (kN/m)</li>
+            <li>Elongation at break (%)</li>
+            <li>Coating type</li>
+            <li>Color / finish</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-tech">3</div>
+      <div class="step-body">
+        <h4>Sample Management</h4>
+        <p>When customer requests samples before placing full order, manage here.</p>
+        <span class="nav">📍 Technical Textile → Sample Management</span>
+        <div class="fields">
+          <strong>Sample workflow:</strong>
+          <ul>
+            <li>Prepare sample → status: Prepared</li>
+            <li>Send to customer → status: Sent</li>
+            <li>Customer approves → status: Approved</li>
+            <li>Then convert to full Sales Order</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-tech">4</div>
+      <div class="step-body">
+        <h4>Technical Data Sheet (TDS)</h4>
+        <p>Generate and maintain technical data sheets for each product — sent to customers with orders.</p>
+        <span class="nav">📍 Technical Textile → Technical Data Sheet</span>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-tech">5</div>
+      <div class="step-body">
+        <h4>Testing Lab</h4>
+        <p>Record all lab test results for produced goods before delivery.</p>
+        <span class="nav">📍 Technical Textile → Testing Lab</span>
+        <div class="fields">
+          <strong>Tests to record:</strong>
+          <ul>
+            <li>GSM test result</li>
+            <li>Tensile test result</li>
+            <li>Elongation test</li>
+            <li>Water permeability</li>
+            <li>Pass/Fail status</li>
+            <li>Test date, Lab technician</li>
+          </ul>
+        </div>
+        <div class="result">✅ Testing PASS → proceed to QC → then Delivery</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-tech">6</div>
+      <div class="step-body">
+        <h4>R&D Projects</h4>
+        <p>Track new product development or custom product R&D projects.</p>
+        <span class="nav">📍 Technical Textile → R&D Projects</span>
+        <div class="result">✅ Active R&D count shown on Dashboard</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 6 — MEDICAL TEXTILE
+══════════════════════════════════════════ -->
+<div class="section pb" id="medical">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#fce4ec">🏥</div>
+    <div>
+      <div class="sec-title" style="color:#c2185b">Medical Textile Integration</div>
+      <div class="sec-sub">For surgical, wound care, and medical-grade textile orders — ISO 13485 compliant</div>
+    </div>
+  </div>
+
+  <div class="integration" style="background:linear-gradient(135deg,#fce4ec,#f3e5f5); border-color:#f48fb1">
+    <h4>🔗 When does Medical Textile connect?</h4>
+    <p>Medical textile adds <strong>compliance, traceability, and sterility</strong> requirements on top of normal production. Every batch must be traceable, every certificate must be valid, and every CAPA must be closed before audit.</p>
+  </div>
+
+  <div class="steps">
+
+    <div class="step-card">
+      <div class="step-badge c-med">1</div>
+      <div class="step-body">
+        <h4>Regulatory Compliance</h4>
+        <p>Maintain all certificates and regulatory approvals (ISO 13485, CE marking, FDA, BIS, etc.)</p>
+        <span class="nav">📍 Medical Textile → Regulatory Compliance</span>
+        <div class="fields">
+          <strong>Track:</strong>
+          <ul>
+            <li>Certificate name & number</li>
+            <li>Issued by (certifying body)</li>
+            <li>Valid from / Expiry date</li>
+            <li>Status: Active / Expired / Pending renewal</li>
+          </ul>
+        </div>
+        <div class="warning">⚠️ Dashboard alerts you 90 days before expiry!</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-med">2</div>
+      <div class="step-body">
+        <h4>Batch Traceability</h4>
+        <p>Every medical product batch must be 100% traceable — raw material → production → customer.</p>
+        <span class="nav">📍 Medical Textile → Batch Traceability</span>
+        <div class="fields">
+          <strong>Record for each batch:</strong>
+          <ul>
+            <li>Batch number (links to Production batch)</li>
+            <li>Raw material source & lot number</li>
+            <li>Production date</li>
+            <li>Customer delivered to</li>
+            <li>Any deviations</li>
+          </ul>
+        </div>
+        <div class="result">✅ Required for ISO 13485 audit compliance</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-med">3</div>
+      <div class="step-body">
+        <h4>Sterility Records</h4>
+        <p>For sterile medical textiles (surgical drapes, gowns, wound dressings), record sterilization details.</p>
+        <span class="nav">📍 Medical Textile → Sterility Records</span>
+        <div class="fields">
+          <strong>Record:</strong>
+          <ul>
+            <li>Sterilization method (ETO / Gamma / Steam)</li>
+            <li>Sterilization date & batch</li>
+            <li>Sterilization parameters</li>
+            <li>Sterility test result</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-med">4</div>
+      <div class="step-body">
+        <h4>CAPA Management</h4>
+        <p>Corrective and Preventive Actions — record any quality failures, customer complaints, or audit findings and track resolution.</p>
+        <span class="nav">📍 Medical Textile → CAPA Management</span>
+        <div class="fields">
+          <strong>CAPA workflow:</strong>
+          <ul>
+            <li>Open CAPA → record problem</li>
+            <li>Root cause analysis</li>
+            <li>Corrective action taken</li>
+            <li>Preventive action for future</li>
+            <li>Close CAPA after verification</li>
+          </ul>
+        </div>
+        <div class="warning">⚠️ Open CAPAs shown as RED alert on Dashboard!</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-med">5</div>
+      <div class="step-body">
+        <h4>Shelf Life Tracking</h4>
+        <p>Medical products have expiry dates. Track shelf life of all medical textile stock.</p>
+        <span class="nav">📍 Medical Textile → Shelf Life Tracking</span>
+        <div class="fields">
+          <strong>Status types:</strong>
+          <ul>
+            <li>Active — within shelf life</li>
+            <li>Near Expiry — approaching expiry date</li>
+            <li>Expired — past expiry date</li>
+          </ul>
+        </div>
+        <div class="warning">⚠️ Dashboard alerts for near-expiry and expired batches!</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-med">6</div>
+      <div class="step-body">
+        <h4>Audit Trail</h4>
+        <p>Complete log of all actions in the system — who did what and when. Required for ISO 13485 audits.</p>
+        <span class="nav">📍 Medical Textile → Audit Trail</span>
+        <div class="result">✅ Read-only — automatically maintained by system</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 7 — FINANCE FLOW
+══════════════════════════════════════════ -->
+<div class="section pb" id="finance">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#ffebee">💰</div>
+    <div>
+      <div class="sec-title" style="color:#c62828">Finance & Accounting Flow</div>
+      <div class="sec-sub">Double-entry bookkeeping — Journal Entries to P&L</div>
+    </div>
+  </div>
+
+  <div class="flow" style="margin-bottom:28px">
+    <div class="flow-step"><div class="flow-box c-fin"><div class="step-num">1</div>Chart of Accounts<div class="step-page">Finance → COA</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-fin"><div class="step-num">2</div>Journal Entry<div class="step-page">Finance → Journal</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-fin"><div class="step-num">3</div>Post Entry<div class="step-page">Journal → Post</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-fin"><div class="step-num">4</div>Trial Balance<div class="step-page">Finance → TB</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-dash"><div class="step-num">5</div>P&L Dashboard<div class="step-page">Dashboard</div></div></div>
+  </div>
+
+  <div class="steps">
+
+    <div class="step-card">
+      <div class="step-badge c-fin">1</div>
+      <div class="step-body">
+        <h4>Chart of Accounts Setup (One-time)</h4>
+        <p>Define all your financial accounts. Do this once during initial setup.</p>
+        <span class="nav">📍 Finance → Chart of Accounts</span>
+        <div class="fields">
+          <strong>Account categories:</strong>
+          <ul>
+            <li>Asset — Cash, Bank, Stock, Machinery</li>
+            <li>Liability — Loans, Accounts Payable</li>
+            <li>Equity — Owner Capital</li>
+            <li>Income — Sales Revenue, Other Income</li>
+            <li>Expense — Raw Material, Salary, Rent, Power</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-fin">2</div>
+      <div class="step-body">
+        <h4>Journal Entry</h4>
+        <p>Record every financial transaction as a journal entry (double-entry — debit must equal credit).</p>
+        <span class="nav">📍 Finance → Journal Entries → + New Entry</span>
+        <div class="fields">
+          <strong>Example — Sales Invoice raised:</strong>
+          <ul>
+            <li>DEBIT: Accounts Receivable ₹1,00,000</li>
+            <li>CREDIT: Sales Revenue ₹1,00,000</li>
+          </ul>
+          <br/>
+          <strong>Example — Salary paid:</strong>
+          <ul>
+            <li>DEBIT: Salary Expense ₹50,000</li>
+            <li>CREDIT: Bank Account ₹50,000</li>
+          </ul>
+        </div>
+        <div class="warning">⚠️ Entry must balance — Total Debit = Total Credit</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-fin">3</div>
+      <div class="step-body">
+        <h4>Post Journal Entry</h4>
+        <p>After reviewing, post the entry to make it permanent and affect account balances.</p>
+        <span class="nav">📍 Finance → Journal Entries → Click "Post" button</span>
+        <div class="result">✅ Posted entries update Trial Balance and P&L</div>
+        <div class="warning">⚠️ Posted entries are locked — cannot be edited</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-fin">4</div>
+      <div class="step-body">
+        <h4>Trial Balance</h4>
+        <p>View all account balances at any point in time to verify books are balanced.</p>
+        <span class="nav">📍 Finance → Trial Balance</span>
+        <div class="result">✅ Total Debits = Total Credits → Books are balanced</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="tip">
+    <strong>💡 Finance integration tip</strong>
+    Currently finance is manual (you create journal entries). Future enhancement: auto-create journal entries when SO is delivered or invoice is paid.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 8 — HR & PAYROLL
+══════════════════════════════════════════ -->
+<div class="section pb" id="hr">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#e0f7fa">👥</div>
+    <div>
+      <div class="sec-title" style="color:#00838f">HR & Payroll Flow</div>
+      <div class="sec-sub">Employee management, attendance, and monthly salary</div>
+    </div>
+  </div>
+
+  <div class="flow" style="margin-bottom:28px">
+    <div class="flow-step"><div class="flow-box c-hr"><div class="step-num">1</div>Add Employee<div class="step-page">HR → Employees</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-hr"><div class="step-num">2</div>Daily Attendance<div class="step-page">HR → Attendance</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-hr"><div class="step-num">3</div>Monthly Salary<div class="step-page">HR → Salary</div></div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="flow-box c-fin"><div class="step-num">4</div>Journal Entry<div class="step-page">Finance → Journal</div></div></div>
+  </div>
+
+  <div class="steps">
+
+    <div class="step-card">
+      <div class="step-badge c-hr">1</div>
+      <div class="step-body">
+        <h4>Add Employee (One-time)</h4>
+        <span class="nav">📍 HR & Payroll → Employees → + New Employee</span>
+        <div class="fields">
+          <strong>Fields:</strong>
+          <ul>
+            <li>Name, Employee ID, Department</li>
+            <li>Designation, Date of joining</li>
+            <li>Basic salary, Bank details</li>
+            <li>PF, ESI numbers</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-hr">2</div>
+      <div class="step-body">
+        <h4>Daily Attendance</h4>
+        <span class="nav">📍 HR & Payroll → Attendance → + Mark Attendance</span>
+        <div class="fields">
+          <strong>Status options:</strong>
+          <ul>
+            <li>Present / Absent / Half Day / Leave / Holiday</li>
+          </ul>
+        </div>
+        <div class="result">✅ Attendance data used for salary calculation</div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-hr">3</div>
+      <div class="step-body">
+        <h4>Monthly Salary</h4>
+        <span class="nav">📍 HR & Payroll → Salary → + Generate Salary</span>
+        <div class="fields">
+          <strong>Auto-calculated:</strong>
+          <ul>
+            <li>Basic salary based on attendance</li>
+            <li>PF deduction, ESI deduction</li>
+            <li>Net payable salary</li>
+          </ul>
+        </div>
+        <div class="result">✅ Print salary slip for each employee</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 9 — DASHBOARD & REPORTS
+══════════════════════════════════════════ -->
+<div class="section pb" id="dashboard">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#ede7f6">📊</div>
+    <div>
+      <div class="sec-title" style="color:#6366f1">Dashboard & Reports</div>
+      <div class="sec-sub">Real-time business overview and document reports</div>
+    </div>
+  </div>
+
+  <div class="steps">
+
+    <div class="step-card">
+      <div class="step-badge c-dash">📈</div>
+      <div class="step-body">
+        <h4>Dashboard — What to check every morning</h4>
+        <span class="nav">📍 Dashboard (Home page)</span>
+        <div class="fields">
+          <strong>Check these daily:</strong>
+          <ul>
+            <li>🔴 Low Stock Alerts — reorder if needed</li>
+            <li>🔴 Open CAPAs — close any overdue</li>
+            <li>🔴 Overdue Invoices — follow up with customers</li>
+            <li>🟡 Expiring Certificates — renew before expiry</li>
+            <li>📊 Revenue trend — is business growing?</li>
+            <li>💰 Outstanding AR — how much is pending collection</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-dash">🖨️</div>
+      <div class="step-body">
+        <h4>Printable Documents</h4>
+        <p>Every business document can be printed using the Print button (🖨️) on each page.</p>
+        <div class="fields">
+          <strong>Available print documents:</strong>
+          <ul>
+            <li>📄 Quotation — send to customer for approval</li>
+            <li>🛒 Sales Order — customer order confirmation</li>
+            <li>🚚 Delivery Challan — send with goods</li>
+            <li>🧾 Sales Invoice — for billing customer</li>
+            <li>📦 Purchase Order — send to supplier</li>
+            <li>🏪 GRN — goods received record</li>
+            <li>⚙️ Work Order — for production floor</li>
+            <li>👥 Salary Slip — for employee</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-badge c-dash">📋</div>
+      <div class="step-body">
+        <h4>Reports</h4>
+        <span class="nav">📍 Reports section in sidebar</span>
+        <div class="fields">
+          <strong>Available reports:</strong>
+          <ul>
+            <li>📊 Production Report — work orders, output, efficiency</li>
+            <li>📦 Inventory Report — stock levels, movements</li>
+            <li>🛒 Sales Report — revenue, orders, customers</li>
+            <li>💰 Finance Report — P&L, balances</li>
+            <li>👥 HR Report — attendance, headcount</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 10 — ROLES
+══════════════════════════════════════════ -->
+<div class="section pb" id="roles">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:#f5f5f5">🔐</div>
+    <div>
+      <div class="sec-title" style="color:#333">User Roles & Permissions</div>
+      <div class="sec-sub">Who can access what in SASI ERP</div>
+    </div>
+  </div>
+
+  <table class="role-table">
+    <tr>
+      <th>Module</th>
+      <th>Admin</th>
+      <th>Sales Team</th>
+      <th>Production</th>
+      <th>Finance</th>
+      <th>HR</th>
+    </tr>
+    <tr><td>Dashboard</td><td class="tick">✅</td><td class="tick">✅</td><td class="tick">✅</td><td class="tick">✅</td><td class="tick">✅</td></tr>
+    <tr><td>Sales (Inquiry, Quotation, SO)</td><td class="tick">✅</td><td class="tick">✅</td><td class="cross">—</td><td class="cross">—</td><td class="cross">—</td></tr>
+    <tr><td>Purchasing (PO, GRN)</td><td class="tick">✅</td><td class="cross">—</td><td class="tick">✅</td><td class="cross">—</td><td class="cross">—</td></tr>
+    <tr><td>Production (WO, QC, Batch)</td><td class="tick">✅</td><td class="cross">—</td><td class="tick">✅</td><td class="cross">—</td><td class="cross">—</td></tr>
+    <tr><td>Inventory</td><td class="tick">✅</td><td class="tick">✅</td><td class="tick">✅</td><td class="cross">—</td><td class="cross">—</td></tr>
+    <tr><td>Finance (Journal, Trial Balance)</td><td class="tick">✅</td><td class="cross">—</td><td class="cross">—</td><td class="tick">✅</td><td class="cross">—</td></tr>
+    <tr><td>Invoices (AR)</td><td class="tick">✅</td><td class="tick">✅</td><td class="cross">—</td><td class="tick">✅</td><td class="cross">—</td></tr>
+    <tr><td>HR & Payroll</td><td class="tick">✅</td><td class="cross">—</td><td class="cross">—</td><td class="cross">—</td><td class="tick">✅</td></tr>
+    <tr><td>Technical Textile</td><td class="tick">✅</td><td class="tick">✅</td><td class="tick">✅</td><td class="cross">—</td><td class="cross">—</td></tr>
+    <tr><td>Medical Textile</td><td class="tick">✅</td><td class="tick">✅</td><td class="tick">✅</td><td class="cross">—</td><td class="cross">—</td></tr>
+    <tr><td>User Management</td><td class="tick">✅</td><td class="cross">—</td><td class="cross">—</td><td class="cross">—</td><td class="cross">—</td></tr>
+  </table>
+
+  <div class="tip" style="margin-top:20px">
+    <strong>💡 How to create roles</strong>
+    Go to Admin page → Roles → Create role → Select which pages this role can access → Assign role to users.
+  </div>
+
+  <div style="margin-top:32px; padding:20px; background:#f0f4ff; border-radius:12px; text-align:center">
+    <p style="font-size:13px; color:#666; margin-bottom:8px">SASI ERP — Live System</p>
+    <p style="font-size:20px; font-weight:800; color:#1a237e">sasi-erp.onrender.com</p>
+    <p style="font-size:13px; color:#666; margin-top:8px">Login: admin &nbsp;|&nbsp; Version 1.0 &nbsp;|&nbsp; April 2026</p>
+  </div>
+</div>
+
+</div><!-- /page -->
+</body>
+</html>
