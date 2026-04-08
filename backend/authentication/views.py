@@ -375,6 +375,62 @@ def user_list_view(request):
 
 
 @csrf_exempt
+@require_http_methods(["GET", "PUT"])
+def my_profile_view(request):
+    """GET/PUT the logged-in user's own profile."""
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'Not logged in.'}, status=401)
+
+    user = request.user
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+
+    if request.method == 'GET':
+        return JsonResponse({
+            'id':             user.id,
+            'username':       user.username,
+            'email':          user.email,
+            'first_name':     user.first_name,
+            'last_name':      user.last_name,
+            'is_staff':       user.is_staff,
+            'role':           profile.role.name if profile.role else '',
+            'designation':    profile.designation,
+            'department':     profile.department,
+            'phone':          profile.phone,
+            'employee_id':    profile.employee_id,
+            'date_of_joining': profile.date_of_joining.strftime('%Y-%m-%d') if profile.date_of_joining else '',
+            'bio':            profile.bio,
+            'avatar':         profile.avatar,
+        })
+
+    # PUT — update profile
+    data = json.loads(request.body)
+
+    # Update User fields
+    user.first_name = data.get('first_name', user.first_name).strip()
+    user.last_name  = data.get('last_name',  user.last_name).strip()
+    user.email      = data.get('email',      user.email).strip()
+    new_password    = data.get('password', '').strip()
+    if new_password:
+        user.set_password(new_password)
+    user.save()
+
+    # Update Profile fields
+    profile.designation    = data.get('designation',    profile.designation)
+    profile.department     = data.get('department',     profile.department)
+    profile.phone          = data.get('phone',          profile.phone)
+    profile.employee_id    = data.get('employee_id',    profile.employee_id)
+    doj = data.get('date_of_joining', '')
+    profile.date_of_joining = doj if doj else None
+    profile.bio            = data.get('bio',            profile.bio)
+    avatar = data.get('avatar', '')
+    if avatar:  # only overwrite if a new image was sent
+        profile.avatar = avatar
+    profile.save()
+
+    return JsonResponse({'message': 'Profile updated successfully.'})
+
+
+@csrf_exempt
 @require_http_methods(["PUT", "DELETE"])
 def user_detail_view(request, user_id):
     err = _require_admin(request)

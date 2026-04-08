@@ -16,6 +16,9 @@ urlpatterns = [
     path('roles/',              views.role_list_view,        name='role-list'),
     path('roles/<int:role_id>/',views.role_detail_view,      name='role-detail'),
 
+    # My profile (any logged-in user)
+    path('my-profile/',          views.my_profile_view,       name='my-profile'),
+
     # User management (admin only)
     path('users/',              views.user_list_view,        name='user-list'),
     path('users/<int:user_id>/',views.user_detail_view,      name='user-detail'),

@@ -26,11 +26,22 @@ class Role(models.Model):
 
 class UserProfile(models.Model):
     """
-    Extends Django's built-in User with a Role assignment.
+    Extends Django's built-in User with a Role assignment and personal profile.
     Created automatically when a new user is created via ERP.
     """
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    role = models.ForeignKey(Role, null=True, blank=True, on_delete=models.SET_NULL)
+    user            = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    role            = models.ForeignKey(Role, null=True, blank=True, on_delete=models.SET_NULL)
+
+    # Personal / official info
+    designation     = models.CharField(max_length=100, blank=True)
+    department      = models.CharField(max_length=100, blank=True)
+    phone           = models.CharField(max_length=20,  blank=True)
+    employee_id     = models.CharField(max_length=50,  blank=True)
+    date_of_joining = models.DateField(null=True, blank=True)
+    bio             = models.TextField(blank=True)
+
+    # Profile picture stored as base64 data URL
+    avatar          = models.TextField(blank=True)
 
     def __str__(self):
         return f"{self.user.username} → {self.role.name if self.role else 'No Role'}"

@@ -230,7 +230,7 @@ function MainLayout({ children, currentUser, onLogout, permissions, isAdmin }) {
                                 </MenuItem>
                             )}
 
-                            <MenuItem disabled>
+                            <MenuItem onClick={() => { setAnchor(null); navigate('/profile'); }}>
                                 <PersonOutlineIcon fontSize="small" sx={{ mr: 1.5, color: 'text.secondary' }} />
                                 My Profile
                             </MenuItem>
