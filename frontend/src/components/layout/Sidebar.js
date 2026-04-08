@@ -28,6 +28,7 @@ import AssessmentIcon        from '@mui/icons-material/Assessment';
 import TuneIcon              from '@mui/icons-material/Tune';
 import HistoryIcon           from '@mui/icons-material/History';
 import CategoryIcon          from '@mui/icons-material/Category';
+import BuildIcon             from '@mui/icons-material/Build';
 import ExpandLess            from '@mui/icons-material/ExpandLess';
 import ExpandMore            from '@mui/icons-material/ExpandMore';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
@@ -101,17 +102,18 @@ const MENU_ITEMS = [
         { title: 'Shelf Life Tracking',   path: '/medical-textile/shelf-life' },
     ]},
     { title: 'Reports', icon: <AssessmentIcon />, children: [
+        { title: 'My Reports',        path: '/reports/my-reports' },
         { title: 'Production Report', path: '/reports/production' },
         { title: 'Inventory Report',  path: '/reports/inventory' },
         { title: 'Sales Report',      path: '/reports/sales' },
         { title: 'Finance Report',    path: '/reports/finance' },
         { title: 'HR Report',         path: '/reports/hr' },
-        { title: 'Report Maker',      path: '/reports/maker/list' },
     ]},
     { title: 'Settings', icon: <TuneIcon />, children: [
         { title: 'Format Panel',      path: '/settings/format-panel' },
     ]},
-    { title: 'Activity Log', icon: <HistoryIcon />, path: '/audit/activity-log' },
+    { title: 'Report Maker', icon: <BuildIcon />, path: '/reports/maker/list' },
+    { title: 'Activity Log',  icon: <HistoryIcon />, path: '/audit/activity-log' },
 ];
 
 const MODULE_COLORS = {
@@ -127,6 +129,7 @@ const MODULE_COLORS = {
     'Medical Textile':   '#ec4899',
     'Settings':          '#64748b',
     'Reports':           '#a78bfa',
+    'Report Maker':      '#a78bfa',
     'Activity Log':      '#0ea5e9',
 };
 
