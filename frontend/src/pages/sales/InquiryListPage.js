@@ -11,6 +11,7 @@ import {
     DialogActions, TextField, MenuItem, IconButton, Tooltip,
     InputAdornment, Stack, FormControlLabel, Switch, Divider,
 } from '@mui/material';
+import { useColumnResize } from '../../components/common/useColumnResize';
 import AddIcon        from '@mui/icons-material/Add';
 import EditIcon       from '@mui/icons-material/Edit';
 import SearchIcon     from '@mui/icons-material/Search';
@@ -43,6 +44,7 @@ function StatusChip({ status }) {
 }
 
 export default function InquiryListPage() {
+    const { widths, Resizer } = useColumnResize('inquiry_list', [120, 160, 200, 120, 90, 110, 110, 90]);
     const [inquiries,   setInquiries]   = useState([]);
     const [customers,   setCustomers]   = useState([]);
     const [loading,     setLoading]     = useState(true);
@@ -182,17 +184,14 @@ export default function InquiryListPage() {
 
             {/* Table */}
             <Paper>
-                <Table size="small">
-                    <TableHead>
-                        <TableRow sx={{ '& th': { fontWeight: 700, backgroundColor: 'action.hover' } }}>
-                            <TableCell>Inquiry #</TableCell>
-                            <TableCell>Customer</TableCell>
-                            <TableCell>Product Description</TableCell>
-                            <TableCell>End Use</TableCell>
-                            <TableCell>Qty</TableCell>
-                            <TableCell>Date</TableCell>
-                            <TableCell>Status</TableCell>
-                            <TableCell align="right">Actions</TableCell>
+                <Table size="small" sx={{ tableLayout: "fixed" }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
+                        <TableRow>
+                            {['Inquiry #','Customer','Product Description','End Use','Qty','Date','Status','Actions'].map((h, i) => (
+                                <TableCell key={h} sx={{ color:'white', fontWeight:'bold', whiteSpace:'nowrap', position:'relative', userSelect:'none', px:2, py:1 }} style={{ width: widths[i] }}>
+                                    {h}<Resizer index={i} />
+                                </TableCell>
+                            ))}
                         </TableRow>
                     </TableHead>
                     <TableBody>

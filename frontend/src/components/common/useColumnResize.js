@@ -58,7 +58,8 @@ export function useColumnResize(storageKey, defaultWidths) {
         window.addEventListener('mouseup', onUp);
     }, [widths, storageKey]);
 
-    // Resizer: must be placed INSIDE a <div style={{position:'relative'}}> wrapper in the th cell
+    // Resizer: place DIRECTLY inside a TableCell that has sx={{ position:'relative' }}
+    // Uses top:0/bottom:0 so it spans the full cell height without needing height:'100%'
     function Resizer({ index }) {
         const [hovered, setHovered] = useState(false);
         return (
@@ -69,9 +70,8 @@ export function useColumnResize(storageKey, defaultWidths) {
                 title="Drag ↔ to resize this column"
                 style={{
                     position: 'absolute',
-                    right: 0, top: 0,
+                    right: 0, top: 0, bottom: 0,
                     width: 8,
-                    height: '100%',      // confined to the wrapper div, NOT the table
                     cursor: 'col-resize',
                     zIndex: 10,
                     display: 'flex',
@@ -82,7 +82,7 @@ export function useColumnResize(storageKey, defaultWidths) {
             >
                 <div style={{
                     width: 2,
-                    height: '70%',
+                    height: '60%',
                     backgroundColor: hovered ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.25)',
                     borderRadius: 2,
                     transition: 'background 0.15s',

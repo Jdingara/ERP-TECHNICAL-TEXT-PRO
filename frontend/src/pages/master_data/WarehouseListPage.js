@@ -78,10 +78,10 @@ function WarehouseListPage() {
                 <Table sx={{ tableLayout: "fixed" }}>
                     <TableHead sx={{ backgroundColor: 'primary.main' }}>
                         <TableRow>
-                            <TableCell sx={{ color:"white",fontWeight:"bold",overflow:"hidden",whiteSpace:"nowrap",p:0 }} style={{ width: widths[0] }}><div style={{ position:"relative", padding:"6px 16px", height:"100%", display:"flex", alignItems:"center" }}>Code<Resizer index={0} /></div></TableCell>
-                            <TableCell sx={{ color:"white",fontWeight:"bold",overflow:"hidden",whiteSpace:"nowrap",p:0 }} style={{ width: widths[1] }}><div style={{ position:"relative", padding:"6px 16px", height:"100%", display:"flex", alignItems:"center" }}>Warehouse Name<Resizer index={1} /></div></TableCell>
-                            <TableCell sx={{ color:"white",fontWeight:"bold",overflow:"hidden",whiteSpace:"nowrap",p:0 }} style={{ width: widths[2] }}><div style={{ position:"relative", padding:"6px 16px", height:"100%", display:"flex", alignItems:"center" }}>Address<Resizer index={2} /></div></TableCell>
-                            <TableCell sx={{ color:"white",fontWeight:"bold",overflow:"hidden",whiteSpace:"nowrap",p:0 }} style={{ width: widths[3] }}><div style={{ position:"relative", padding:"6px 16px", height:"100%", display:"flex", alignItems:"center" }}>Actions<Resizer index={3} /></div></TableCell>
+                            <TableCell sx={{ color:"white",fontWeight:"bold",whiteSpace:"nowrap",position:"relative",userSelect:"none",px:2,py:1 }} style={{ width: widths[0] }}>Code<Resizer index={0} /></TableCell>
+                            <TableCell sx={{ color:"white",fontWeight:"bold",whiteSpace:"nowrap",position:"relative",userSelect:"none",px:2,py:1 }} style={{ width: widths[1] }}>Warehouse Name<Resizer index={1} /></TableCell>
+                            <TableCell sx={{ color:"white",fontWeight:"bold",whiteSpace:"nowrap",position:"relative",userSelect:"none",px:2,py:1 }} style={{ width: widths[2] }}>Address<Resizer index={2} /></TableCell>
+                            <TableCell sx={{ color:"white",fontWeight:"bold",whiteSpace:"nowrap",position:"relative",userSelect:"none",px:2,py:1 }} style={{ width: widths[3] }}>Actions<Resizer index={3} /></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

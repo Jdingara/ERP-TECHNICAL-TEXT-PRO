@@ -11,6 +11,7 @@ import {
     DialogActions, TextField, MenuItem, IconButton, Tooltip,
     InputAdornment, Stack,
 } from '@mui/material';
+import { useColumnResize } from '../../components/common/useColumnResize';
 import AddIcon             from '@mui/icons-material/Add';
 import EditIcon            from '@mui/icons-material/Edit';
 import DeleteIcon          from '@mui/icons-material/Delete';
@@ -46,6 +47,7 @@ function StatusChip({ status }) {
 }
 
 export default function MachineListPage() {
+    const { widths, Resizer } = useColumnResize('machine_list', [110, 180, 130, 110, 130, 110, 90]);
     const [machines,  setMachines]  = useState([]);
     const [loading,   setLoading]   = useState(true);
     const [search,    setSearch]    = useState('');
@@ -165,16 +167,14 @@ export default function MachineListPage() {
 
             {/* Table */}
             <Paper>
-                <Table size="small">
-                    <TableHead>
-                        <TableRow sx={{ '& th': { fontWeight: 700, backgroundColor: 'action.hover' } }}>
-                            <TableCell>Code</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Type</TableCell>
-                            <TableCell>Capacity</TableCell>
-                            <TableCell>Location</TableCell>
-                            <TableCell>Status</TableCell>
-                            <TableCell align="right">Actions</TableCell>
+                <Table size="small" sx={{ tableLayout: "fixed" }}>
+                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
+                        <TableRow>
+                            {['Code','Name','Type','Capacity','Location','Status','Actions'].map((h, i) => (
+                                <TableCell key={h} sx={{ color:'white', fontWeight:'bold', whiteSpace:'nowrap', position:'relative', userSelect:'none', px:2, py:1 }} style={{ width: widths[i] }}>
+                                    {h}<Resizer index={i} />
+                                </TableCell>
+                            ))}
                         </TableRow>
                     </TableHead>
                     <TableBody>

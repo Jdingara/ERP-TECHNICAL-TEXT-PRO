@@ -5,13 +5,15 @@
 // ============================================================
 
 import { Box, Typography, Paper, Grid, ToggleButton,
-    ToggleButtonGroup, Divider, Button, Tooltip, Chip } from '@mui/material';
+    ToggleButtonGroup, Divider, Button, Tooltip, Chip, Alert } from '@mui/material';
 import { useSettings } from '../../context/SettingsContext';
+import { useState } from 'react';
 import LightModeIcon   from '@mui/icons-material/LightMode';
 import DarkModeIcon    from '@mui/icons-material/DarkMode';
 import CheckIcon       from '@mui/icons-material/Check';
 import WallpaperIcon   from '@mui/icons-material/Wallpaper';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 const ACCENT_COLORS = [
     { label: 'Indigo',   value: '#6366f1' },
@@ -45,8 +47,50 @@ function Section({ title, subtitle, children }) {
     );
 }
 
+// Modules for per-module layout reset
+const LAYOUT_MODULES = [
+    { label: 'Dashboard',         prefixes: ['panel_row_dash', 'chart_h_dash'] },
+    { label: 'Master Data',       prefixes: ['col_w_items_list', 'col_w_customer', 'col_w_vendor', 'col_w_warehouse', 'col_w_unit', 'col_w_categor'] },
+    { label: 'Inventory',         prefixes: ['col_w_stock', 'col_w_inventory', 'col_w_movement', 'col_w_adjustment'] },
+    { label: 'Purchasing',        prefixes: ['col_w_purchase', 'col_w_po_', 'col_w_supplier'] },
+    { label: 'Sales',             prefixes: ['col_w_sales', 'col_w_so_', 'col_w_invoice', 'col_w_customer_order'] },
+    { label: 'Production',        prefixes: ['col_w_production', 'col_w_job', 'col_w_bom', 'col_w_work'] },
+    { label: 'HR & Payroll',      prefixes: ['col_w_employee', 'col_w_payroll', 'col_w_attendance', 'col_w_hr'] },
+    { label: 'Finance',           prefixes: ['col_w_finance', 'col_w_journal', 'col_w_ledger', 'col_w_payment'] },
+    { label: 'Technical Textile', prefixes: ['col_w_technical', 'col_w_yarn', 'col_w_fabric', 'col_w_loom'] },
+    { label: 'Medical Textile',   prefixes: ['col_w_medical', 'col_w_surgical', 'col_w_bandage'] },
+    { label: 'Reports',           prefixes: ['panel_row_report', 'chart_h_report', 'col_w_report',
+                                              'inventoryreport', 'salesreport', 'purchasereport', 'financereport', 'productionreport'] },
+];
+
+function clearLayoutKeys(prefixes) {
+    const keys = Object.keys(localStorage);
+    const layoutPrefixes = prefixes || ['col_w_', 'chart_h_', 'panel_row_'];
+    keys.forEach(k => {
+        if (layoutPrefixes.some(p => k.startsWith(p))) {
+            localStorage.removeItem(k);
+        }
+    });
+}
+
 function SettingsPage() {
     const { settings, updateSetting, resetSettings } = useSettings();
+    const [layoutResetMsg, setLayoutResetMsg] = useState('');
+
+    const showResetMsg = (label) => {
+        setLayoutResetMsg(`${label} layout reset. Refresh or navigate away and back to see the default sizes.`);
+        setTimeout(() => setLayoutResetMsg(''), 5000);
+    };
+
+    const handleResetAll = () => {
+        clearLayoutKeys();
+        showResetMsg('All layout');
+    };
+
+    const handleResetModule = (mod) => {
+        clearLayoutKeys(mod.prefixes);
+        showResetMsg(mod.label);
+    };
 
     const handleBgUpload = (e) => {
         const file = e.target.files[0];
@@ -232,6 +276,43 @@ function SettingsPage() {
                     <ToggleButton value="top"    sx={{ px: 3 }}>Top</ToggleButton>
                     <ToggleButton value="bottom" sx={{ px: 3 }}>Bottom</ToggleButton>
                 </ToggleButtonGroup>
+            </Section>
+
+            {/* ── Layout Reset ── */}
+            <Section title="Reset Column & Chart Sizes"
+                subtitle="Reset column widths and chart sizes that you've resized. Changes take effect after navigating to the page.">
+
+                {layoutResetMsg && (
+                    <Alert severity="success" sx={{ mb: 2 }} onClose={() => setLayoutResetMsg('')}>
+                        {layoutResetMsg}
+                    </Alert>
+                )}
+
+                {/* Reset All button */}
+                <Button
+                    variant="contained" color="error" size="small"
+                    startIcon={<RestartAltIcon />}
+                    onClick={handleResetAll}
+                    sx={{ mb: 2, textTransform: 'none' }}>
+                    Reset All — Columns & Charts
+                </Button>
+
+                {/* Per-module reset buttons */}
+                <Typography variant="body2" color="text.secondary" mb={1}>
+                    Or reset individual modules:
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    {LAYOUT_MODULES.map(mod => (
+                        <Button
+                            key={mod.label}
+                            variant="outlined" size="small"
+                            startIcon={<RestartAltIcon />}
+                            onClick={() => handleResetModule(mod)}
+                            sx={{ textTransform: 'none', fontSize: 12 }}>
+                            {mod.label}
+                        </Button>
+                    ))}
+                </Box>
             </Section>
 
             <Divider sx={{ my: 3 }} />
