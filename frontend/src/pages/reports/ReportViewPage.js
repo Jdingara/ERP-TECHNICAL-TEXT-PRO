@@ -17,6 +17,7 @@ import RefreshIcon          from '@mui/icons-material/Refresh';
 import SearchIcon           from '@mui/icons-material/Search';
 import ArrowUpwardIcon      from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon    from '@mui/icons-material/ArrowDownward';
+import ShareWidget          from '../../components/common/ShareWidget';
 
 const API = '/api/reports/maker/templates/';
 
@@ -145,6 +146,13 @@ export default function ReportViewPage() {
                     >
                         Print / PDF
                     </Button>
+                    {tmpl && (
+                        <ShareWidget
+                            title={tmpl.name}
+                            subject={`${tmpl.name} — SASI ERP Report`}
+                            message={`${tmpl.name}\nSource: ${tmpl.source_label || tmpl.source_key}\nRows: ${rows.length}\nGenerated: ${new Date().toLocaleDateString('en-IN')}\n\nSASI ERP`}
+                        />
+                    )}
                 </Box>
             </Box>
 

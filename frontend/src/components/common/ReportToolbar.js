@@ -13,6 +13,7 @@ import { Box, Button, Divider } from '@mui/material';
 import PrintIcon from '@mui/icons-material/Print';
 import DownloadIcon from '@mui/icons-material/Download';
 import * as XLSX from 'xlsx';
+import ShareWidget from './ShareWidget';
 
 // ── PDF ──────────────────────────────────────────────────────
 // Opens browser print dialog. The sidebar/topbar are hidden
@@ -71,6 +72,8 @@ function handleExcel(title, onExcel) {
 
 // ── COMPONENT ─────────────────────────────────────────────────
 export default function ReportToolbar({ title, printRef, onExcel }) {
+    const shareMessage = `${title}\nGenerated from SASI ERP\nDate: ${new Date().toLocaleDateString('en-IN')}`;
+
     return (
         <Box
             className="no-print"
@@ -97,6 +100,12 @@ export default function ReportToolbar({ title, printRef, onExcel }) {
                     Download Excel
                 </Button>
             )}
+
+            <ShareWidget
+                title={title}
+                message={shareMessage}
+                subject={`${title} — SASI ERP`}
+            />
 
             <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
         </Box>

@@ -17,6 +17,7 @@ import ReceiptIcon      from '@mui/icons-material/Receipt';
 import { useNavigate } from 'react-router-dom';
 import { useColumnResize } from '../../components/common/useColumnResize';
 import { printInvoice } from '../../utils/printUtils';
+import ShareWidget from '../../components/common/ShareWidget';
 
 const STATUS_COLOR = {
     draft:   'default',
@@ -146,13 +147,20 @@ function SalesInvoicePage() {
                                         color={STATUS_COLOR[inv.status] || 'default'} />
                                 </TableCell>
                                 <TableCell>
-                                    <Stack direction="row" spacing={0.5}>
+                                    <Stack direction="row" spacing={0.5} alignItems="center">
                                         <Tooltip title="Print Invoice">
                                             <IconButton size="small" color="primary"
                                                 onClick={() => printInvoice(inv)}>
                                                 <PrintIcon fontSize="small" />
                                             </IconButton>
                                         </Tooltip>
+                                        <ShareWidget
+                                            title={`Invoice ${inv.invoice_number}`}
+                                            subject={`Invoice ${inv.invoice_number} from SASI ERP`}
+                                            message={`Dear ${inv.customer_name},\n\nPlease find your invoice details below:\n\nInvoice No : ${inv.invoice_number}\nSales Order: ${inv.so_number}\nDate       : ${inv.invoice_date}\nDue Date   : ${inv.due_date}\nAmount     : ₹${parseFloat(inv.total_amount || 0).toLocaleString('en-IN')}\nBalance Due: ₹${parseFloat(inv.balance_due || 0).toLocaleString('en-IN')}\nStatus     : ${inv.status?.toUpperCase()}\n\nThank you for your business.\nSASI ERP`}
+                                            email={inv.customer_email || ''}
+                                            phone={inv.customer_phone || ''}
+                                        />
                                         {inv.status !== 'paid' && inv.status !== 'draft' && (
                                             <Tooltip title="Mark as Paid">
                                                 <IconButton size="small" color="success"
