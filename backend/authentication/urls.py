@@ -21,6 +21,7 @@ urlpatterns = [
 
     # Audit log
     path('audit-logs/',          views.audit_log_list,        name='audit-logs'),
+    path('support-log/',         views.support_log_download,  name='support-log'),
 
     # User management (admin only)
     path('users/',              views.user_list_view,        name='user-list'),

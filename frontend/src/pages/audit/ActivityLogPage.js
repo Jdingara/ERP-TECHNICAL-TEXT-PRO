@@ -11,6 +11,7 @@ import FilterAltIcon       from '@mui/icons-material/FilterAlt';
 import RefreshIcon         from '@mui/icons-material/Refresh';
 import ExpandMoreIcon      from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon      from '@mui/icons-material/ExpandLess';
+import FileDownloadIcon    from '@mui/icons-material/FileDownload';
 
 // ── Action colours ────────────────────────────────────────────
 const ACTION_COLOR = {
@@ -153,6 +154,27 @@ function ActivityLogPage() {
             {/* Header */}
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2 }}>
                 <Typography variant="h5" fontWeight="bold" color="primary" flex={1}>Activity Log</Typography>
+                <Tooltip title="Download last 200 log entries as CSV — send this to your support team when reporting a problem">
+                    <Button
+                        startIcon={<FileDownloadIcon />}
+                        variant="outlined"
+                        size="small"
+                        color="success"
+                        onClick={async () => {
+                            const res  = await fetch('/api/authentication/support-log/', { credentials: 'include' });
+                            const blob = await res.blob();
+                            const url  = URL.createObjectURL(blob);
+                            const a    = document.createElement('a');
+                            a.href     = url;
+                            a.download = `SASI_ERP_Support_Log_${new Date().toISOString().slice(0,10)}.csv`;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                        }}
+                        sx={{ textTransform: 'none', whiteSpace: 'nowrap' }}
+                    >
+                        Download Support Log
+                    </Button>
+                </Tooltip>
                 <Button startIcon={<RefreshIcon />} variant="outlined" size="small" onClick={fetchLogs}>
                     Refresh
                 </Button>

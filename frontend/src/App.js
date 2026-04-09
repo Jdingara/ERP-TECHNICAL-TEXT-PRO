@@ -5,6 +5,8 @@
 
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ErrorProvider } from './context/ErrorContext';
+import GlobalErrorAlert  from './components/common/GlobalErrorAlert';
 
 import MainLayout from './components/layout/MainLayout';
 
@@ -143,6 +145,8 @@ function App() {
     if (isCheckingAuth) return null;
 
     return (
+        <ErrorProvider>
+        <GlobalErrorAlert />
         <BrowserRouter>
             <Routes>
                 <Route path="/login"
@@ -262,6 +266,7 @@ function App() {
                 />
             </Routes>
         </BrowserRouter>
+        </ErrorProvider>
     );
 }
 
