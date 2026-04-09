@@ -160,6 +160,7 @@ function SalesInvoicePage() {
                                             message={`Dear ${inv.customer_name},\n\nPlease find your invoice details below:\n\nInvoice No : ${inv.invoice_number}\nSales Order: ${inv.so_number}\nDate       : ${inv.invoice_date}\nDue Date   : ${inv.due_date}\nAmount     : ₹${parseFloat(inv.total_amount || 0).toLocaleString('en-IN')}\nBalance Due: ₹${parseFloat(inv.balance_due || 0).toLocaleString('en-IN')}\nStatus     : ${inv.status?.toUpperCase()}\n\nThank you for your business.\nSASI ERP`}
                                             email={inv.customer_email || ''}
                                             phone={inv.customer_phone || ''}
+                                            onPrint={() => printInvoice(inv)}
                                         />
                                         {inv.status !== 'paid' && inv.status !== 'draft' && (
                                             <Tooltip title="Mark as Paid">

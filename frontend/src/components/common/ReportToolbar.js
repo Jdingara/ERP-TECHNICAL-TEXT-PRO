@@ -105,6 +105,7 @@ export default function ReportToolbar({ title, printRef, onExcel }) {
                 title={title}
                 message={shareMessage}
                 subject={`${title} — SASI ERP`}
+                onPrint={() => handlePrint(printRef)}
             />
 
             <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />

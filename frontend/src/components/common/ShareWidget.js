@@ -143,25 +143,45 @@ export default function ShareWidget({
     email    = '',               // recipient email (if known)
     phone    = '',               // recipient phone for WhatsApp (if known)
     subject  = '',               // email subject override
+    onPrint  = null,             // callback to trigger PDF download before email opens
 }) {
-    const [open,     setOpen]     = useState(false);
-    const [apiInfo,  setApiInfo]  = useState(null); // which platform's info card is expanded
+    const [open,        setOpen]        = useState(false);
+    const [apiInfo,     setApiInfo]     = useState(null);
+    const [pdfTip,      setPdfTip]      = useState(false); // show the "attach PDF" tip banner
 
     const emailSubject = subject || `${title} — SASI ERP`;
-    const emailBody    = message || title;
-    const waMessage    = encodeURIComponent(message || title);
-    const waPhone      = phone ? phone.replace(/\D/g, '') : '';
+
+    // Email body always includes the PDF attachment reminder at the top
+    const emailBody = `📎 NOTE: A PDF has been downloaded to your Downloads folder — please attach it to this email before sending.\n\n${message || title}`;
+
+    const waMessage = encodeURIComponent(message || title);
+    const waPhone   = phone ? phone.replace(/\D/g, '') : '';
 
     const handleShare = (platform) => {
         if (platform.status === 'api') {
             setApiInfo(apiInfo?.key === platform.key ? null : platform);
             return;
         }
+
         if (platform.key === 'email') {
-            const to   = email ? `${email}` : '';
-            const href = `mailto:${to}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
-            window.open(href, '_blank');
+            // Step 1 — trigger PDF download first
+            if (onPrint) {
+                onPrint();
+                setPdfTip(true);
+                // Step 2 — open email after short delay so print dialog appears first
+                setTimeout(() => {
+                    const to   = email || '';
+                    const href = `mailto:${to}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+                    window.open(href, '_self');
+                }, 1200);
+            } else {
+                // No print callback — open email directly
+                const to   = email || '';
+                const href = `mailto:${to}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(message || title)}`;
+                window.open(href, '_self');
+            }
         }
+
         if (platform.key === 'whatsapp') {
             const base = waPhone
                 ? `https://wa.me/${waPhone}?text=${waMessage}`
@@ -200,6 +220,25 @@ export default function ShareWidget({
                 </DialogTitle>
 
                 <DialogContent sx={{ pt: 0 }}>
+
+                    {/* ── PDF tip banner — shown after email clicked ── */}
+                    {pdfTip && (
+                        <Box sx={{
+                            display: 'flex', alignItems: 'flex-start', gap: 1,
+                            p: 1.5, mb: 2, borderRadius: 2,
+                            bgcolor: '#fff8e1', border: '1.5px solid #fbbf24',
+                        }}>
+                            <span style={{ fontSize: 18, flexShrink: 0 }}>📎</span>
+                            <Box>
+                                <Typography fontWeight={700} fontSize={13} color="#92400e">
+                                    PDF is downloading now
+                                </Typography>
+                                <Typography fontSize={12} color="#92400e" sx={{ mt: 0.3 }}>
+                                    Check your <strong>Downloads folder</strong> — attach the PDF to the email that just opened, then click Send.
+                                </Typography>
+                            </Box>
+                        </Box>
+                    )}
 
                     {/* ── Message preview ── */}
                     {message && (

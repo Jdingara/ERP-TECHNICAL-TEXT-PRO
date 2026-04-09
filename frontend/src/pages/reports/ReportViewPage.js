@@ -151,6 +151,7 @@ export default function ReportViewPage() {
                             title={tmpl.name}
                             subject={`${tmpl.name} — SASI ERP Report`}
                             message={`${tmpl.name}\nSource: ${tmpl.source_label || tmpl.source_key}\nRows: ${rows.length}\nGenerated: ${new Date().toLocaleDateString('en-IN')}\n\nSASI ERP`}
+                            onPrint={() => window.print()}
                         />
                     )}
                 </Box>
