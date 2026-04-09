@@ -36,7 +36,7 @@ export function ErrorProvider({ children }) {
     // This intercepts EVERY fetch call across the whole app.
     // No changes needed in existing pages.
     useEffect(() => {
-        originalFetch.current = window.fetch;
+        originalFetch.current = window.fetch.bind(window);
 
         window.fetch = async (...args) => {
             // Skip non-API calls (e.g. CDN assets)
