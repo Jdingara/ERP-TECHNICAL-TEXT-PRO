@@ -26,36 +26,104 @@ const ACTION_COLOR = {
     'Marked Paid':  'success',
 };
 
-function ChangesRow({ changes }) {
-    // changes may be {changes: [...]} or {data: ..., customer: ..., etc.}
+function ChangesRow({ changes, action }) {
     const list = changes?.changes;
-    if (list && Array.isArray(list) && list.length > 0) {
+
+    // ── UPDATED: before → after table ────────────────────────
+    if (Array.isArray(list)) {
+        if (list.length === 0) {
+            return (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
+                    <Typography variant="caption">
+                        ℹ️ Record was saved — no field values were modified.
+                    </Typography>
+                </Box>
+            );
+        }
         return (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                {list.map((c, i) => (
-                    <Box key={i} sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
-                        <Typography variant="caption" fontWeight={700} color="text.secondary" minWidth={100}>
-                            {c.field}
-                        </Typography>
-                        <Chip label={c.before || '(empty)'} size="small" color="error" variant="outlined"
-                              sx={{ fontSize: 11, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }} />
-                        <Typography variant="caption" color="text.secondary">→</Typography>
-                        <Chip label={c.after || '(empty)'} size="small" color="success" variant="outlined"
-                              sx={{ fontSize: 11, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }} />
-                    </Box>
-                ))}
+            <Box sx={{ overflowX: 'auto' }}>
+                <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: 13 }}>
+                    <thead>
+                        <tr>
+                            {['Field', 'Before (Old Value)', 'After (New Value)'].map(h => (
+                                <th key={h} style={{
+                                    textAlign: 'left', padding: '6px 14px',
+                                    backgroundColor: '#1e3a5f', color: '#ffffff',
+                                    fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap',
+                                }}>
+                                    {h}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {list.map((c, i) => (
+                            <tr key={i} style={{ backgroundColor: i % 2 === 0 ? 'rgba(0,0,0,0.02)' : 'transparent' }}>
+                                <td style={{ padding: '6px 14px', fontWeight: 600, whiteSpace: 'nowrap', color: '#334155' }}>
+                                    {c.field}
+                                </td>
+                                <td style={{ padding: '6px 14px' }}>
+                                    <span style={{
+                                        display: 'inline-block', padding: '2px 10px',
+                                        borderRadius: 12, fontSize: 12,
+                                        backgroundColor: '#fee2e2', color: '#991b1b',
+                                        border: '1px solid #fca5a5', maxWidth: 280,
+                                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                                    }}>
+                                        {c.before !== '' && c.before != null ? c.before : '(empty)'}
+                                    </span>
+                                </td>
+                                <td style={{ padding: '6px 14px' }}>
+                                    <span style={{
+                                        display: 'inline-block', padding: '2px 10px',
+                                        borderRadius: 12, fontSize: 12,
+                                        backgroundColor: '#dcfce7', color: '#166534',
+                                        border: '1px solid #86efac', maxWidth: 280,
+                                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                                    }}>
+                                        {c.after !== '' && c.after != null ? c.after : '(empty)'}
+                                    </span>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </Box>
         );
     }
-    // For create / delete — show key-value pairs
+
+    // ── CREATED / DELETED: key-value snapshot ─────────────────
     const entries = Object.entries(changes || {}).filter(([k]) => k !== 'changes');
-    if (entries.length === 0) return <Typography variant="caption" color="text.secondary">—</Typography>;
+    if (entries.length === 0) {
+        return <Typography variant="caption" color="text.secondary">No detail recorded.</Typography>;
+    }
     return (
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            {entries.map(([k, v]) => (
-                <Chip key={k} label={`${k.replace(/_/g, ' ')}: ${v}`} size="small" variant="outlined"
-                      sx={{ fontSize: 11 }} />
-            ))}
+        <Box sx={{ overflowX: 'auto' }}>
+            <table style={{ borderCollapse: 'collapse', fontSize: 13 }}>
+                <thead>
+                    <tr>
+                        {['Field', 'Value'].map(h => (
+                            <th key={h} style={{
+                                textAlign: 'left', padding: '6px 14px',
+                                backgroundColor: '#1e3a5f', color: '#ffffff',
+                                fontWeight: 700, fontSize: 12,
+                            }}>
+                                {h}
+                            </th>
+                        ))}
+                    </tr>
+                </thead>
+                <tbody>
+                    {entries.map(([k, v], i) => (
+                        <tr key={k} style={{ backgroundColor: i % 2 === 0 ? 'rgba(0,0,0,0.02)' : 'transparent' }}>
+                            <td style={{ padding: '6px 14px', fontWeight: 600, color: '#334155', whiteSpace: 'nowrap' }}>
+                                {k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                            </td>
+                            <td style={{ padding: '6px 14px', color: '#475569' }}>{String(v)}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </Box>
     );
 }
@@ -101,8 +169,12 @@ function LogRow({ log }) {
                 <TableRow>
                     <TableCell colSpan={6} sx={{ py: 0, borderBottom: open ? undefined : 'none' }}>
                         <Collapse in={open} timeout="auto" unmountOnExit>
-                            <Box sx={{ py: 1.5, px: 2, backgroundColor: 'action.hover', borderRadius: 1, mb: 0.5 }}>
-                                <ChangesRow changes={log.changes} />
+                            <Box sx={{ py: 1.5, px: 2, mb: 0.5 }}>
+                                <Typography variant="caption" fontWeight={700} color="text.secondary"
+                                    sx={{ display: 'block', mb: 1, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                                    Change Details — {log.action} on {log.object_repr}
+                                </Typography>
+                                <ChangesRow changes={log.changes} action={log.action} />
                             </Box>
                         </Collapse>
                     </TableCell>
