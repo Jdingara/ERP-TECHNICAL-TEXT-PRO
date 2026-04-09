@@ -250,7 +250,7 @@ function ReportTable({ rows, navigate, onExport, onDelete, onPublishToggle }) {
                                 <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
                                     <Tooltip title="Run report">
                                         <IconButton size="small" color="primary"
-                                            onClick={() => navigate(`/reports/maker?tmpl=${tmpl.id}`)}>
+                                            onClick={() => navigate(`/reports/view/${tmpl.id}`)}>
                                             <PlayArrowIcon fontSize="small" />
                                         </IconButton>
                                     </Tooltip>

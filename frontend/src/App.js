@@ -74,6 +74,7 @@ import ActivityLogPage         from './pages/audit/ActivityLogPage';
 import ReportMakerPage         from './pages/reports/ReportMakerPage';
 import ReportMakerListPage     from './pages/reports/ReportMakerListPage';
 import MyReportsPage           from './pages/reports/MyReportsPage';
+import ReportViewPage          from './pages/reports/ReportViewPage';
 
 function App() {
     const [currentUser,    setCurrentUser]    = useState(null);
@@ -247,6 +248,7 @@ function App() {
                                     <Route path="/reports/finance"     element={canSee('/reports/finance')    ? <FinanceReportPage />    : <Navigate to="/dashboard" />} />
                                     <Route path="/reports/hr"          element={canSee('/reports/hr')         ? <HRReportPage />         : <Navigate to="/dashboard" />} />
                                     <Route path="/reports/my-reports"  element={<MyReportsPage />} />
+                                    <Route path="/reports/view/:id"    element={<ReportViewPage />} />
                                     <Route path="/reports/maker/list"  element={<ReportMakerListPage />} />
                                     <Route path="/reports/maker"       element={<ReportMakerPage />} />
 

@@ -129,7 +129,7 @@ export default function MyReportsPage() {
                         }}>
                             <CardActionArea
                                 sx={{ height: '100%', p: 0 }}
-                                onClick={() => navigate(`/reports/maker?tmpl=${tmpl.id}`)}
+                                onClick={() => navigate(`/reports/view/${tmpl.id}`)}
                             >
                                 <CardContent sx={{ p: 2.5 }}>
                                     {/* Source chip */}
@@ -180,7 +180,7 @@ export default function MyReportsPage() {
                                                 cursor: 'pointer', fontSize: 12,
                                                 '&:hover': { bgcolor: 'primary.dark' },
                                             }}
-                                                onClick={() => navigate(`/reports/maker?tmpl=${tmpl.id}`)}>
+                                                onClick={() => navigate(`/reports/view/${tmpl.id}`)}>
                                                 <PlayArrowIcon sx={{ fontSize: 14 }} />
                                                 Run
                                             </Box>
