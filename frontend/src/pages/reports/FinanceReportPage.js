@@ -132,7 +132,7 @@ function FinanceReportPage() {
                 <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Account Balances by Category</Typography>
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
+                        <TableHead sx={{ backgroundColor: '#1e3a5f', '& th': { color: '#ffffff', fontWeight: 700, fontSize: 12.5 } }}>
                             <TableRow>
                                 <TableCell><strong>Category</strong></TableCell>
                                 <TableCell align="right"><strong>No. of Accounts</strong></TableCell>
@@ -162,7 +162,7 @@ function FinanceReportPage() {
                 <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Recent Journal Entries (Last 30 Days)</Typography>
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
+                        <TableHead sx={{ backgroundColor: '#1e3a5f', '& th': { color: '#ffffff', fontWeight: 700, fontSize: 12.5 } }}>
                             <TableRow>
                                 <TableCell><strong>Entry No.</strong></TableCell>
                                 <TableCell><strong>Date</strong></TableCell>

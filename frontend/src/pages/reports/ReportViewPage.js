@@ -205,9 +205,11 @@ export default function ReportViewPage() {
                                                     fontWeight: 700,
                                                     cursor: 'pointer',
                                                     userSelect: 'none',
-                                                    bgcolor: 'action.hover',
+                                                    bgcolor: '#1e3a5f',
+                                                    color: '#ffffff',
+                                                    fontSize: 12.5,
                                                     whiteSpace: 'nowrap',
-                                                    '&:hover': { bgcolor: 'action.selected' },
+                                                    '&:hover': { bgcolor: '#264a7a' },
                                                 }}
                                             >
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>

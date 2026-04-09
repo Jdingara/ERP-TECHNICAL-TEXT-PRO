@@ -197,7 +197,7 @@ function ReportTable({ rows, navigate, onExport, onDelete, onPublishToggle }) {
         <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2 }}>
             <Table size="small">
                 <TableHead>
-                    <TableRow sx={{ '& th': { fontWeight: 700, bgcolor: 'action.hover' } }}>
+                    <TableRow sx={{ '& th': { fontWeight: 700, bgcolor: '#1e3a5f', color: '#ffffff', fontSize: 12.5 } }}>
                         <TableCell>Report Name</TableCell>
                         <TableCell>Data Source</TableCell>
                         <TableCell>Columns</TableCell>

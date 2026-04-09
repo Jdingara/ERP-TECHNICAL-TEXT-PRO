@@ -114,7 +114,7 @@ function SalesReportPage() {
                 <ResizableChartPanel storageKey="salesreport_top_5_customers_by_order_" title="Top 5 Customers by Order Value" defaultHeight={280}>
                         <TableContainer>
                             <Table size="small">
-                                <TableHead sx={{ backgroundColor: 'action.hover' }}>
+                                <TableHead sx={{ backgroundColor: '#1e3a5f', '& th': { color: '#ffffff', fontWeight: 700, fontSize: 12.5 } }}>
                                     <TableRow>
                                         <TableCell><strong>Customer</strong></TableCell>
                                         <TableCell align="right"><strong>Orders</strong></TableCell>
@@ -155,7 +155,7 @@ function SalesReportPage() {
                 <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Recent Sales Orders</Typography>
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
+                        <TableHead sx={{ backgroundColor: '#1e3a5f', '& th': { color: '#ffffff', fontWeight: 700, fontSize: 12.5 } }}>
                             <TableRow>
                                 <TableCell><strong>SO Number</strong></TableCell>
                                 <TableCell><strong>Customer</strong></TableCell>
