@@ -150,7 +150,7 @@ function HRReportPage() {
                         </ResponsiveContainer>
                         <TableContainer sx={{ mt: 2 }}>
                             <Table size="small">
-                                <TableHead sx={{ backgroundColor: '#1e3a5f', '& th': { color: '#ffffff', fontWeight: 700, fontSize: 12.5 } }}>
+                                <TableHead sx={{ backgroundColor: 'primary.main', '& th': { color: 'primary.contrastText', fontWeight: 700, fontSize: 12.5 } }}>
                                     <TableRow>
                                         <TableCell><strong>Period</strong></TableCell>
                                         <TableCell align="right"><strong>Employees</strong></TableCell>
@@ -183,7 +183,7 @@ function HRReportPage() {
                 <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Recent Salary Records</Typography>
                 <TableContainer>
                     <Table size="small">
-                        <TableHead sx={{ backgroundColor: '#1e3a5f', '& th': { color: '#ffffff', fontWeight: 700, fontSize: 12.5 } }}>
+                        <TableHead sx={{ backgroundColor: 'primary.main', '& th': { color: 'primary.contrastText', fontWeight: 700, fontSize: 12.5 } }}>
                             <TableRow>
                                 <TableCell><strong>Employee</strong></TableCell>
                                 <TableCell><strong>Code</strong></TableCell>
