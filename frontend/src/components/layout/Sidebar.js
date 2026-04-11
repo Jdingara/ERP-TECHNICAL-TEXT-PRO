@@ -110,7 +110,8 @@ const MENU_ITEMS = [
         { title: 'HR Report',         path: '/reports/hr' },
     ]},
     { title: 'Settings', icon: <TuneIcon />, children: [
-        { title: 'Format Panel',      path: '/settings/format-panel' },
+        { title: 'Format Panel',       path: '/settings/format-panel' },
+        { title: 'Message Templates',  path: '/settings/message-templates' },
     ]},
     { title: 'Report Maker', icon: <BuildIcon />, path: '/reports/maker/list' },
     { title: 'Activity Log',  icon: <HistoryIcon />, path: '/audit/activity-log' },

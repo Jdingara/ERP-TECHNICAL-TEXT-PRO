@@ -36,6 +36,7 @@ import OrderJourneyPage        from './pages/sales/OrderJourneyPage';
 import SalesInvoicePage        from './pages/sales/SalesInvoicePage';
 import SalesInvoiceFormPage    from './pages/sales/SalesInvoiceFormPage';
 import FormatPanelPage         from './pages/settings/FormatPanelPage';
+import MessageTemplatesPage    from './pages/settings/MessageTemplatesPage';
 import ChartOfAccountsPage     from './pages/finance/ChartOfAccountsPage';
 import JournalEntryListPage    from './pages/finance/JournalEntryListPage';
 import JournalEntryFormPage    from './pages/finance/JournalEntryFormPage';
@@ -256,7 +257,8 @@ function App() {
                                     <Route path="/reports/maker/list"  element={<ReportMakerListPage />} />
                                     <Route path="/reports/maker"       element={<ReportMakerPage />} />
 
-                                    <Route path="/settings/format-panel" element={canSee('/settings/format-panel') ? <FormatPanelPage /> : <Navigate to="/dashboard" />} />
+                                    <Route path="/settings/format-panel"       element={canSee('/settings/format-panel') ? <FormatPanelPage /> : <Navigate to="/dashboard" />} />
+                                    <Route path="/settings/message-templates" element={<MessageTemplatesPage />} />
 
                                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                                 </Routes>

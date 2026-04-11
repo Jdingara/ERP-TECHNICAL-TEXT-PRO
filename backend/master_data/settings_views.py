@@ -8,7 +8,7 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from .models import FinancialYear, DocumentSeries
+from .models import FinancialYear, DocumentSeries, MessageTemplate
 
 
 def _require_admin(request):
@@ -178,3 +178,44 @@ def series_enabled_map(request):
         return JsonResponse({'message': 'Not logged in.'}, status=401)
     result = {s.document_type: s.is_enabled for s in DocumentSeries.objects.all()}
     return JsonResponse(result)
+
+
+# ─── Message Templates ────────────────────────────────────────
+
+def _tmpl_to_dict(t):
+    return {
+        'document_type':  t.document_type,
+        'label':          t.get_document_type_display(),
+        'email_subject':  t.email_subject,
+        'email_body':     t.email_body,
+        'whatsapp_body':  t.whatsapp_body,
+        'updated_at':     t.updated_at.strftime('%Y-%m-%d %H:%M'),
+    }
+
+
+@require_http_methods(["GET"])
+def message_template_list(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'Not logged in.'}, status=401)
+    # Auto-create rows if they don't exist
+    for doc_type, _ in MessageTemplate.DOCUMENT_TYPES:
+        MessageTemplate.objects.get_or_create(document_type=doc_type)
+    templates = MessageTemplate.objects.all()
+    return JsonResponse({'templates': [_tmpl_to_dict(t) for t in templates]})
+
+
+@csrf_exempt
+@require_http_methods(["PUT"])
+def message_template_update(request, doc_type):
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'Not logged in.'}, status=401)
+    try:
+        tmpl = MessageTemplate.objects.get(document_type=doc_type)
+    except MessageTemplate.DoesNotExist:
+        tmpl = MessageTemplate(document_type=doc_type)
+    data = json.loads(request.body)
+    tmpl.email_subject  = data.get('email_subject',  tmpl.email_subject)
+    tmpl.email_body     = data.get('email_body',     tmpl.email_body)
+    tmpl.whatsapp_body  = data.get('whatsapp_body',  tmpl.whatsapp_body)
+    tmpl.save()
+    return JsonResponse({'message': 'Template saved.', 'template': _tmpl_to_dict(tmpl)})

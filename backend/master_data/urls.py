@@ -20,6 +20,10 @@ urlpatterns = [
     path('settings/document-series/<int:series_id>/reset/',  settings_views.document_series_reset,   name='series-reset'),
     path('settings/series-enabled/',                         settings_views.series_enabled_map,      name='series-enabled'),
 
+    # ── Settings: Message Templates ───────────────────────────
+    path('settings/message-templates/',                      settings_views.message_template_list,   name='msg-tmpl-list'),
+    path('settings/message-templates/<str:doc_type>/',       settings_views.message_template_update, name='msg-tmpl-update'),
+
 
     # Units of Measure
     path('units/',              views.unit_of_measure_list_and_create,  name='unit-list'),

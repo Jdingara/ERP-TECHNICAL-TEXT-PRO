@@ -6,17 +6,16 @@
 //          the customer buys that integration.
 // ============================================================
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { fetchTemplates, fillTemplate } from '../../utils/messageTemplates';
 import {
     Dialog, DialogTitle, DialogContent, DialogActions,
-    Button, Box, Typography, Divider, Tooltip, IconButton,
-    TextField, Chip,
+    Button, Box, Typography, Divider, Tooltip, IconButton, Chip,
 } from '@mui/material';
-import ShareIcon     from '@mui/icons-material/Share';
-import CloseIcon     from '@mui/icons-material/Close';
-import EmailIcon     from '@mui/icons-material/Email';
+import ShareIcon       from '@mui/icons-material/Share';
+import CloseIcon       from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import LockIcon      from '@mui/icons-material/Lock';
+import LockIcon        from '@mui/icons-material/Lock';
 
 // ── Platform definitions ──────────────────────────────────────
 // status: 'live'    → works now (free)
@@ -137,25 +136,44 @@ const PLATFORMS = [
 ];
 
 // ── Main ShareWidget component ────────────────────────────────
+// Usage A — document-based (Quotation / SO / Invoice):
+//   <ShareWidget docType="invoice" vars={{ customer_name, document_number, amount, date }}
+//                email={inv.customer_email} phone={inv.customer_phone} title="Invoice INV-001" />
+//
+// Usage B — manual message (Reports / ReportToolbar):
+//   <ShareWidget title="Sales Report" message="..." subject="..." onPrint={fn} />
 export default function ShareWidget({
-    title    = 'Document',       // e.g. "Invoice INV-001"
-    message  = '',               // pre-built text for sharing
-    email    = '',               // recipient email (if known)
-    phone    = '',               // recipient phone for WhatsApp (if known)
-    subject  = '',               // email subject override
-    onPrint  = null,             // callback to trigger PDF download before email opens
+    title    = 'Document',   // shown in dialog header
+    docType  = '',           // 'quotation' | 'sales_order' | 'invoice'  (loads template)
+    vars     = {},           // { customer_name, document_number, amount, date }
+    message  = '',           // fallback if no docType
+    email    = '',           // recipient email
+    phone    = '',           // recipient phone for WhatsApp
+    subject  = '',           // email subject override (used when no docType)
+    onPrint  = null,         // used only in report pages (PDF download before email)
 }) {
-    const [open,        setOpen]        = useState(false);
-    const [apiInfo,     setApiInfo]     = useState(null);
-    const [pdfTip,      setPdfTip]      = useState(false); // show the "attach PDF" tip banner
+    const [open,    setOpen]    = useState(false);
+    const [apiInfo, setApiInfo] = useState(null);
 
-    const emailSubject = subject || `${title} — SASI ERP`;
+    // Resolved subject / body from template or props
+    const [emailSubject, setEmailSubject] = useState(subject || `${title} — SASI ERP`);
+    const [emailBody,    setEmailBody]    = useState(message || title);
+    const [waBody,       setWaBody]       = useState(message || title);
 
-    // Email body always includes the PDF attachment reminder at the top
-    const emailBody = `📎 NOTE: A PDF has been downloaded to your Downloads folder — please attach it to this email before sending.\n\n${message || title}`;
+    // Load message templates when dialog opens (only for document types)
+    useEffect(() => {
+        if (!open || !docType) return;
+        fetchTemplates().then(templates => {
+            const tmpl = templates[docType];
+            if (!tmpl) return;
+            const filled = (text) => fillTemplate(text, vars);
+            if (tmpl.email_subject) setEmailSubject(filled(tmpl.email_subject));
+            if (tmpl.email_body)    setEmailBody(filled(tmpl.email_body));
+            if (tmpl.whatsapp_body) setWaBody(filled(tmpl.whatsapp_body));
+        });
+    }, [open, docType, vars]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const waMessage = encodeURIComponent(message || title);
-    const waPhone   = phone ? phone.replace(/\D/g, '') : '';
+    const waPhone = phone ? phone.replace(/\D/g, '') : '';
 
     const handleShare = (platform) => {
         if (platform.status === 'api') {
@@ -164,28 +182,24 @@ export default function ShareWidget({
         }
 
         if (platform.key === 'email') {
-            // Step 1 — trigger PDF download first
             if (onPrint) {
+                // Report pages: trigger print/PDF first, then open email
                 onPrint();
-                setPdfTip(true);
-                // Step 2 — open email after short delay so print dialog appears first
                 setTimeout(() => {
-                    const to   = email || '';
-                    const href = `mailto:${to}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+                    const href = `mailto:${email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
                     window.open(href, '_self');
                 }, 1200);
             } else {
-                // No print callback — open email directly
-                const to   = email || '';
-                const href = `mailto:${to}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(message || title)}`;
+                const href = `mailto:${email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
                 window.open(href, '_self');
             }
         }
 
         if (platform.key === 'whatsapp') {
+            const text = encodeURIComponent(waBody);
             const base = waPhone
-                ? `https://wa.me/${waPhone}?text=${waMessage}`
-                : `https://wa.me/?text=${waMessage}`;
+                ? `https://wa.me/${waPhone}?text=${text}`
+                : `https://wa.me/?text=${text}`;
             window.open(base, '_blank');
         }
     };
@@ -221,27 +235,8 @@ export default function ShareWidget({
 
                 <DialogContent sx={{ pt: 0 }}>
 
-                    {/* ── PDF tip banner — shown after email clicked ── */}
-                    {pdfTip && (
-                        <Box sx={{
-                            display: 'flex', alignItems: 'flex-start', gap: 1,
-                            p: 1.5, mb: 2, borderRadius: 2,
-                            bgcolor: '#fff8e1', border: '1.5px solid #fbbf24',
-                        }}>
-                            <span style={{ fontSize: 18, flexShrink: 0 }}>📎</span>
-                            <Box>
-                                <Typography fontWeight={700} fontSize={13} color="#92400e">
-                                    PDF is downloading now
-                                </Typography>
-                                <Typography fontSize={12} color="#92400e" sx={{ mt: 0.3 }}>
-                                    Check your <strong>Downloads folder</strong> — attach the PDF to the email that just opened, then click Send.
-                                </Typography>
-                            </Box>
-                        </Box>
-                    )}
-
                     {/* ── Message preview ── */}
-                    {message && (
+                    {emailBody && (
                         <Box sx={{ mb: 2 }}>
                             <Typography variant="caption" fontWeight={700} color="text.secondary"
                                 sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>
@@ -250,10 +245,10 @@ export default function ShareWidget({
                             <Box sx={{
                                 mt: 0.5, p: 1.5, bgcolor: 'action.hover',
                                 borderRadius: 1.5, fontSize: 12.5, color: 'text.secondary',
-                                whiteSpace: 'pre-line', maxHeight: 100, overflowY: 'auto',
+                                whiteSpace: 'pre-line', maxHeight: 120, overflowY: 'auto',
                                 border: '1px solid', borderColor: 'divider',
                             }}>
-                                {message}
+                                {emailBody}
                             </Box>
                         </Box>
                     )}

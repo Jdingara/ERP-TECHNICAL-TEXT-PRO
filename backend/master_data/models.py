@@ -298,3 +298,31 @@ class DocumentSeries(models.Model):
         parts.append(str(next_n).zfill(self.padding))
         sep = self.separator or ''
         return sep.join(parts)
+
+
+# ============================================================
+# MESSAGE TEMPLATES
+# One row per document type — email subject/body + WhatsApp body
+# with placeholders: {{customer_name}}, {{document_number}},
+# {{amount}}, {{date}}
+# ============================================================
+class MessageTemplate(models.Model):
+    DOCUMENT_TYPES = [
+        ('quotation',    'Quotation'),
+        ('sales_order',  'Sales Order'),
+        ('invoice',      'Invoice'),
+    ]
+
+    document_type   = models.CharField(max_length=30, choices=DOCUMENT_TYPES, unique=True)
+    email_subject   = models.CharField(max_length=255, blank=True, default='')
+    email_body      = models.TextField(blank=True, default='')
+    whatsapp_body   = models.TextField(blank=True, default='')
+    updated_at      = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'settings_message_template'
+        ordering = ['document_type']
+
+    def __str__(self):
+        return f"MessageTemplate — {self.get_document_type_display()}"
+

@@ -8,16 +8,19 @@ import { useState, useEffect, useCallback } from 'react';
 import {
     Box, Typography, Button, Paper, Table, TableHead, TableRow,
     TableCell, TableBody, Chip, IconButton, Tooltip,
-    InputAdornment, Stack, TextField, MenuItem,
+    InputAdornment, Stack, TextField, Checkbox,
 } from '@mui/material';
 import AddIcon          from '@mui/icons-material/Add';
 import EditIcon         from '@mui/icons-material/Edit';
 import DeleteIcon       from '@mui/icons-material/Delete';
 import PrintIcon        from '@mui/icons-material/Print';
 import SearchIcon       from '@mui/icons-material/Search';
+import ShareIcon        from '@mui/icons-material/Share';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import { useNavigate } from 'react-router-dom';
 import { printQuotation } from '../../utils/printUtils';
+import ShareWidget     from '../../components/common/ShareWidget';
+import BulkShareDialog from '../../components/common/BulkShareDialog';
 
 const STATUS_CHOICES = [
     { value: 'draft',    label: 'Draft',              color: 'default' },
@@ -27,7 +30,6 @@ const STATUS_CHOICES = [
     { value: 'expired',  label: 'Expired',             color: 'warning' },
 ];
 
-// Business logic helpers
 const canEdit   = (qt) => ['draft', 'sent'].includes(qt.status);
 const canDelete = (qt) => qt.status === 'draft';
 
@@ -42,6 +44,8 @@ export default function QuotationPage() {
     const [loading,      setLoading]      = useState(true);
     const [search,       setSearch]       = useState('');
     const [statusFilter, setStatusFilter] = useState('');
+    const [selected,     setSelected]     = useState(new Set());
+    const [bulkOpen,     setBulkOpen]     = useState(false);
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -51,6 +55,7 @@ export default function QuotationPage() {
         const res    = await fetch(url, { credentials: 'include' });
         const qtData = await res.json();
         setQuotations(qtData.quotations || []);
+        setSelected(new Set());
         setLoading(false);
     }, [statusFilter]);
 
@@ -67,11 +72,39 @@ export default function QuotationPage() {
         else { alert(data.message || 'Delete failed.'); }
     };
 
+    const toggleSelect = (id) => {
+        setSelected(prev => {
+            const next = new Set(prev);
+            next.has(id) ? next.delete(id) : next.add(id);
+            return next;
+        });
+    };
+
+    const toggleAll = () => {
+        if (selected.size === filtered.length) setSelected(new Set());
+        else setSelected(new Set(filtered.map(q => q.id)));
+    };
+
     const filtered = quotations.filter(q =>
         q.quotation_number.toLowerCase().includes(search.toLowerCase()) ||
         q.customer_name.toLowerCase().includes(search.toLowerCase()) ||
         q.product_description.toLowerCase().includes(search.toLowerCase())
     );
+
+    const bulkRows = filtered
+        .filter(q => selected.has(q.id))
+        .map(q => ({
+            id:    q.id,
+            title: `Quotation ${q.quotation_number}`,
+            email: q.customer_email || '',
+            phone: q.customer_phone || '',
+            vars:  {
+                customer_name:   q.customer_name,
+                document_number: q.quotation_number,
+                amount:          `₹${parseFloat(q.total_amount).toLocaleString('en-IN')}`,
+                date:            q.date,
+            },
+        }));
 
     return (
         <Box>
@@ -86,9 +119,21 @@ export default function QuotationPage() {
                         </Typography>
                     </Box>
                 </Box>
-                <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/sales/quotations/new')}>
-                    New Quotation
-                </Button>
+                <Stack direction="row" spacing={1}>
+                    {selected.size > 0 && (
+                        <Button
+                            variant="outlined"
+                            startIcon={<ShareIcon />}
+                            onClick={() => setBulkOpen(true)}
+                            sx={{ textTransform: 'none', borderRadius: 2 }}
+                        >
+                            Share Selected ({selected.size})
+                        </Button>
+                    )}
+                    <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/sales/quotations/new')}>
+                        New Quotation
+                    </Button>
+                </Stack>
             </Box>
 
             {/* Status filter chips */}
@@ -117,7 +162,7 @@ export default function QuotationPage() {
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     sx={{ minWidth: 320 }}
-                    InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> }}
+                    slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> } }}
                 />
             </Paper>
 
@@ -125,7 +170,16 @@ export default function QuotationPage() {
             <Paper>
                 <Table size="small">
                     <TableHead>
-                        <TableRow sx={{ '& th': { fontWeight: 700, backgroundColor: 'action.hover' } }}>
+                        <TableRow sx={{ '& th': { fontWeight: 700, backgroundColor: 'primary.main', color: 'primary.contrastText', fontSize: 12.5 } }}>
+                            <TableCell padding="checkbox" sx={{ backgroundColor: 'primary.main' }}>
+                                <Checkbox
+                                    size="small"
+                                    indeterminate={selected.size > 0 && selected.size < filtered.length}
+                                    checked={filtered.length > 0 && selected.size === filtered.length}
+                                    onChange={toggleAll}
+                                    sx={{ color: 'primary.contrastText', '&.Mui-checked': { color: 'primary.contrastText' }, '&.MuiCheckbox-indeterminate': { color: 'primary.contrastText' } }}
+                                />
+                            </TableCell>
                             <TableCell>Quotation #</TableCell>
                             <TableCell>Customer</TableCell>
                             <TableCell>Product</TableCell>
@@ -139,11 +193,14 @@ export default function QuotationPage() {
                     </TableHead>
                     <TableBody>
                         {loading ? (
-                            <TableRow><TableCell colSpan={9} align="center">Loading…</TableCell></TableRow>
+                            <TableRow><TableCell colSpan={10} align="center">Loading…</TableCell></TableRow>
                         ) : filtered.length === 0 ? (
-                            <TableRow><TableCell colSpan={9} align="center">No quotations found.</TableCell></TableRow>
+                            <TableRow><TableCell colSpan={10} align="center">No quotations found.</TableCell></TableRow>
                         ) : filtered.map(qt => (
-                            <TableRow key={qt.id} hover>
+                            <TableRow key={qt.id} hover selected={selected.has(qt.id)}>
+                                <TableCell padding="checkbox">
+                                    <Checkbox size="small" checked={selected.has(qt.id)} onChange={() => toggleSelect(qt.id)} />
+                                </TableCell>
                                 <TableCell><Typography fontWeight={600} fontSize={12}>{qt.quotation_number}</Typography></TableCell>
                                 <TableCell>{qt.customer_name}</TableCell>
                                 <TableCell sx={{ maxWidth: 180 }}>
@@ -164,6 +221,18 @@ export default function QuotationPage() {
                                                 <PrintIcon fontSize="small" />
                                             </IconButton>
                                         </Tooltip>
+                                        <ShareWidget
+                                            title={`Quotation ${qt.quotation_number}`}
+                                            docType="quotation"
+                                            vars={{
+                                                customer_name:   qt.customer_name,
+                                                document_number: qt.quotation_number,
+                                                amount:          `₹${parseFloat(qt.total_amount).toLocaleString('en-IN')}`,
+                                                date:            qt.date,
+                                            }}
+                                            email={qt.customer_email || ''}
+                                            phone={qt.customer_phone || ''}
+                                        />
                                         <Tooltip title={canEdit(qt) ? 'Edit' : 'Locked — accepted/rejected/expired quotations cannot be edited'}>
                                             <span>
                                                 <IconButton
@@ -189,6 +258,13 @@ export default function QuotationPage() {
                     </TableBody>
                 </Table>
             </Paper>
+
+            <BulkShareDialog
+                open={bulkOpen}
+                onClose={() => setBulkOpen(false)}
+                docType="quotation"
+                rows={bulkRows}
+            />
         </Box>
     );
 }
