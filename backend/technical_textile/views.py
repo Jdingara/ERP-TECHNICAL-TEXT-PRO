@@ -57,7 +57,7 @@ def sample_to_dict(s):
     return {
         'id': s.id, 'sample_number': s.sample_number,
         'item_id': s.item_id, 'item_code': s.item.item_code, 'item_name': s.item.item_name,
-        'customer_id': s.customer_id, 'customer_name': s.customer.company_name,
+        'customer_id': s.customer_id, 'customer_name': s.customer.customer_name,
         'quantity': str(s.quantity),
         'sent_date': str(s.sent_date) if s.sent_date else '',
         'approved_date': str(s.approved_date) if s.approved_date else '',
