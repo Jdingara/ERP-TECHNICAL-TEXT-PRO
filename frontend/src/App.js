@@ -14,6 +14,7 @@ import MainLayout from './components/layout/MainLayout';
 import LoginPage               from './pages/authentication/LoginPage';
 import DashboardPage           from './pages/dashboard/DashboardPage';
 import CustomerIntelligencePage from './pages/analytics/CustomerIntelligencePage';
+import SmartFeedPage            from './pages/feed/SmartFeedPage';
 import ItemListPage            from './pages/master_data/ItemListPage';
 import ItemFormPage            from './pages/master_data/ItemFormPage';
 import SupplierListPage        from './pages/master_data/SupplierListPage';
@@ -259,6 +260,7 @@ function App() {
                                     <Route path="/reports/maker"       element={<ReportMakerPage />} />
 
                                     <Route path="/analytics/customer-intelligence" element={<CustomerIntelligencePage />} />
+                                    <Route path="/feed"                            element={<SmartFeedPage />} />
 
                                     <Route path="/settings/format-panel"       element={canSee('/settings/format-panel') ? <FormatPanelPage /> : <Navigate to="/dashboard" />} />
                                     <Route path="/settings/message-templates" element={<MessageTemplatesPage />} />

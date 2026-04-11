@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'dashboard',             # KPIs, charts, production predictions
     'reports',               # Report generation (PDF, Excel)
     'analytics',             # Customer Intelligence — RFM, churn, forecast, product analytics
+    'feed',                  # Smart Business Feed — daily insights, tips, alerts
 ]
 
 

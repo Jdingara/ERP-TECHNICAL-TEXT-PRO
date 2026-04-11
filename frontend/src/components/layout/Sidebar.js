@@ -26,6 +26,7 @@ import ScienceIcon           from '@mui/icons-material/Science';
 import LocalHospitalIcon     from '@mui/icons-material/LocalHospital';
 import AssessmentIcon        from '@mui/icons-material/Assessment';
 import InsightsIcon          from '@mui/icons-material/Insights';
+import DynamicFeedIcon       from '@mui/icons-material/DynamicFeed';
 import TuneIcon              from '@mui/icons-material/Tune';
 import HistoryIcon           from '@mui/icons-material/History';
 import CategoryIcon          from '@mui/icons-material/Category';
@@ -102,6 +103,7 @@ const MENU_ITEMS = [
         { title: 'Audit Trail',           path: '/medical-textile/audit-trail' },
         { title: 'Shelf Life Tracking',   path: '/medical-textile/shelf-life' },
     ]},
+    { title: 'Smart Feed',             icon: <DynamicFeedIcon />, path: '/feed', children: [] },
     { title: 'Customer Intelligence', icon: <InsightsIcon />, path: '/analytics/customer-intelligence', children: [] },
     { title: 'Reports', icon: <AssessmentIcon />, children: [
         { title: 'My Reports',        path: '/reports/my-reports' },
@@ -131,6 +133,7 @@ const MODULE_COLORS = {
     'Technical Textile': '#14b8a6',
     'Medical Textile':   '#ec4899',
     'Settings':          '#64748b',
+    'Smart Feed':            '#f59e0b',
     'Customer Intelligence': '#0ea5e9',
     'Reports':           '#a78bfa',
     'Report Maker':      '#a78bfa',

@@ -52,6 +52,9 @@ urlpatterns = [
 
     # Customer Intelligence Analytics
     path('api/analytics/', include('analytics.urls')),
+
+    # Smart Business Feed
+    path('api/feed/', include('feed.urls')),
 ]
 
 # ── Serve React frontend in production ───────────────────────
