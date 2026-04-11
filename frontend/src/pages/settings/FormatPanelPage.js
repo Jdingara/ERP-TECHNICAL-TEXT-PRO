@@ -121,7 +121,8 @@ function FinancialYearPanel() {
                                     </TableCell>
                                 </TableRow>
                             ) : years.map(fy => (
-                                <TableRow key={fy.id} sx={{ backgroundColor: fy.is_active ? '#e8f5e9' : 'white' }}>
+                                <TableRow key={fy.id} sx={{ backgroundColor: fy.is_active ? 'success.light' : 'inherit', opacity: 1 }}
+                                    style={fy.is_active ? { backgroundColor: 'rgba(46,125,50,0.08)' } : {}}>
                                     <TableCell><strong>{fy.label}</strong></TableCell>
                                     <TableCell>{fy.start_date}</TableCell>
                                     <TableCell>{fy.end_date}</TableCell>
@@ -300,14 +301,11 @@ function DocumentSeriesPanel() {
                         </TableHead>
                         <TableBody>
                             {series.map(s => (
-                                <TableRow key={s.id} sx={{
-                                    backgroundColor: s.is_enabled ? 'white' : '#fafafa',
-                                    opacity: s.is_enabled ? 1 : 0.6,
-                                }}>
+                                <TableRow key={s.id} sx={{ opacity: s.is_enabled ? 1 : 0.6 }}>
                                     <TableCell sx={{ fontWeight: 600, fontSize: 12 }}>{s.label}</TableCell>
                                     <TableCell>
-                                        <Chip label={s.prefix || '—'} size="small"
-                                            sx={{ fontSize: 11, backgroundColor: '#e3f2fd' }} />
+                                        <Chip label={s.prefix || '—'} size="small" variant="outlined"
+                                            color="primary" sx={{ fontSize: 11 }} />
                                     </TableCell>
                                     <TableCell sx={{ fontSize: 12 }}>
                                         {s.separator === '' ? '(none)' : s.separator}
@@ -319,10 +317,10 @@ function DocumentSeriesPanel() {
                                     </TableCell>
                                     <TableCell sx={{ fontSize: 12 }}>{`${s.padding}d`}</TableCell>
                                     <TableCell sx={{ fontSize: 12 }}>{s.starting_number}</TableCell>
-                                    <TableCell sx={{ fontSize: 12, color: '#666' }}>{s.current_number}</TableCell>
+                                    <TableCell sx={{ fontSize: 12, color: 'text.secondary' }}>{s.current_number}</TableCell>
                                     <TableCell>
-                                        <Chip label={s.preview} size="small"
-                                            sx={{ fontSize: 11, backgroundColor: '#e8f5e9', fontFamily: 'monospace' }} />
+                                        <Chip label={s.preview} size="small" color="success" variant="outlined"
+                                            sx={{ fontSize: 11, fontFamily: 'monospace' }} />
                                     </TableCell>
                                     <TableCell>
                                         {s.is_enabled
