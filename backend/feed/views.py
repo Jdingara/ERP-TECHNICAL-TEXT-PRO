@@ -9,7 +9,7 @@
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum, Count, Q, F
 from django.conf import settings
 from datetime import date, timedelta
 from collections import defaultdict
@@ -19,7 +19,7 @@ import uuid
 import os
 
 from sales.models import SalesOrder, SalesOrderLine, Invoice
-from inventory.models import StockItem
+from inventory.models import Stock
 from master_data.models import Customer
 from .content_library import BOOKS, COURSES, TIPS, MARKET_INSIGHTS
 
@@ -161,22 +161,23 @@ def _stock_alert_cards():
     """Cards for items below minimum stock level."""
     cards = []
     try:
-        low = StockItem.objects.filter(
-            quantity__lt=models.F('item__minimum_stock'),
-            item__is_active=True,
-        ).select_related('item')[:10]
-
-        if low.count() > 0:
+        low = list(
+            Stock.objects.filter(
+                quantity__lt=F('item__minimum_stock'),
+                item__is_active=True,
+                item__minimum_stock__gt=0,
+            ).select_related('item')[:10]
+        )
+        if low:
             names = ', '.join(s.item.item_name for s in low[:3])
             cards.append(_card(
                 'alert', 'high', 'inventory_2', '#e65100',
-                f'🔴 {low.count()} item{"s" if low.count() > 1 else ""} below minimum stock',
-                f'{names}{"..." if low.count() > 3 else ""} — these items are running low. Raise purchase orders before production is affected.',
+                f'🔴 {len(low)} item{"s" if len(low) > 1 else ""} below minimum stock',
+                f'{names}{"..." if len(low) > 3 else ""} — these items are running low. Raise purchase orders before production is affected.',
                 action_label='View Inventory',
                 action_path='/inventory/stock-list',
             ))
     except Exception:
-        # StockItem model or F() import may vary — graceful skip
         pass
     return cards
 
