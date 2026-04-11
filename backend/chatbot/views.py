@@ -172,12 +172,6 @@ def _answer_pattern(msg):
             Stock.objects.filter(quantity__lt=0.1, item__is_active=True)
             .select_related('item').values_list('item__item_name', flat=True)[:5]
         )
-        below_min = list(
-            Stock.objects.filter(quantity__gt=0, item__is_active=True, item__minimum_stock__gt=0)
-            .filter(quantity__lt=models_f_placeholder := None)
-            .values_list('item__item_name', flat=True)
-        ) if False else []  # skip F() check here, just report out of stock
-
         if not low:
             return 'No items are completely out of stock right now. ✅'
         return f'**{len(low)}** item{"s" if len(low)>1 else ""} with near-zero stock: **{", ".join(low)}**. Consider raising purchase orders.'
