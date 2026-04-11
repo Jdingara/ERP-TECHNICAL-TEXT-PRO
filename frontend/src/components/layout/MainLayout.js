@@ -14,7 +14,8 @@ import NotificationsNoneIcon    from '@mui/icons-material/NotificationsNone';
 import SettingsIcon             from '@mui/icons-material/Settings';
 import AdminPanelSettingsIcon   from '@mui/icons-material/AdminPanelSettings';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Sidebar from './Sidebar';
+import Sidebar  from './Sidebar';
+import ChatBot  from '../common/ChatBot';
 
 const PAGE_TITLES = {
     '/dashboard':                           'Dashboard',
@@ -113,6 +114,7 @@ function MainLayout({ children, currentUser, onLogout, permissions, isAdmin }) {
     const initials   = (currentUser?.first_name?.[0] || currentUser?.username?.[0] || 'U').toUpperCase();
 
     return (
+        <>
         <Box sx={{
             display: 'flex', minHeight: '100vh',
             backgroundColor: 'background.default',
@@ -270,6 +272,10 @@ function MainLayout({ children, currentUser, onLogout, permissions, isAdmin }) {
                 </Box>
             </Box>
         </Box>
+
+        {/* Floating ERP chatbot — visible on every page */}
+        <ChatBot />
+        </>
     );
 }
 

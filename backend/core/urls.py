@@ -55,6 +55,9 @@ urlpatterns = [
 
     # Smart Business Feed
     path('api/feed/', include('feed.urls')),
+
+    # ERP Chatbot
+    path('api/chat/', include('chatbot.urls')),
 ]
 
 # ── Serve React frontend in production ───────────────────────
