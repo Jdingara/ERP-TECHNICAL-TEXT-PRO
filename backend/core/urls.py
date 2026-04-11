@@ -49,6 +49,9 @@ urlpatterns = [
 
     # Dashboard API
     path('api/dashboard/', include('dashboard.urls')),
+
+    # Customer Intelligence Analytics
+    path('api/analytics/', include('analytics.urls')),
 ]
 
 # ── Serve React frontend in production ───────────────────────

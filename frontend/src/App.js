@@ -13,6 +13,7 @@ import MainLayout from './components/layout/MainLayout';
 // Pages
 import LoginPage               from './pages/authentication/LoginPage';
 import DashboardPage           from './pages/dashboard/DashboardPage';
+import CustomerIntelligencePage from './pages/analytics/CustomerIntelligencePage';
 import ItemListPage            from './pages/master_data/ItemListPage';
 import ItemFormPage            from './pages/master_data/ItemFormPage';
 import SupplierListPage        from './pages/master_data/SupplierListPage';
@@ -256,6 +257,8 @@ function App() {
                                     <Route path="/reports/view/:id"    element={<ReportViewPage />} />
                                     <Route path="/reports/maker/list"  element={<ReportMakerListPage />} />
                                     <Route path="/reports/maker"       element={<ReportMakerPage />} />
+
+                                    <Route path="/analytics/customer-intelligence" element={<CustomerIntelligencePage />} />
 
                                     <Route path="/settings/format-panel"       element={canSee('/settings/format-panel') ? <FormatPanelPage /> : <Navigate to="/dashboard" />} />
                                     <Route path="/settings/message-templates" element={<MessageTemplatesPage />} />

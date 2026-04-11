@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'medical_textile',       # Medical textile specific features
     'dashboard',             # KPIs, charts, production predictions
     'reports',               # Report generation (PDF, Excel)
+    'analytics',             # Customer Intelligence — RFM, churn, forecast, product analytics
 ]
 
 
