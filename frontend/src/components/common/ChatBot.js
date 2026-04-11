@@ -7,6 +7,7 @@
 // ============================================================
 
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Box, Paper, Typography, TextField, IconButton,
     Chip, Tooltip, CircularProgress, Fade, Avatar,
@@ -14,8 +15,156 @@ import {
 import SmartToyIcon     from '@mui/icons-material/SmartToy';
 import SendIcon         from '@mui/icons-material/Send';
 import CloseIcon        from '@mui/icons-material/Close';
-import MinimizeIcon     from '@mui/icons-material/Remove';
 import PersonIcon       from '@mui/icons-material/Person';
+import LaunchIcon       from '@mui/icons-material/Launch';
+
+// ── Navigation command map ────────────────────────────────────
+// Each entry: { keywords: [...], path: '...', label: '...' }
+// Keywords are matched against the lowercased user input.
+// Any word from the array matching anywhere in the message triggers navigation.
+const NAV_COMMANDS = [
+    // Dashboard
+    { keywords: ['dashboard', 'home', 'main page', 'start'],
+      path: '/dashboard',                              label: 'Dashboard' },
+    // Sales
+    { keywords: ['sales order', 'sales orders', 'so list', 'open so', 'order list'],
+      path: '/sales/sales-orders',                    label: 'Sales Orders' },
+    { keywords: ['create sales order', 'new sales order', 'new so', 'make sales order'],
+      path: '/sales/create-sales-order',              label: 'Create Sales Order' },
+    { keywords: ['invoice', 'invoices'],
+      path: '/sales/invoices',                        label: 'Invoices' },
+    { keywords: ['new invoice', 'create invoice'],
+      path: '/sales/invoices/new',                    label: 'New Invoice' },
+    { keywords: ['quotation', 'quotations', 'quote', 'quotes'],
+      path: '/sales/quotations',                      label: 'Quotations' },
+    { keywords: ['new quotation', 'create quotation', 'new quote'],
+      path: '/sales/quotations/new',                  label: 'New Quotation' },
+    { keywords: ['inquiry', 'inquiries', 'enquiry', 'enquiries', 'customer inquiry'],
+      path: '/sales/inquiries',                       label: 'Customer Inquiries' },
+    { keywords: ['new inquiry', 'new enquiry', 'create inquiry'],
+      path: '/sales/inquiries/new',                   label: 'New Inquiry' },
+    { keywords: ['order journey', 'journey'],
+      path: '/sales/order-journey',                   label: 'Order Journey' },
+    // Purchasing
+    { keywords: ['purchase order', 'purchase orders', 'po list', 'open po'],
+      path: '/purchasing/purchase-orders',            label: 'Purchase Orders' },
+    { keywords: ['create purchase order', 'new purchase order', 'new po'],
+      path: '/purchasing/create-purchase-order',      label: 'Create Purchase Order' },
+    { keywords: ['goods receipt', 'grn', 'goods received'],
+      path: '/purchasing/goods-receipt',              label: 'Goods Receipt' },
+    // Inventory
+    { keywords: ['stock', 'inventory', 'stock list'],
+      path: '/inventory/stock-list',                  label: 'Stock List' },
+    { keywords: ['stock movement', 'movements'],
+      path: '/inventory/stock-movement',              label: 'Stock Movements' },
+    // Master Data
+    { keywords: ['customer', 'customers', 'customer list'],
+      path: '/master-data/customers',                 label: 'Customers' },
+    { keywords: ['supplier', 'suppliers', 'vendor', 'vendors'],
+      path: '/master-data/suppliers',                 label: 'Suppliers' },
+    { keywords: ['item', 'items', 'product', 'products', 'item list'],
+      path: '/master-data/items',                     label: 'Items & Products' },
+    { keywords: ['warehouse', 'warehouses'],
+      path: '/master-data/warehouses',                label: 'Warehouses' },
+    // Production
+    { keywords: ['work order', 'work orders', 'production order'],
+      path: '/production/work-orders',                label: 'Work Orders' },
+    { keywords: ['machine', 'machines', 'machine list'],
+      path: '/production/machines',                   label: 'Machines' },
+    { keywords: ['quality', 'quality check', 'quality checks'],
+      path: '/production/quality-checks',             label: 'Quality Checks' },
+    { keywords: ['batch', 'batches', 'production batch'],
+      path: '/production/batches',                    label: 'Production Batches' },
+    { keywords: ['bom', 'bill of material', 'bill of materials'],
+      path: '/production/bill-of-materials',          label: 'Bill of Materials' },
+    // Finance
+    { keywords: ['journal', 'journal entry', 'journal entries'],
+      path: '/finance/journal-entries',               label: 'Journal Entries' },
+    { keywords: ['chart of accounts', 'accounts', 'coa'],
+      path: '/finance/chart-of-accounts',             label: 'Chart of Accounts' },
+    { keywords: ['trial balance'],
+      path: '/finance/trial-balance',                 label: 'Trial Balance' },
+    // HR
+    { keywords: ['employee', 'employees', 'staff'],
+      path: '/hr-payroll/employees',                  label: 'Employees' },
+    { keywords: ['attendance', 'leave'],
+      path: '/hr-payroll/attendance',                 label: 'Attendance' },
+    { keywords: ['salary', 'payroll', 'payslip'],
+      path: '/hr-payroll/salary',                     label: 'Salary & Payroll' },
+    // Technical Textile
+    { keywords: ['performance spec', 'performance specs', 'specifications'],
+      path: '/technical-textile/performance-specs',   label: 'Performance Specs' },
+    { keywords: ['sample', 'samples', 'sample management'],
+      path: '/technical-textile/samples',             label: 'Sample Management' },
+    { keywords: ['data sheet', 'data sheets', 'tds'],
+      path: '/technical-textile/data-sheets',         label: 'Technical Data Sheets' },
+    { keywords: ['testing lab', 'lab', 'lab records'],
+      path: '/technical-textile/testing-lab',         label: 'Testing Lab' },
+    { keywords: ['r&d', 'rd project', 'research', 'rd projects'],
+      path: '/technical-textile/rd-projects',         label: 'R&D Projects' },
+    // Medical Textile
+    { keywords: ['compliance', 'regulatory'],
+      path: '/medical-textile/compliance',            label: 'Regulatory Compliance' },
+    { keywords: ['capa'],
+      path: '/medical-textile/capa',                  label: 'CAPA Management' },
+    { keywords: ['sterility', 'sterile'],
+      path: '/medical-textile/sterility',             label: 'Sterility Records' },
+    { keywords: ['shelf life', 'expiry'],
+      path: '/medical-textile/shelf-life',            label: 'Shelf Life Tracking' },
+    // Reports
+    { keywords: ['sales report'],
+      path: '/reports/sales',                         label: 'Sales Report' },
+    { keywords: ['production report'],
+      path: '/reports/production',                    label: 'Production Report' },
+    { keywords: ['inventory report', 'stock report'],
+      path: '/reports/inventory',                     label: 'Inventory Report' },
+    { keywords: ['finance report', 'financial report'],
+      path: '/reports/finance',                       label: 'Finance Report' },
+    { keywords: ['hr report', 'payroll report'],
+      path: '/reports/hr',                            label: 'HR Report' },
+    { keywords: ['report maker', 'custom report'],
+      path: '/reports/maker/list',                    label: 'Report Maker' },
+    // Analytics & Feed
+    { keywords: ['customer intelligence', 'analytics', 'rfm', 'churn', 'forecast'],
+      path: '/analytics/customer-intelligence',       label: 'Customer Intelligence' },
+    { keywords: ['smart feed', 'feed', 'business feed', 'insights feed'],
+      path: '/feed',                                  label: 'Smart Feed' },
+    // Settings
+    { keywords: ['format panel', 'document format', 'numbering'],
+      path: '/settings/format-panel',                 label: 'Format Panel' },
+    { keywords: ['message template', 'templates', 'whatsapp template'],
+      path: '/settings/message-templates',            label: 'Message Templates' },
+    // Activity
+    { keywords: ['activity log', 'audit', 'log'],
+      path: '/audit/activity-log',                    label: 'Activity Log' },
+];
+
+// Words that signal intent to navigate (open/go to/show/take me to/close etc.)
+const NAV_INTENT = ['open', 'go to', 'go', 'show', 'show me', 'take me', 'navigate', 'launch', 'load', 'jump to', 'switch to', 'close', 'back to'];
+
+function _resolveNavCommand(input) {
+    const m = input.toLowerCase().trim();
+
+    // "close" with no other target = close the chatbot (handled in caller)
+    if (['close', 'close chat', 'close chatbot', 'bye', 'goodbye', 'exit'].includes(m)) {
+        return { close: true };
+    }
+
+    // Check if input contains a nav intent verb OR just a page keyword directly
+    const hasIntent = NAV_INTENT.some(v => m.startsWith(v) || m.includes(' ' + v + ' '));
+
+    for (const cmd of NAV_COMMANDS) {
+        for (const kw of cmd.keywords) {
+            if (m.includes(kw)) {
+                // Either user said "open X" or just typed the page name alone
+                if (hasIntent || m === kw || m === 'open ' + kw || m === 'show ' + kw) {
+                    return { path: cmd.path, label: cmd.label };
+                }
+            }
+        }
+    }
+    return null;
+}
 
 // ── Markdown-like renderer (bold + bullets) ───────────────────
 function MsgText({ text }) {
@@ -49,14 +198,17 @@ function MsgText({ text }) {
 
 // ── Suggested questions ───────────────────────────────────────
 const SUGGESTIONS = [
-    "Today's summary",
-    'Sales orders today',
-    'This month revenue',
-    'Overdue invoices',
-    'Machine status',
-    'Top customers',
-    'Low stock items',
-    'Work orders',
+    { label: "Today's summary",     nav: false },
+    { label: 'Open sales orders',   nav: true  },
+    { label: 'Open invoices',       nav: true  },
+    { label: 'Open dashboard',      nav: true  },
+    { label: 'Open customers',      nav: true  },
+    { label: 'Open stock',          nav: true  },
+    { label: 'Open machines',       nav: true  },
+    { label: 'Overdue invoices',    nav: false },
+    { label: 'This month revenue',  nav: false },
+    { label: 'Machine status',      nav: false },
+    { label: 'Top customers',       nav: false },
 ];
 
 // ── Chat message ──────────────────────────────────────────────
@@ -109,11 +261,12 @@ function Message({ msg }) {
 
 // ── Main ChatBot widget ───────────────────────────────────────
 export default function ChatBot() {
+    const navigate = useNavigate();
     const [open,     setOpen]     = useState(false);
     const [messages, setMessages] = useState([
         {
             role: 'bot',
-            text: 'Hello! 👋 I\'m your SASI ERP assistant.\n\nAsk me anything about your business:\n• *How many sales orders today?*\n• *Which machines broke down?*\n• *What\'s this month\'s revenue?*\n• *Any overdue invoices?*',
+            text: 'Hello! 👋 I\'m your SASI ERP assistant.\n\nAsk me anything or say **open** + a page name:\n• *Open sales orders*\n• *Open invoices*\n• *Open dashboard*\n• *How many machines broke down?*\n• *This month\'s revenue?*',
             id: 0,
         }
     ]);
@@ -134,10 +287,27 @@ export default function ChatBot() {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
+    const addBotMsg = (text) =>
+        setMessages(prev => [...prev.filter(m => !m.loading), { role: 'bot', text, id: Date.now() + 2 }]);
+
     const send = async (text) => {
         const q = (text || input).trim();
         if (!q || loading) return;
         setInput('');
+
+        // ── Navigation command — instant, no backend call ──────
+        const nav = _resolveNavCommand(q);
+        if (nav) {
+            setMessages(prev => [...prev, { role: 'user', text: q, id: Date.now() }]);
+            if (nav.close) {
+                setOpen(false);
+                addBotMsg('See you! 👋');
+            } else {
+                addBotMsg(`Opening **${nav.label}**… ✅`);
+                setTimeout(() => { navigate(nav.path); setOpen(false); }, 600);
+            }
+            return;
+        }
 
         const userMsg = { role: 'user', text: q, id: Date.now() };
         const loadMsg = { role: 'bot', loading: true, id: Date.now() + 1 };
@@ -230,9 +400,22 @@ export default function ChatBot() {
                             '&::-webkit-scrollbar-thumb': { backgroundColor: 'divider', borderRadius: 2 },
                         }}>
                             {SUGGESTIONS.map(s => (
-                                <Chip key={s} label={s} size="small" onClick={() => send(s)}
-                                    sx={{ cursor: 'pointer', fontSize: 11, flexShrink: 0,
-                                          '&:hover': { backgroundColor: 'primary.main', color: 'primary.contrastText' } }} />
+                                <Chip
+                                    key={s.label}
+                                    label={s.label}
+                                    size="small"
+                                    icon={s.nav ? <LaunchIcon style={{ fontSize: 11 }} /> : undefined}
+                                    onClick={() => send(s.label)}
+                                    sx={{
+                                        cursor: 'pointer', fontSize: 11, flexShrink: 0,
+                                        ...(s.nav ? {
+                                            borderColor: 'primary.main', color: 'primary.main',
+                                            border: '1px solid',
+                                        } : {}),
+                                        '&:hover': { backgroundColor: 'primary.main', color: 'primary.contrastText',
+                                                     '& .MuiChip-icon': { color: 'primary.contrastText' } },
+                                    }}
+                                />
                             ))}
                         </Box>
                     </Box>
