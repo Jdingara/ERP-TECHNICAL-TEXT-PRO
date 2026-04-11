@@ -1,9 +1,10 @@
 // FILE: pages/sales/InquiryFormPage.js
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Typography, Button, TextField, Paper, MenuItem, Select, InputLabel, FormControl, Alert, FormControlLabel, Switch } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import SaveIcon from '@mui/icons-material/Save';
-import { useNavigate, useParams } from 'react-router-dom';
+import ArrowBackIcon  from '@mui/icons-material/ArrowBack';
+import SaveIcon       from '@mui/icons-material/Save';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 const STATUS_CHOICES = [
     { value: 'new',           label: 'New' },
@@ -14,8 +15,9 @@ const STATUS_CHOICES = [
     { value: 'lost',          label: 'Lost' },
 ];
 const END_USE_CHOICES = ['geotextile','agrotextile','filtration','automotive','medical','protective','industrial','other'];
+const TODAY = new Date().toISOString().split('T')[0];
 const EMPTY_FORM = {
-    customer_id: '', received_date: new Date().toISOString().split('T')[0],
+    customer_id: '', received_date: TODAY,
     product_description: '', end_use: '', gsm_required: '', width_cm: '',
     tensile_requirement: '', coating_required: false, coating_type: '',
     color: '', quantity_required: '', unit: 'meters',
@@ -23,24 +25,45 @@ const EMPTY_FORM = {
 };
 
 function InquiryFormPage() {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const isEdit = Boolean(id);
-    const [form, setForm]         = useState(EMPTY_FORM);
-    const [customers, setCustomers] = useState([]);
-    const [saving, setSaving]     = useState(false);
-    const [error, setError]       = useState('');
+    const { id }             = useParams();
+    const [searchParams]     = useSearchParams();
+    const fromId             = searchParams.get('from');   // duplicate source id
+    const navigate           = useNavigate();
+    const isEdit             = Boolean(id);
+    const isDuplicate        = Boolean(fromId);
+
+    const [form,       setForm]       = useState(EMPTY_FORM);
+    const [sourceNum,  setSourceNum]  = useState('');      // original inquiry number for banner
+    const [customers,  setCustomers]  = useState([]);
+    const [saving,     setSaving]     = useState(false);
+    const [error,      setError]      = useState('');
 
     useEffect(() => {
         fetchCustomers();
-        if (isEdit) fetchInquiry();
-    }, [id]); // eslint-disable-line
+        if (isEdit)      fetchInquiry(id);
+        else if (fromId) fetchAndDuplicate(fromId);
+    }, [id, fromId]); // eslint-disable-line
 
-    const fetchInquiry = async () => {
-        const res  = await fetch(`/api/sales/inquiries/${id}/`, { credentials: 'include' });
+    const fetchInquiry = async (targetId) => {
+        const res  = await fetch(`/api/sales/inquiries/${targetId}/`, { credentials: 'include' });
         const data = await res.json();
         if (data.inquiry) setForm(data.inquiry);
     };
+
+    const fetchAndDuplicate = async (sourceId) => {
+        const res  = await fetch(`/api/sales/inquiries/${sourceId}/`, { credentials: 'include' });
+        const data = await res.json();
+        if (data.inquiry) {
+            setSourceNum(data.inquiry.inquiry_number || '');
+            setForm({
+                ...data.inquiry,
+                received_date:  TODAY,   // reset to today
+                required_by_date: '',    // clear date — probably outdated
+                status:         'new',   // always start fresh
+            });
+        }
+    };
+
     const fetchCustomers = async () => {
         const res  = await fetch('/api/master-data/customers/', { credentials: 'include' });
         const data = await res.json();
@@ -67,15 +90,25 @@ function InquiryFormPage() {
         <TextField label={label} value={form[field] ?? ''} onChange={e => set(field, e.target.value)} {...extra} />
     );
 
+    const pageTitle = isEdit ? 'Edit Inquiry' : isDuplicate ? 'Duplicate Inquiry' : 'New Customer Inquiry';
+
     return (
         <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 2 }}>
                 <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/sales/inquiries')} variant="outlined" size="small">Back to Inquiries</Button>
-                <Typography variant="h5" fontWeight="bold" color="primary" flex={1}>{isEdit ? 'Edit Inquiry' : 'New Customer Inquiry'}</Typography>
+                <Typography variant="h5" fontWeight="bold" color="primary" flex={1}>{pageTitle}</Typography>
                 <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSave} disabled={saving} sx={{ backgroundColor: 'primary.main' }}>
                     {saving ? 'Saving…' : (isEdit ? 'Update Inquiry' : 'Save Inquiry')}
                 </Button>
             </Box>
+
+            {/* Duplicate banner */}
+            {isDuplicate && sourceNum && (
+                <Alert icon={<ContentCopyIcon fontSize="small" />} severity="info" sx={{ mb: 2 }}>
+                    Duplicated from <strong>{sourceNum}</strong> — all fields are pre-filled. Review, adjust if needed, then save as a new inquiry.
+                </Alert>
+            )}
+
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
             <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>

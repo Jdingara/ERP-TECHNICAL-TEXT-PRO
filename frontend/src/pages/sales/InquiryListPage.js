@@ -14,10 +14,11 @@ import { TextField } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { useColumnResize } from '../../components/common/useColumnResize';
-import AddIcon        from '@mui/icons-material/Add';
-import EditIcon       from '@mui/icons-material/Edit';
-import SearchIcon     from '@mui/icons-material/Search';
-import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
+import AddIcon             from '@mui/icons-material/Add';
+import EditIcon            from '@mui/icons-material/Edit';
+import SearchIcon          from '@mui/icons-material/Search';
+import ContentCopyIcon     from '@mui/icons-material/ContentCopy';
+import QuestionAnswerIcon  from '@mui/icons-material/QuestionAnswer';
 
 const STATUS_CHOICES = [
     { value: 'new',           label: 'New',           color: 'info' },
@@ -140,11 +141,18 @@ export default function InquiryListPage() {
                                 <TableCell>{inq.received_date}</TableCell>
                                 <TableCell><StatusChip status={inq.status} /></TableCell>
                                 <TableCell align="right">
-                                    <Tooltip title="Edit">
-                                        <IconButton size="small" onClick={() => navigate(`/sales/inquiries/edit/${inq.id}`)}>
-                                            <EditIcon fontSize="small" />
-                                        </IconButton>
-                                    </Tooltip>
+                                    <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                                        <Tooltip title="Duplicate — create new inquiry with same details">
+                                            <IconButton size="small" color="primary" onClick={() => navigate(`/sales/inquiries/new?from=${inq.id}`)}>
+                                                <ContentCopyIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Edit">
+                                            <IconButton size="small" onClick={() => navigate(`/sales/inquiries/edit/${inq.id}`)}>
+                                                <EditIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Stack>
                                 </TableCell>
                             </TableRow>
                         ))}

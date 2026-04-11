@@ -11,9 +11,10 @@ import {
     IconButton, Tooltip, Stack,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import AddIcon    from '@mui/icons-material/Add';
-import PrintIcon  from '@mui/icons-material/Print';
-import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon          from '@mui/icons-material/Add';
+import PrintIcon        from '@mui/icons-material/Print';
+import DeleteIcon       from '@mui/icons-material/Delete';
+import ContentCopyIcon  from '@mui/icons-material/ContentCopy';
 import { useColumnResize } from '../../components/common/useColumnResize';
 import { useNavigate } from 'react-router-dom';
 import { printPurchaseOrder } from '../../utils/printUtils';
@@ -135,6 +136,11 @@ function PurchaseOrderListPage() {
                                                     Confirm
                                                 </Button>
                                             )}
+                                            <Tooltip title="Duplicate — create new PO with same items">
+                                                <IconButton size="small" color="primary" onClick={() => navigate(`/purchasing/create-purchase-order?from=${po.id}`)}>
+                                                    <ContentCopyIcon fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
                                             <Tooltip title="Print Purchase Order">
                                                 <IconButton size="small" onClick={() => handlePrint(po)}>
                                                     <PrintIcon fontSize="small" />

@@ -16,6 +16,7 @@ import DeleteIcon       from '@mui/icons-material/Delete';
 import PrintIcon        from '@mui/icons-material/Print';
 import SearchIcon       from '@mui/icons-material/Search';
 import ShareIcon        from '@mui/icons-material/Share';
+import ContentCopyIcon  from '@mui/icons-material/ContentCopy';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import { useNavigate } from 'react-router-dom';
 import { printQuotation } from '../../utils/printUtils';
@@ -216,6 +217,11 @@ export default function QuotationPage() {
                                 <TableCell><StatusChip status={qt.status} /></TableCell>
                                 <TableCell align="right">
                                     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                                        <Tooltip title="Duplicate — create new quotation with same details">
+                                            <IconButton size="small" color="primary" onClick={() => navigate(`/sales/quotations/new?from=${qt.id}`)}>
+                                                <ContentCopyIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
                                         <Tooltip title="Print Quotation">
                                             <IconButton size="small" onClick={() => printQuotation(qt)}>
                                                 <PrintIcon fontSize="small" />

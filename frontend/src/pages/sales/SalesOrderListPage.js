@@ -15,6 +15,7 @@ import AddIcon          from '@mui/icons-material/Add';
 import PrintIcon        from '@mui/icons-material/Print';
 import DeleteIcon       from '@mui/icons-material/Delete';
 import ShareIcon        from '@mui/icons-material/Share';
+import ContentCopyIcon  from '@mui/icons-material/ContentCopy';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { useColumnResize } from '../../components/common/useColumnResize';
 import { useNavigate } from 'react-router-dom';
@@ -212,6 +213,11 @@ function SalesOrderListPage() {
                                                     Deliver
                                                 </Button>
                                             )}
+                                            <Tooltip title="Duplicate — create new order with same items">
+                                                <IconButton size="small" color="primary" onClick={() => navigate(`/sales/create-sales-order?from=${so.id}`)}>
+                                                    <ContentCopyIcon fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
                                             <Tooltip title="Print Sales Order">
                                                 <IconButton size="small" onClick={() => handlePrintSO(so)}>
                                                     <PrintIcon fontSize="small" />

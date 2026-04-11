@@ -1,47 +1,67 @@
 // FILE: pages/sales/QuotationFormPage.js
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Typography, Button, TextField, Paper, MenuItem, Select, InputLabel, FormControl, Alert } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import SaveIcon from '@mui/icons-material/Save';
-import { useNavigate, useParams } from 'react-router-dom';
+import ArrowBackIcon   from '@mui/icons-material/ArrowBack';
+import SaveIcon        from '@mui/icons-material/Save';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
+const TODAY = new Date().toISOString().split('T')[0];
 const EMPTY_FORM = {
-    inquiry_id: '', customer_id: '', date: new Date().toISOString().split('T')[0],
+    inquiry_id: '', customer_id: '', date: TODAY,
     valid_until: '', product_description: '', gsm: '', width_cm: '',
     quantity: '', unit: 'meters', unit_price: '',
     lead_time_days: 30, spec_notes: '', payment_terms: '', delivery_terms: '',
 };
 
 function QuotationFormPage() {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const isEdit = Boolean(id);
-    const [form, setForm]         = useState(EMPTY_FORM);
+    const { id }          = useParams();
+    const [searchParams]  = useSearchParams();
+    const fromId          = searchParams.get('from');
+    const navigate        = useNavigate();
+    const isEdit          = Boolean(id);
+    const isDuplicate     = Boolean(fromId);
+
+    const [form,      setForm]      = useState(EMPTY_FORM);
+    const [sourceNum, setSourceNum] = useState('');
     const [inquiries, setInquiries] = useState([]);
     const [customers, setCustomers] = useState([]);
-    const [saving, setSaving]     = useState(false);
-    const [error, setError]       = useState('');
+    const [saving,    setSaving]    = useState(false);
+    const [error,     setError]     = useState('');
 
     useEffect(() => {
         Promise.all([
-            fetch('/api/sales/inquiries/', { credentials: 'include' }).then(r => r.json()),
-            fetch('/api/master-data/customers/', { credentials: 'include' }).then(r => r.json()),
+            fetch('/api/sales/inquiries/',        { credentials: 'include' }).then(r => r.json()),
+            fetch('/api/master-data/customers/',  { credentials: 'include' }).then(r => r.json()),
         ]).then(([inqData, custData]) => {
             setInquiries(inqData.inquiries || []);
             setCustomers(custData.customers || []);
         });
-        if (isEdit) fetchQuotation();
-    }, [id]); // eslint-disable-line
+        if (isEdit)      fetchQuotation(id);
+        else if (fromId) fetchAndDuplicate(fromId);
+    }, [id, fromId]); // eslint-disable-line
 
-    const fetchQuotation = async () => {
-        const res  = await fetch(`/api/sales/quotations/${id}/`, { credentials: 'include' });
+    const fetchQuotation = async (targetId) => {
+        const res  = await fetch(`/api/sales/quotations/${targetId}/`, { credentials: 'include' });
         const data = await res.json();
         if (data.quotation) setForm(data.quotation);
     };
 
+    const fetchAndDuplicate = async (sourceId) => {
+        const res  = await fetch(`/api/sales/quotations/${sourceId}/`, { credentials: 'include' });
+        const data = await res.json();
+        if (data.quotation) {
+            setSourceNum(data.quotation.quotation_number || '');
+            setForm({
+                ...data.quotation,
+                date:        TODAY,   // reset to today
+                valid_until: '',      // clear — user must set new validity
+            });
+        }
+    };
+
     const set = (f, v) => setForm(p => ({ ...p, [f]: v }));
 
-    // When inquiry is selected, prefill customer + product
     const handleInquiryChange = (inquiryId) => {
         set('inquiry_id', inquiryId);
         const inq = inquiries.find(i => i.id === parseInt(inquiryId));
@@ -83,16 +103,25 @@ function QuotationFormPage() {
     );
 
     const total = (parseFloat(form.quantity || 0) * parseFloat(form.unit_price || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+    const pageTitle = isEdit ? 'Edit Quotation' : isDuplicate ? 'Duplicate Quotation' : 'New Quotation';
 
     return (
         <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 2 }}>
                 <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/sales/quotations')} variant="outlined" size="small">Back to Quotations</Button>
-                <Typography variant="h5" fontWeight="bold" color="primary" flex={1}>{isEdit ? 'Edit Quotation' : 'New Quotation'}</Typography>
+                <Typography variant="h5" fontWeight="bold" color="primary" flex={1}>{pageTitle}</Typography>
                 <Button variant="contained" startIcon={<SaveIcon />} onClick={handleSave} disabled={saving} sx={{ backgroundColor: 'primary.main' }}>
                     {saving ? 'Saving…' : (isEdit ? 'Update Quotation' : 'Save Quotation')}
                 </Button>
             </Box>
+
+            {/* Duplicate banner */}
+            {isDuplicate && sourceNum && (
+                <Alert icon={<ContentCopyIcon fontSize="small" />} severity="info" sx={{ mb: 2 }}>
+                    Duplicated from <strong>{sourceNum}</strong> — review and update the date, validity and pricing before saving.
+                </Alert>
+            )}
+
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
             <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
