@@ -34,13 +34,132 @@ def _fmt(n):
     if n >= 100_000:    return f'₹{n/100_000:.2f} L'
     return f'₹{n:,.0f}'
 
-TODAY = date.today()
 ACTIVE = ['confirmed', 'partial', 'delivered']
+
+# ── Date range parser ─────────────────────────────────────────
+
+def _parse_date_range(msg):
+    """
+    Extract a (start_date, end_date, label) from natural language.
+    Examples:
+      "last 10 days"  → (today-10, today, "last 10 days")
+      "last 2 weeks"  → (today-14, today, "last 2 weeks")
+      "last week"     → (today-7,  today, "last 7 days")
+      "yesterday"     → (yesterday, yesterday, "yesterday")
+      "this week"     → (monday,   today, "this week")
+      "this month"    → (month_start, today, "this month")
+      "last month"    → (prev_month_start, prev_month_end, "last month")
+      "last 3 months" → (today-90, today, "last 3 months")
+      None if no date range found.
+    """
+    today = date.today()
+    m = msg.lower()
+
+    # "last N days / weeks / months"
+    match = re.search(r'last\s+(\d+)\s*(day|days|week|weeks|month|months)', m)
+    if match:
+        n    = int(match.group(1))
+        unit = match.group(2)
+        if 'month' in unit:
+            delta = n * 30
+            label = f'last {n} month{"s" if n > 1 else ""}'
+        elif 'week' in unit:
+            delta = n * 7
+            label = f'last {n} week{"s" if n > 1 else ""}'
+        else:
+            delta = n
+            label = f'last {n} day{"s" if n > 1 else ""}'
+        return today - timedelta(days=delta), today, label
+
+    # "past N days / weeks"
+    match = re.search(r'past\s+(\d+)\s*(day|days|week|weeks)', m)
+    if match:
+        n    = int(match.group(1))
+        unit = match.group(2)
+        delta = n * 7 if 'week' in unit else n
+        label = f'past {n} {"week" if "week" in unit else "day"}{"s" if n > 1 else ""}'
+        return today - timedelta(days=delta), today, label
+
+    # "N days / weeks summary / report"
+    match = re.search(r'(\d+)\s*(day|days|week|weeks)\s*(summary|report|data|revenue|orders|sales)?', m)
+    if match:
+        n    = int(match.group(1))
+        unit = match.group(2)
+        delta = n * 7 if 'week' in unit else n
+        label = f'last {n} {"week" if "week" in unit else "day"}{"s" if n > 1 else ""}'
+        return today - timedelta(days=delta), today, label
+
+    # Fixed keywords
+    if 'yesterday' in m:
+        y = today - timedelta(days=1)
+        return y, y, 'yesterday'
+    if 'this week' in m:
+        monday = today - timedelta(days=today.weekday())
+        return monday, today, 'this week'
+    if 'last week' in m:
+        last_mon = today - timedelta(days=today.weekday() + 7)
+        last_sun = last_mon + timedelta(days=6)
+        return last_mon, last_sun, 'last week'
+    if 'last month' in m:
+        first_this = date(today.year, today.month, 1)
+        last_prev  = first_this - timedelta(days=1)
+        first_prev = date(last_prev.year, last_prev.month, 1)
+        return first_prev, last_prev, 'last month'
+    if 'this month' in m or 'current month' in m:
+        return date(today.year, today.month, 1), today, 'this month'
+    if 'this year' in m or 'this fy' in m or 'financial year' in m:
+        fy_start = date(today.year, 4, 1) if today.month >= 4 else date(today.year - 1, 4, 1)
+        return fy_start, today, 'this financial year'
+
+    return None
+
+
+def _range_summary(start, end, label):
+    """Generate a comprehensive summary for any date range."""
+    today = date.today()
+    qs = SalesOrder.objects.filter(order_date__gte=start, order_date__lte=end)
+
+    so_all   = qs.count()
+    so_conf  = qs.filter(status__in=ACTIVE)
+    revenue  = _sf(so_conf.aggregate(t=Sum('total_amount'))['t'])
+    invoices = Invoice.objects.filter(invoice_date__gte=start, invoice_date__lte=end).count()
+
+    # Top customer in range
+    top = (
+        so_conf.values('customer__customer_name')
+        .annotate(rev=Sum('total_amount'))
+        .order_by('-rev')
+        .first()
+    )
+    top_str = f'\n• Top customer: **{top["customer__customer_name"]}** ({_fmt(top["rev"])})' if top else ''
+
+    # Unique customers
+    unique_custs = so_conf.values('customer_id').distinct().count()
+
+    date_str = (f'{start.strftime("%d %b")} – {end.strftime("%d %b %Y")}'
+                if start != end else start.strftime('%d %b %Y'))
+
+    lines = [
+        f'📊 **Summary: {label}** ({date_str})',
+        f'• Sales orders: **{so_all}** total, **{so_conf.count()}** confirmed',
+        f'• Revenue: **{_fmt(revenue)}**',
+        f'• Invoices raised: **{invoices}**',
+        f'• Unique customers: **{unique_custs}**',
+    ]
+    if top_str:
+        lines.append(top_str)
+
+    return '\n'.join(lines)
+
+
+def _today():
+    return date.today()
 
 # ── ERP data snapshot (used by Claude) ───────────────────────
 
 def _build_snapshot():
     """Compact JSON snapshot of today's ERP state for Claude."""
+    TODAY   = _today()
     m_start = date(TODAY.year, TODAY.month, 1)
 
     today_so  = SalesOrder.objects.filter(order_date=TODAY)
@@ -90,13 +209,37 @@ def _match(text, *keywords):
 def _answer_pattern(msg):
     """
     Try to answer from patterns. Returns answer string or None.
-    Covers the most common ERP questions so they work without API key.
+    Date-range queries are detected first and handled for any period.
     """
-    m = msg.lower()
+    m     = msg.lower()
+    today = _today()
+
+    # ── Date range summary (handles any N-day/week/month range) ──
+    date_range = _parse_date_range(m)
+    if date_range and _match(m, 'summary', 'report', 'overview', 'data',
+                             'revenue', 'sales', 'orders', 'how many',
+                             'what', 'show', 'give', 'tell'):
+        start, end, label = date_range
+        return _range_summary(start, end, label)
+
+    # ── Revenue for a specific range ──────────────────────────
+    if date_range and _match(m, 'revenue', 'income', 'earning', 'money'):
+        start, end, label = date_range
+        rev = _sf(
+            SalesOrder.objects.filter(status__in=ACTIVE, order_date__gte=start, order_date__lte=end)
+            .aggregate(t=Sum('total_amount'))['t']
+        )
+        cnt = SalesOrder.objects.filter(status__in=ACTIVE, order_date__gte=start, order_date__lte=end).count()
+        return f'Revenue for **{label}**: **{_fmt(rev)}** across **{cnt}** confirmed orders.'
+
+    # ── Orders for a specific range ───────────────────────────
+    if date_range and _match(m, 'order', 'so', 'invoice'):
+        start, end, label = date_range
+        return _range_summary(start, end, label)
 
     # ── Today sales orders ────────────────────────────────────
     if _match(m, 'sales order', 'so') and _match(m, 'today', 'this day'):
-        qs  = SalesOrder.objects.filter(order_date=TODAY)
+        qs  = SalesOrder.objects.filter(order_date=today)
         cnt = qs.count()
         rev = _sf(qs.filter(status__in=ACTIVE).aggregate(t=Sum('total_amount'))['t'])
         if cnt == 0:
@@ -105,12 +248,12 @@ def _answer_pattern(msg):
 
     # ── Today invoices ────────────────────────────────────────
     if _match(m, 'invoice') and _match(m, 'today', 'this day'):
-        cnt = Invoice.objects.filter(invoice_date=TODAY).count()
+        cnt = Invoice.objects.filter(invoice_date=today).count()
         return f'**{cnt}** invoice{"s" if cnt > 1 else ""} created today.' if cnt else 'No invoices raised today yet.'
 
     # ── Overdue invoices ──────────────────────────────────────
     if _match(m, 'overdue', 'unpaid', 'pending payment', 'outstanding'):
-        qs  = Invoice.objects.filter(status__in=['sent','overdue'], due_date__lt=TODAY)
+        qs  = Invoice.objects.filter(status__in=['sent','overdue'], due_date__lt=today)
         cnt = qs.count()
         amt = _sf(qs.aggregate(t=Sum('total_amount'))['t'])
         if cnt == 0:
@@ -137,18 +280,18 @@ def _answer_pattern(msg):
         active   = machines.filter(status='active').count()
         breakdown= machines.filter(status='breakdown').count()
         maint    = machines.filter(status='maintenance').count()
-        return (f'**{total}** machines total: **{active}** active, **{breakdown}** in breakdown, **{maint}** in maintenance.')
+        return f'**{total}** machines total: **{active}** active, **{breakdown}** in breakdown, **{maint}** in maintenance.'
 
     # ── This month revenue ────────────────────────────────────
-    if _match(m, 'revenue', 'sales', 'income', 'earning') and _match(m, 'month', 'this month', 'monthly'):
-        m_start = date(TODAY.year, TODAY.month, 1)
+    if _match(m, 'revenue', 'income', 'earning') and _match(m, 'month', 'this month', 'monthly'):
+        m_start = date(today.year, today.month, 1)
         rev = _sf(SalesOrder.objects.filter(status__in=ACTIVE, order_date__gte=m_start).aggregate(t=Sum('total_amount'))['t'])
         cnt = SalesOrder.objects.filter(status__in=ACTIVE, order_date__gte=m_start).count()
         return f'This month\'s revenue (confirmed orders): **{_fmt(rev)}** across **{cnt}** orders.'
 
     # ── Top customers ─────────────────────────────────────────
     if _match(m, 'top customer', 'best customer', 'biggest customer', 'largest customer'):
-        m_start = date(TODAY.year, TODAY.month, 1)
+        m_start = date(today.year, today.month, 1)
         qs = (
             SalesOrder.objects.filter(status__in=ACTIVE, order_date__gte=m_start)
             .values('customer__customer_name')
@@ -163,7 +306,8 @@ def _answer_pattern(msg):
     # ── Total customers ───────────────────────────────────────
     if _match(m, 'customer') and _match(m, 'how many', 'total', 'count', 'number of'):
         total  = Customer.objects.filter(is_active=True).count()
-        active = set(SalesOrder.objects.filter(status__in=ACTIVE, order_date__gte=date(TODAY.year,TODAY.month,1)).values_list('customer_id', flat=True))
+        m_start = date(today.year, today.month, 1)
+        active = set(SalesOrder.objects.filter(status__in=ACTIVE, order_date__gte=m_start).values_list('customer_id', flat=True))
         return f'**{total}** active customers in the system. **{len(active)}** placed orders this month.'
 
     # ── Stock / inventory ─────────────────────────────────────
@@ -178,7 +322,7 @@ def _answer_pattern(msg):
 
     # ── Work orders ───────────────────────────────────────────
     if _match(m, 'work order', 'production order', 'wo'):
-        qs  = WorkOrder.objects.all()
+        qs      = WorkOrder.objects.all()
         draft   = qs.filter(status='draft').count()
         running = qs.filter(status__in=['in_progress', 'confirmed']).count()
         done    = qs.filter(status='completed').count()
@@ -190,18 +334,19 @@ def _answer_pattern(msg):
         return (f'**{cnt}** sales order{"s" if cnt>1 else ""} still in draft — not yet confirmed.'
                 if cnt else 'No draft sales orders. All are confirmed. ✅')
 
-    # ── Today summary / what's happening ─────────────────────
-    if _match(m, 'today', "what's happening", 'summary', 'daily', 'morning', 'overview'):
-        so_today  = SalesOrder.objects.filter(order_date=TODAY).count()
-        inv_today = Invoice.objects.filter(invoice_date=TODAY).count()
+    # ── Today / general summary ───────────────────────────────
+    if _match(m, 'today', "what's happening", 'daily', 'morning', 'overview') or \
+       (m.strip() in ('summary', 'report')):
+        so_today  = SalesOrder.objects.filter(order_date=today).count()
+        inv_today = Invoice.objects.filter(invoice_date=today).count()
         breakdown = Machine.objects.filter(status='breakdown').count()
-        overdue_c = Invoice.objects.filter(status__in=['sent','overdue'], due_date__lt=TODAY).count()
+        overdue_c = Invoice.objects.filter(status__in=['sent','overdue'], due_date__lt=today).count()
         rev_today = _sf(
-            SalesOrder.objects.filter(order_date=TODAY, status__in=ACTIVE).aggregate(t=Sum('total_amount'))['t']
+            SalesOrder.objects.filter(order_date=today, status__in=ACTIVE).aggregate(t=Sum('total_amount'))['t']
         )
         lines = [
-            f'📅 **Today ({TODAY.strftime("%d %b %Y")})**',
-            f'• Sales orders created: **{so_today}** (revenue: {_fmt(rev_today)})',
+            f'📅 **Today ({today.strftime("%d %b %Y")})**',
+            f'• Sales orders: **{so_today}** (confirmed revenue: {_fmt(rev_today)})',
             f'• Invoices raised: **{inv_today}**',
             f'• Machines in breakdown: **{breakdown}**',
             f'• Overdue invoices: **{overdue_c}**',
@@ -210,25 +355,27 @@ def _answer_pattern(msg):
 
     # ── Greetings ─────────────────────────────────────────────
     if _match(m, 'hello', 'hi ', 'hey', 'good morning', 'good afternoon', 'namaste'):
-        return ('Hello! 👋 I\'m your SASI ERP assistant. You can ask me things like:\n'
-                '• *How many sales orders today?*\n'
-                '• *What is this month\'s revenue?*\n'
-                '• *Which machines are in breakdown?*\n'
-                '• *How many overdue invoices?*\n'
-                '• *Who are our top customers this month?*\n'
-                '• *Give me today\'s summary*')
+        return ('Hello! 👋 I\'m your SASI ERP assistant. Ask me anything:\n'
+                '• *Last 10 days summary*\n'
+                '• *Revenue last 2 weeks*\n'
+                '• *This month\'s orders*\n'
+                '• *Which machines broke down?*\n'
+                '• *Overdue invoices*\n'
+                '• *Open sales orders* (navigates to the page)')
 
     # ── Help ──────────────────────────────────────────────────
     if _match(m, 'help', 'what can you', 'what do you', 'capabilities'):
-        return ('I can answer questions about your live ERP data:\n\n'
-                '**Sales:** orders today, monthly revenue, top customers, draft orders\n'
-                '**Invoices:** today\'s count, overdue invoices, outstanding amounts\n'
-                '**Production:** machine status, breakdowns, work orders\n'
-                '**Inventory:** out-of-stock items, low stock alerts\n'
-                '**Customers:** total count, active this month\n\n'
-                'Just ask naturally — e.g. *"How many machines broke down?"* or *"Give me today\'s summary"*')
+        return ('I understand natural date ranges — try:\n'
+                '• *Last 7 days revenue*\n'
+                '• *Last 10 days summary*\n'
+                '• *Last 2 weeks orders*\n'
+                '• *Yesterday\'s summary*\n'
+                '• *This week\'s sales*\n'
+                '• *Last month report*\n\n'
+                'And live ERP data:\n'
+                '**Sales** · **Invoices** · **Machines** · **Inventory** · **Customers** · **Work Orders**')
 
-    return None  # no pattern matched
+    return None
 
 
 # ── Claude AI fallback ────────────────────────────────────────
@@ -243,7 +390,7 @@ def _answer_claude(question):
         import anthropic
         snapshot = _build_snapshot()
         system_prompt = f"""You are the AI assistant for SASI ERP, a textile manufacturing ERP system.
-Today is {TODAY}. Here is a live snapshot of the business data:
+Today is {_today()}. Here is a live snapshot of the business data:
 
 {json.dumps(snapshot, indent=2)}
 

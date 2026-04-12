@@ -17,6 +17,8 @@ import SendIcon         from '@mui/icons-material/Send';
 import CloseIcon        from '@mui/icons-material/Close';
 import PersonIcon       from '@mui/icons-material/Person';
 import LaunchIcon       from '@mui/icons-material/Launch';
+import MicIcon          from '@mui/icons-material/Mic';
+import MicOffIcon       from '@mui/icons-material/MicOff';
 
 // ── Navigation command map ────────────────────────────────────
 // Each entry: { keywords: [...], path: '...', label: '...' }
@@ -198,17 +200,21 @@ function MsgText({ text }) {
 
 // ── Suggested questions ───────────────────────────────────────
 const SUGGESTIONS = [
-    { label: "Today's summary",     nav: false },
-    { label: 'Open sales orders',   nav: true  },
-    { label: 'Open invoices',       nav: true  },
-    { label: 'Open dashboard',      nav: true  },
-    { label: 'Open customers',      nav: true  },
-    { label: 'Open stock',          nav: true  },
-    { label: 'Open machines',       nav: true  },
-    { label: 'Overdue invoices',    nav: false },
-    { label: 'This month revenue',  nav: false },
-    { label: 'Machine status',      nav: false },
-    { label: 'Top customers',       nav: false },
+    { label: "Today's summary",       nav: false },
+    { label: 'Last 7 days summary',   nav: false },
+    { label: 'Last 10 days revenue',  nav: false },
+    { label: 'Last 30 days orders',   nav: false },
+    { label: 'This week sales',       nav: false },
+    { label: 'This month revenue',    nav: false },
+    { label: 'Last month report',     nav: false },
+    { label: 'Overdue invoices',      nav: false },
+    { label: 'Machine status',        nav: false },
+    { label: 'Top customers',         nav: false },
+    { label: 'Open sales orders',     nav: true  },
+    { label: 'Open invoices',         nav: true  },
+    { label: 'Open dashboard',        nav: true  },
+    { label: 'Open customers',        nav: true  },
+    { label: 'Open stock',            nav: true  },
 ];
 
 // ── Chat message ──────────────────────────────────────────────
@@ -273,8 +279,40 @@ export default function ChatBot() {
     const [input,    setInput]    = useState('');
     const [loading,  setLoading]  = useState(false);
     const [unread,   setUnread]   = useState(0);
+    const [listening, setListening] = useState(false);
     const bottomRef = useRef(null);
     const inputRef  = useRef(null);
+    const recognitionRef = useRef(null);
+
+    // ── Voice recognition setup ───────────────────────────────
+    const voiceSupported = typeof window !== 'undefined' &&
+        ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+
+    const startVoice = () => {
+        if (!voiceSupported || listening) return;
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const rec = new SR();
+        rec.lang = 'en-IN';
+        rec.continuous = false;
+        rec.interimResults = false;
+        recognitionRef.current = rec;
+
+        rec.onstart  = () => setListening(true);
+        rec.onend    = () => setListening(false);
+        rec.onerror  = () => setListening(false);
+        rec.onresult = (e) => {
+            const transcript = e.results[0][0].transcript;
+            setInput(transcript);
+            // auto-send after brief pause so user sees what was heard
+            setTimeout(() => send(transcript), 400);
+        };
+        rec.start();
+    };
+
+    const stopVoice = () => {
+        recognitionRef.current?.stop();
+        setListening(false);
+    };
 
     useEffect(() => {
         if (open) {
@@ -421,22 +459,44 @@ export default function ChatBot() {
                     </Box>
 
                     {/* Input */}
-                    <Box sx={{ px: 2, py: 1.5, borderTop: '1px solid', borderColor: 'divider', display: 'flex', gap: 1 }}>
+                    <Box sx={{ px: 2, py: 1.5, borderTop: '1px solid', borderColor: 'divider', display: 'flex', gap: 1, alignItems: 'flex-end' }}>
                         <TextField
                             inputRef={inputRef}
                             fullWidth size="small" multiline maxRows={3}
-                            placeholder="Ask anything about your ERP…"
+                            placeholder={listening ? '🎤 Listening…' : 'Ask anything or say "open invoices"…'}
                             value={input}
                             onChange={e => setInput(e.target.value)}
                             onKeyDown={handleKey}
-                            disabled={loading}
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2, fontSize: 13 } }}
+                            disabled={loading || listening}
+                            sx={{
+                                '& .MuiOutlinedInput-root': { borderRadius: 2, fontSize: 13 },
+                                ...(listening ? { '& fieldset': { borderColor: '#dc2626 !important', borderWidth: '2px !important' } } : {}),
+                            }}
                         />
+
+                        {/* Mic button */}
+                        {voiceSupported && (
+                            <Tooltip title={listening ? 'Stop listening' : 'Voice input'}>
+                                <IconButton
+                                    onClick={listening ? stopVoice : startVoice}
+                                    sx={{
+                                        width: 36, height: 36, borderRadius: 2, flexShrink: 0,
+                                        backgroundColor: listening ? '#dc2626' : 'action.hover',
+                                        color: listening ? 'white' : 'text.secondary',
+                                        animation: listening ? 'chatPulse 1s ease-in-out infinite' : 'none',
+                                        '&:hover': { backgroundColor: listening ? '#b91c1c' : 'action.selected' },
+                                    }}
+                                >
+                                    {listening ? <MicIcon fontSize="small" /> : <MicOffIcon fontSize="small" />}
+                                </IconButton>
+                            </Tooltip>
+                        )}
+
+                        {/* Send button */}
                         <IconButton
                             onClick={() => send()}
                             disabled={loading || !input.trim()}
-                            color="primary"
-                            sx={{ alignSelf: 'flex-end', backgroundColor: 'primary.main', color: 'white',
+                            sx={{ backgroundColor: 'primary.main', color: 'white',
                                   width: 36, height: 36, borderRadius: 2, flexShrink: 0,
                                   '&:hover': { backgroundColor: 'primary.dark' },
                                   '&.Mui-disabled': { backgroundColor: 'action.disabledBackground' },
