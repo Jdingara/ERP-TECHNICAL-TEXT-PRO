@@ -1,19 +1,19 @@
 // ============================================================
 // FILE: utils/printUtils.js
-// PURPOSE: Print utility for SASI ERP.
+// PURPOSE: Print utility for MEI TEXZ ERP.
 //          Generates formatted HTML for all business documents
 //          and opens them in a new window for browser printing.
 // ============================================================
 
 // Company info — update logo path once final logo is available
 const COMPANY = {
-    name:    'SASI Group',
+    name:    'MEI TEXZ Technologies',
     tagline: 'Medical & Technical Textiles',
-    address: 'Plot 12, Industrial Estate, Tiruppur - 641 604, Tamil Nadu, India',
-    phone:   '+91 98765 43210',
-    email:   'info@sasigroup.com',
+    address: 'Coimbatore, Tamilnadu 641062',
+    phone:   '+91 9176236675',
+    email:   'info@meitexz.com',
     gstin:   '33AABCS1234A1Z5',
-    website: 'www.sasigroup.com',
+    website: 'www.meitexz.com',
 };
 
 // SVG placeholder logo — replace <img src="..."> once logo is ready
@@ -24,7 +24,7 @@ const LOGO_SVG = `
   <rect x="10" y="24" width="44" height="6" rx="2" fill="white" opacity="0.7"/>
   <rect x="10" y="34" width="30" height="6" rx="2" fill="white" opacity="0.5"/>
   <rect x="44" y="24" width="6" height="22" rx="2" fill="#5c6bc0"/>
-  <text x="10" y="56" font-family="Arial" font-size="10" font-weight="bold" fill="#5c6bc0">SASI</text>
+  <text x="10" y="56" font-family="Arial" font-size="8" font-weight="bold" fill="#5c6bc0">MEI TEXZ</text>
 </svg>`;
 
 // ────────────────────────────────────────────────────────────

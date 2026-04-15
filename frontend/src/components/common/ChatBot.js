@@ -272,7 +272,7 @@ export default function ChatBot() {
     const [messages, setMessages] = useState([
         {
             role: 'bot',
-            text: 'Hello! 👋 I\'m your SASI ERP assistant.\n\nAsk me anything or say **open** + a page name:\n• *Open sales orders*\n• *Open invoices*\n• *Open dashboard*\n• *How many machines broke down?*\n• *This month\'s revenue?*',
+            text: 'Hello! 👋 I\'m your MEI TEXZ ERP assistant.\n\nAsk me anything or say **open** + a page name:\n• *Open sales orders*\n• *Open invoices*\n• *Open dashboard*\n• *How many machines broke down?*\n• *This month\'s revenue?*',
             id: 0,
         }
     ]);
@@ -411,7 +411,7 @@ export default function ChatBot() {
                         <Box display="flex" alignItems="center" gap={1}>
                             <SmartToyIcon sx={{ color: 'white', fontSize: 20 }} />
                             <Box>
-                                <Typography fontSize={14} fontWeight={700} color="white">SASI Assistant</Typography>
+                                <Typography fontSize={14} fontWeight={700} color="white">MEI TEXZ Assistant</Typography>
                                 <Box display="flex" alignItems="center" gap={0.5}>
                                     <Box sx={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: '#4ade80' }} />
                                     <Typography fontSize={10} sx={{ color: 'rgba(255,255,255,0.8)' }}>Online — ERP data live</Typography>

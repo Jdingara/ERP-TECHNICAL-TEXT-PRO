@@ -10,11 +10,24 @@ import { SettingsProvider, useSettings } from './context/SettingsContext';
 const FONT_SIZES        = { small: 13,   medium: 14.5, large: 16   };
 const HTML_FONT_SIZES   = { small: '13px', medium: '15px', large: '17px' };
 
+// Border radius scale per setting
+const BR_SCALE = { sharp: 2, medium: 8, round: 16 };
+
+// Table cell padding per density
+const CELL_PAD = {
+    compact:     '5px 10px',
+    normal:      '10px 16px',
+    comfortable: '14px 20px',
+};
+
 function ThemedApp() {
     const { settings } = useSettings();
 
     // Apply font size to <html> so all rem-based values scale with it
     document.documentElement.style.fontSize = HTML_FONT_SIZES[settings.fontSize] || '15px';
+
+    const br       = BR_SCALE[settings.borderRadius] ?? 8;
+    const cellPad  = CELL_PAD[settings.density]      ?? '10px 16px';
 
     const theme = createTheme({
         palette: {
@@ -33,16 +46,16 @@ function ThemedApp() {
             h6:  { fontWeight: 600 },
             subtitle1: { fontWeight: 600 },
         },
-        shape: { borderRadius: 10 },
+        shape: { borderRadius: br },
         components: {
             MuiPaper: {
                 styleOverrides: {
-                    root: { backgroundImage: 'none' },
+                    root: { backgroundImage: 'none', borderRadius: br },
                 },
             },
             MuiButton: {
                 styleOverrides: {
-                    root: { textTransform: 'none', fontWeight: 600, borderRadius: 8 },
+                    root: { textTransform: 'none', fontWeight: 600, borderRadius: Math.max(br, 4) },
                     contained: {
                         boxShadow: 'none',
                         '&:hover': { boxShadow: '0 4px 12px rgba(0,0,0,0.15)' },
@@ -66,7 +79,7 @@ function ThemedApp() {
             },
             MuiTableCell: {
                 styleOverrides: {
-                    root: { fontSize: 13.5, padding: '10px 16px' },
+                    root: { fontSize: 13.5, padding: cellPad },
                 },
             },
             MuiTableRow: {
@@ -77,14 +90,17 @@ function ThemedApp() {
             MuiTextField: {
                 defaultProps: { size: 'small' },
                 styleOverrides: {
-                    root: { '& .MuiOutlinedInput-root': { borderRadius: 8 } },
+                    root: { '& .MuiOutlinedInput-root': { borderRadius: br } },
                 },
             },
             MuiDialog: {
-                styleOverrides: { paper: { borderRadius: 16 } },
+                styleOverrides: { paper: { borderRadius: Math.min(br * 2, 24) } },
             },
             MuiAlert: {
-                styleOverrides: { root: { borderRadius: 10 } },
+                styleOverrides: { root: { borderRadius: br } },
+            },
+            MuiCard: {
+                styleOverrides: { root: { borderRadius: br } },
             },
         },
     });

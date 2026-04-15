@@ -13,6 +13,8 @@ const DEFAULTS = {
     accentColor:     '#6366f1',       // any hex color
     fontFamily:      'Inter',         // 'Inter' | 'Roboto' | 'Poppins' | 'DM Sans'
     fontSize:        'medium',        // 'small' | 'medium' | 'large'
+    borderRadius:    'medium',        // 'sharp' | 'medium' | 'round'
+    density:         'normal',        // 'compact' | 'normal' | 'comfortable'
     sidebarSide:     'left',          // 'left' | 'right'
     bgImage:         null,            // base64 string or null
 };
@@ -45,7 +47,7 @@ function mixColor(hex, mixWith, ratio) {
 }
 
 // Returns sidebar shade variants derived from the chosen accent color.
-// sidebarHeader — darkest (SASI ERP logo area)
+// sidebarHeader — darkest (MEI TEXZ ERP logo area)
 // sidebarBg     — dark tinted (menu list area, slightly lighter)
 // activeAlpha   — transparent bg for the active menu item
 export function getShades(accent) {
@@ -84,8 +86,17 @@ export function SettingsProvider({ children }) {
         setSettings(DEFAULTS);
     }, []);
 
+    // Apply a full theme preset — overwrites all relevant keys at once
+    const applyPreset = useCallback((presetSettings) => {
+        setSettings(prev => {
+            const next = { ...prev, ...presetSettings };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+            return next;
+        });
+    }, []);
+
     return (
-        <SettingsContext.Provider value={{ settings, updateSetting, resetSettings }}>
+        <SettingsContext.Provider value={{ settings, updateSetting, resetSettings, applyPreset }}>
             {children}
         </SettingsContext.Provider>
     );

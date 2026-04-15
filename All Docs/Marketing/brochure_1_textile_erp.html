@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MEI TEXZ — ERP Brochure</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Poppins:wght@700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --navy:#0d1b2a; --navy2:#1a2f4a; --blue:#2563eb;
+  --teal:#0891b2; --teal2:#06b6d4; --sky:#bfdbfe;
+  --tsky:#a5f3fc; --white:#fff; --grey:#f1f5f9;
+  --lgrey:#e2e8f0; --text:#1e293b; --muted:#64748b;
+}
+body{font-family:'Inter',sans-serif;background:#94a3b8;}
+
+/* ── A4 PAGE ── */
+.page{
+  width:210mm;min-height:297mm;background:white;
+  margin:15px auto;box-shadow:0 8px 40px rgba(0,0,0,0.25);
+  page-break-after:always;overflow:hidden;position:relative;
+  display:flex;flex-direction:column;
+}
+
+/* ══════════════════════════════════════
+   PAGE 1 — COVER
+══════════════════════════════════════ */
+.p1-hero{
+  height:115mm;background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 55%,#1e3a5f 100%);
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:10mm 12mm;
+}
+/* Big faded ERP text background */
+.p1-hero .bg-erp{
+  position:absolute;top:-5mm;right:-8mm;
+  font-family:'Poppins',sans-serif;font-size:90pt;font-weight:900;
+  color:rgba(255,255,255,0.04);letter-spacing:-3px;line-height:1;
+  user-select:none;pointer-events:none;
+}
+/* Teal circle accent */
+.p1-hero .circle1{
+  position:absolute;top:-20mm;right:30mm;
+  width:70mm;height:70mm;border-radius:50%;
+  background:radial-gradient(circle,rgba(8,145,178,0.3) 0%,transparent 70%);
+}
+.p1-hero .circle2{
+  position:absolute;bottom:-10mm;right:-10mm;
+  width:55mm;height:55mm;border-radius:50%;
+  background:radial-gradient(circle,rgba(37,99,235,0.25) 0%,transparent 70%);
+}
+/* Top accent line */
+.p1-top-bar{
+  position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--teal),var(--blue),var(--teal2));
+}
+
+.p1-hero-content{position:relative;z-index:5;}
+.p1-label{font-size:7pt;letter-spacing:4px;color:var(--tsky);font-weight:600;text-transform:uppercase;margin-bottom:3mm;}
+.p1-company{font-size:28pt;font-weight:900;letter-spacing:3px;color:white;line-height:1;font-family:'Poppins',sans-serif;}
+.p1-company span{color:var(--teal2);}
+.p1-sub{font-size:8pt;letter-spacing:2px;color:rgba(255,255,255,0.5);margin-top:1mm;text-transform:uppercase;}
+.p1-rule{width:40mm;height:3px;background:linear-gradient(90deg,var(--teal2),var(--blue));border-radius:2px;margin:4mm 0;}
+.p1-headline{font-size:14pt;font-weight:700;color:white;line-height:1.3;max-width:130mm;}
+.p1-headline span{color:var(--teal2);}
+.p1-tagline{font-size:7.5pt;color:rgba(255,255,255,0.6);font-style:italic;margin-top:2mm;}
+
+/* Wave transition */
+.p1-wave{
+  height:12mm;background:white;
+  clip-path:ellipse(110% 100% at 50% 100%);
+  margin-top:-6mm;position:relative;z-index:4;
+}
+
+/* Intro section */
+.p1-intro{padding:0 12mm 6mm;display:flex;flex-direction:column;gap:5mm;}
+.p1-intro-text{font-size:7.5pt;color:var(--text);line-height:1.8;text-align:justify;}
+.p1-intro-text strong{color:var(--navy);font-weight:700;}
+
+/* Diamond stat boxes row */
+.diamond-row{display:flex;justify-content:space-around;align-items:center;padding:4mm 6mm;gap:4mm;}
+.diamond-box{
+  display:flex;flex-direction:column;align-items:center;
+  position:relative;
+}
+.diamond-shape{
+  width:22mm;height:22mm;
+  transform:rotate(45deg);
+  border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:3mm;
+}
+.diamond-inner{
+  transform:rotate(-45deg);
+  text-align:center;line-height:1.2;
+}
+.diamond-inner .dn{font-size:14pt;font-weight:900;color:white;line-height:1;}
+.diamond-inner .dl{font-size:5pt;color:rgba(255,255,255,0.8);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.diamond-label{font-size:6.5pt;font-weight:700;color:var(--navy);text-align:center;margin-top:1mm;}
+
+/* Module overview grid */
+.p1-modules{padding:0 12mm 6mm;}
+.section-head{
+  display:flex;align-items:center;gap:3mm;
+  margin-bottom:3mm;
+}
+.sh-line{flex:1;height:1px;background:var(--lgrey);}
+.sh-title{font-size:7.5pt;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap;}
+.sh-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;}
+
+.mod-row{display:flex;gap:2.5mm;flex-wrap:wrap;}
+.mod-chip{
+  background:var(--grey);border-radius:20px;
+  padding:2mm 4mm;border-left:2px solid var(--teal);
+  font-size:6pt;font-weight:700;color:var(--navy);
+  white-space:nowrap;
+}
+
+/* Bottom contact strip */
+.p1-footer{
+  margin-top:auto;
+  background:linear-gradient(135deg,var(--navy),var(--navy2));
+  padding:5mm 12mm;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.p1-footer .co{font-size:6pt;color:rgba(255,255,255,0.6);line-height:1.9;}
+.p1-footer .co strong{color:white;font-size:7pt;}
+.p1-footer .yr{font-size:24pt;font-weight:900;color:rgba(255,255,255,0.07);font-family:'Poppins',sans-serif;}
+
+
+/* ══════════════════════════════════════
+   PAGE 2 — ERP SYSTEM OVERVIEW
+══════════════════════════════════════ */
+.p2-header{
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);
+  padding:7mm 12mm;position:relative;overflow:hidden;
+}
+.p2-header::after{
+  content:'';position:absolute;top:0;right:0;bottom:0;width:40mm;
+  background:linear-gradient(135deg,transparent,rgba(8,145,178,0.2));
+}
+.p2-header h1{font-size:14pt;font-weight:900;color:white;}
+.p2-header p{font-size:6.5pt;color:var(--tsky);margin-top:1.5mm;}
+.p2-header .tag-row{display:flex;gap:2mm;margin-top:3mm;}
+.p2-tag{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;font-size:5.5pt;font-weight:600;padding:1.5px 6px;border-radius:10px;}
+
+.p2-body{flex:1;padding:6mm 12mm;display:flex;flex-direction:column;gap:5mm;}
+
+/* ERP Hub diagram */
+.erp-hub{
+  background:var(--grey);border-radius:6px;padding:6mm;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.hub-center{
+  width:24mm;height:24mm;border-radius:50%;
+  background:linear-gradient(135deg,var(--navy),var(--teal));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(8,145,178,0.4);
+  flex-shrink:0;margin:0 5mm;
+}
+.hub-center .ht{font-size:9pt;font-weight:900;color:white;font-family:'Poppins',sans-serif;}
+.hub-center .hs{font-size:5pt;color:var(--tsky);letter-spacing:1px;}
+
+.hub-col{display:flex;flex-direction:column;gap:2mm;}
+.hub-item{
+  background:white;border-radius:4px;padding:2.5mm 4mm;
+  border-left:2.5px solid var(--teal);
+  font-size:6pt;font-weight:700;color:var(--navy);
+  box-shadow:0 1px 4px rgba(0,0,0,0.06);min-width:26mm;
+}
+.hub-item.blue{border-color:var(--blue);}
+.hub-item.green{border-color:#10b981;}
+.hub-item span{display:block;font-weight:400;color:var(--muted);font-size:5pt;}
+
+/* Connector lines */
+.hub-wrap{display:flex;align-items:center;justify-content:center;gap:2mm;}
+.h-arrow{font-size:8pt;color:var(--lgrey);}
+
+/* Feature cards 2x4 */
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:3mm;}
+.feat-card{
+  background:white;border-radius:5px;padding:4mm;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  border-top:3px solid var(--teal);
+  display:flex;gap:3mm;align-items:flex-start;
+}
+.feat-card.blue{border-color:var(--blue);}
+.feat-card.navy{border-color:var(--navy);}
+.feat-card.green{border-color:#10b981;}
+.fc-icon{
+  width:9mm;height:9mm;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:11pt;
+}
+.fc-icon.teal{background:linear-gradient(135deg,var(--teal),var(--teal2));}
+.fc-icon.blue{background:linear-gradient(135deg,var(--blue),#3b82f6);}
+.fc-icon.navy{background:linear-gradient(135deg,var(--navy),var(--navy2));}
+.fc-icon.green{background:linear-gradient(135deg,#059669,#10b981);}
+.fc-text h4{font-size:7pt;font-weight:800;color:var(--navy);}
+.fc-text p{font-size:5.5pt;color:var(--muted);line-height:1.5;margin-top:0.5mm;}
+
+/* Process flow */
+.flow-row{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--grey);border-radius:6px;padding:4mm 5mm;
+  gap:1mm;
+}
+.flow-step{
+  display:flex;flex-direction:column;align-items:center;
+  flex:1;
+}
+.flow-circle{
+  width:10mm;height:10mm;border-radius:50%;
+  background:linear-gradient(135deg,var(--navy),var(--teal));
+  display:flex;align-items:center;justify-content:center;
+  font-size:5pt;font-weight:800;color:white;margin-bottom:1.5mm;
+}
+.flow-label{font-size:5pt;font-weight:700;color:var(--navy);text-align:center;}
+.flow-arrow{font-size:9pt;color:var(--teal);flex-shrink:0;margin-top:-3mm;}
+
+.p2-footer{
+  background:var(--grey);padding:3mm 12mm;
+  display:flex;justify-content:space-between;align-items:center;
+  border-top:2px solid var(--teal);
+}
+.p2-footer span{font-size:5.5pt;color:var(--muted);}
+.p2-footer strong{font-size:6pt;color:var(--navy);}
+
+
+/* ══════════════════════════════════════
+   PAGE 3 — INDUSTRY FEATURES + AI
+══════════════════════════════════════ */
+.p3-top{
+  display:flex;height:70mm;
+}
+.p3-left{
+  width:50%;
+  background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 60%,#1e4a7a 100%);
+  padding:8mm;position:relative;overflow:hidden;
+}
+.p3-left::after{
+  content:'';position:absolute;bottom:-10mm;right:-10mm;
+  width:40mm;height:40mm;border-radius:50%;
+  background:rgba(8,145,178,0.15);
+}
+.p3-right{
+  width:50%;
+  background:linear-gradient(160deg,#0891b2 0%,#0e7490 60%,#1e3a5f 100%);
+  padding:8mm;position:relative;overflow:hidden;
+}
+.p3-right::after{
+  content:'';position:absolute;top:-10mm;left:-10mm;
+  width:40mm;height:40mm;border-radius:50%;
+  background:rgba(255,255,255,0.08);
+}
+.p3-sec-title{font-size:9pt;font-weight:800;color:white;margin-bottom:1mm;}
+.p3-sec-sub{font-size:5.5pt;color:rgba(255,255,255,0.65);margin-bottom:4mm;}
+.p3-rule{width:20mm;height:2px;background:var(--tsky);border-radius:1px;margin-bottom:4mm;}
+
+ul.wl{list-style:none;}
+ul.wl li{
+  font-size:6pt;color:rgba(255,255,255,0.9);
+  padding:2px 0 2px 10px;position:relative;line-height:1.5;
+}
+ul.wl li::before{content:'▸';color:var(--tsky);position:absolute;left:0;font-size:5.5pt;}
+
+.badge-row{display:flex;flex-wrap:wrap;gap:1.5mm;margin-top:3mm;}
+.wbadge{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:white;font-size:5pt;font-weight:600;padding:1.5px 6px;border-radius:10px;}
+
+/* Middle wave separator */
+.p3-wave-sep{
+  height:8mm;background:white;
+  clip-path:ellipse(110% 100% at 50% 100%);
+  margin-top:-4mm;position:relative;z-index:5;
+}
+
+/* AI section */
+.p3-ai{flex:1;padding:4mm 12mm;display:flex;flex-direction:column;gap:4mm;}
+
+.ai-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3mm;}
+.ai-card{
+  border-radius:5px;padding:4mm;
+  background:var(--grey);
+  border-bottom:3px solid var(--teal);
+  text-align:center;
+}
+.ai-card.blue2{border-color:var(--blue);}
+.ai-card.navy2{border-color:var(--navy);}
+.ai-icon{font-size:14pt;margin-bottom:2mm;}
+.ai-card h4{font-size:6.5pt;font-weight:800;color:var(--navy);margin-bottom:1.5mm;}
+.ai-card p{font-size:5.5pt;color:var(--muted);line-height:1.5;}
+
+/* Analytics row */
+.analytics-row{
+  background:linear-gradient(135deg,var(--navy),var(--navy2));
+  border-radius:6px;padding:4mm 5mm;
+  display:flex;gap:4mm;align-items:center;
+}
+.ar-left{flex:1;}
+.ar-left h4{font-size:8pt;font-weight:800;color:white;margin-bottom:1mm;}
+.ar-left p{font-size:6pt;color:rgba(255,255,255,0.7);line-height:1.6;}
+.ar-stats{display:flex;gap:3mm;}
+.ars{
+  background:rgba(255,255,255,0.08);border-radius:4px;padding:3mm;text-align:center;min-width:16mm;
+}
+.ars .n{font-size:12pt;font-weight:900;color:var(--tsky);line-height:1;}
+.ars .l{font-size:5pt;color:rgba(255,255,255,0.6);}
+
+.p3-footer{
+  background:var(--grey);padding:3mm 12mm;
+  display:flex;justify-content:space-between;align-items:center;
+  border-top:1px solid var(--lgrey);
+}
+.p3-footer span{font-size:5.5pt;color:var(--muted);}
+
+/* ══════════════════════════════════════
+   PAGE 4 — QUOTE + TECH + CONTACT
+══════════════════════════════════════ */
+.p4-quote-section{
+  background:linear-gradient(135deg,var(--navy) 0%,#1a3a6b 50%,var(--teal) 100%);
+  padding:12mm 15mm;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:60mm;
+}
+.p4-quote-section::before{
+  content:'';position:absolute;top:-20mm;left:-20mm;
+  width:80mm;height:80mm;border-radius:50%;
+  background:rgba(255,255,255,0.03);
+}
+.p4-quote-section::after{
+  content:'';position:absolute;bottom:-20mm;right:-20mm;
+  width:60mm;height:60mm;border-radius:50%;
+  background:rgba(8,145,178,0.15);
+}
+.quote-mark{font-size:60pt;line-height:0.5;color:rgba(255,255,255,0.12);font-family:Georgia,serif;position:absolute;top:8mm;left:12mm;}
+.quote-text{
+  font-size:14pt;font-weight:700;color:white;
+  text-align:center;line-height:1.4;position:relative;z-index:2;
+  max-width:160mm;
+}
+.quote-text span{color:var(--teal2);}
+.quote-attr{font-size:7pt;color:rgba(255,255,255,0.6);margin-top:4mm;font-style:italic;position:relative;z-index:2;}
+
+/* Why section */
+.p4-why{padding:6mm 12mm;display:flex;gap:5mm;}
+.p4-why-left{flex:1;}
+.p4-why-right{flex:1;}
+
+.why-card{
+  background:var(--grey);border-radius:5px;padding:3.5mm 4mm;
+  border-left:3px solid var(--teal);margin-bottom:2.5mm;
+  display:flex;gap:2.5mm;align-items:flex-start;
+}
+.why-card.blue{border-color:var(--blue);}
+.why-card.green{border-color:#10b981;}
+.wc-num{
+  font-size:10pt;font-weight:900;color:var(--teal);
+  line-height:1;flex-shrink:0;min-width:5mm;
+}
+.wc-text h4{font-size:6.5pt;font-weight:700;color:var(--navy);}
+.wc-text p{font-size:5.5pt;color:var(--muted);line-height:1.4;}
+
+/* Tech stack section */
+.p4-tech{
+  background:linear-gradient(135deg,#f0f9ff,#e0f2fe);
+  padding:5mm 12mm;
+  border-top:2px solid var(--teal);
+  border-bottom:2px solid var(--teal);
+}
+.tech-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;margin-top:3mm;}
+.tech-item{
+  background:white;border-radius:4px;padding:3mm;text-align:center;
+  box-shadow:0 1px 4px rgba(0,0,0,0.06);
+}
+.tech-item .ti{font-size:10pt;margin-bottom:1mm;}
+.tech-item h4{font-size:5.5pt;font-weight:700;color:var(--navy);}
+.tech-item p{font-size:4.5pt;color:var(--muted);}
+
+/* Contact footer */
+.p4-contact{
+  background:var(--navy);
+  padding:6mm 12mm;
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:auto;
+}
+.p4-contact .logo-w{font-size:14pt;font-weight:900;letter-spacing:2px;color:white;}
+.p4-contact .logo-sw{font-size:5pt;letter-spacing:3px;color:var(--tsky);}
+.p4-contact .contact-info{text-align:right;}
+.p4-contact .contact-info h4{font-size:7pt;font-weight:700;color:white;margin-bottom:1mm;}
+.p4-contact .contact-info p{font-size:6pt;color:var(--tsky);line-height:2;font-weight:600;}
+.p4-cta{
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+  border-radius:4px;padding:3mm 6mm;text-align:center;
+}
+.p4-cta h4{font-size:7pt;font-weight:800;color:white;}
+.p4-cta p{font-size:5.5pt;color:rgba(255,255,255,0.8);}
+
+@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}body{background:white;}.page{margin:0;box-shadow:none;}}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     PAGE 1 — COVER / INTRO
+════════════════════════════════════════ -->
+<div class="page">
+
+  <!-- ── TOP NAV BAR with LOGO ── -->
+  <div style="background:white;padding:4mm 10mm;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e2e8f0;">
+    <!-- INLINE LOGO SVG -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="140" height="35">
+      <defs>
+        <linearGradient id="ig" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#06b6d4"/>
+          <stop offset="50%" style="stop-color:#0891b2"/>
+          <stop offset="100%" style="stop-color:#0d1b2a"/>
+        </linearGradient>
+        <linearGradient id="tg2" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#0d1b2a"/>
+          <stop offset="100%" style="stop-color:#1e3a5f"/>
+        </linearGradient>
+      </defs>
+      <polygon points="40,4 68,20 68,52 40,68 12,52 12,20" fill="url(#ig)"/>
+      <polygon points="40,10 62,23 62,49 40,62 18,49 18,23" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <line x1="16" y1="26" x2="64" y2="26" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="13" y1="36" x2="67" y2="36" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="16" y1="46" x2="64" y2="46" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="28" y1="14" x2="28" y2="58" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="40" y1="8"  x2="40" y2="64" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="52" y1="14" x2="52" y2="58" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="28" cy="26" r="2.5" fill="white" opacity="0.95"/>
+      <circle cx="40" cy="26" r="2.5" fill="white" opacity="0.95"/>
+      <circle cx="52" cy="26" r="2.5" fill="white" opacity="0.95"/>
+      <circle cx="28" cy="36" r="2.5" fill="#a5f3fc" opacity="0.95"/>
+      <circle cx="40" cy="36" r="3.5" fill="white"/>
+      <circle cx="52" cy="36" r="2.5" fill="#a5f3fc" opacity="0.95"/>
+      <circle cx="28" cy="46" r="2.5" fill="white" opacity="0.95"/>
+      <circle cx="40" cy="46" r="2.5" fill="white" opacity="0.95"/>
+      <circle cx="52" cy="46" r="2.5" fill="white" opacity="0.95"/>
+      <text x="84" y="44" font-family="Inter,Arial,sans-serif" font-size="28" font-weight="900" letter-spacing="3" fill="url(#tg2)">MEI TEXZ</text>
+      <line x1="84" y1="50" x2="298" y2="50" stroke="#0891b2" stroke-width="1.5" opacity="0.6"/>
+      <text x="84" y="63" font-family="Inter,Arial,sans-serif" font-size="9" font-weight="500" letter-spacing="5" fill="#0891b2">TECHNOLOGIES</text>
+      <circle cx="302" cy="44" r="3" fill="#06b6d4" opacity="0.8"/>
+      <circle cx="308" cy="44" r="2" fill="#0891b2" opacity="0.5"/>
+    </svg>
+    <div style="font-size:6pt;color:#64748b;text-align:right;line-height:1.8;">
+      Enterprise Resource Planning<br>
+      <strong style="color:#0d1b2a;">Technical & Medical Textile</strong>
+    </div>
+  </div>
+
+  <!-- ── HERO SECTION ── -->
+  <div class="p1-hero">
+    <div class="p1-top-bar"></div>
+    <div class="bg-erp">ERP</div>
+    <div class="circle1"></div>
+    <div class="circle2"></div>
+
+    <!-- Dot grid pattern overlay -->
+    <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.06) 1px,transparent 1px);background-size:12px 12px;z-index:1;"></div>
+
+    <!-- Right side ERP dashboard preview SVG -->
+    <div style="position:absolute;right:6mm;top:50%;transform:translateY(-50%);z-index:3;opacity:0.92;">
+      <svg viewBox="0 0 160 130" width="160" height="130" xmlns="http://www.w3.org/2000/svg">
+        <!-- Screen frame -->
+        <rect x="0" y="0" width="160" height="108" rx="5" fill="#1e293b"/>
+        <rect x="3" y="3" width="154" height="102" rx="3" fill="#0f172a"/>
+        <rect x="3" y="3" width="154" height="102" rx="3" fill="#f8fafc"/>
+        <!-- Nav bar -->
+        <rect x="3" y="3" width="154" height="12" rx="3" fill="#0d1b2a"/>
+        <rect x="3" y="9" width="154" height="6" fill="#0d1b2a"/>
+        <text x="8" y="11" font-family="Inter,sans-serif" font-size="5" font-weight="800" fill="white" letter-spacing="0.5">MEI TEXZ ERP</text>
+        <circle cx="149" cy="9" r="3" fill="#0891b2"/>
+        <!-- Sidebar -->
+        <rect x="3" y="15" width="22" height="90" fill="#1e3a5f"/>
+        <rect x="6" y="18" width="16" height="6" rx="2" fill="#0891b2"/>
+        <rect x="6" y="27" width="16" height="5" rx="2" fill="rgba(255,255,255,0.1)"/>
+        <rect x="6" y="35" width="16" height="5" rx="2" fill="rgba(255,255,255,0.1)"/>
+        <rect x="6" y="43" width="16" height="5" rx="2" fill="rgba(255,255,255,0.1)"/>
+        <rect x="6" y="51" width="16" height="5" rx="2" fill="rgba(255,255,255,0.1)"/>
+        <rect x="6" y="59" width="16" height="5" rx="2" fill="rgba(255,255,255,0.1)"/>
+        <rect x="6" y="67" width="16" height="5" rx="2" fill="rgba(255,255,255,0.1)"/>
+        <!-- KPI cards -->
+        <rect x="28" y="17" width="30" height="18" rx="2" fill="white" stroke="#e2e8f0" stroke-width="0.5"/>
+        <rect x="28" y="17" width="30" height="2.5" rx="2" fill="#0891b2"/>
+        <text x="31" y="25" font-family="Inter,sans-serif" font-size="4" fill="#64748b">Revenue</text>
+        <text x="31" y="32" font-family="Inter,sans-serif" font-size="7" font-weight="800" fill="#0d1b2a">₹4.2L</text>
+
+        <rect x="62" y="17" width="30" height="18" rx="2" fill="white" stroke="#e2e8f0" stroke-width="0.5"/>
+        <rect x="62" y="17" width="30" height="2.5" rx="2" fill="#2563eb"/>
+        <text x="65" y="25" font-family="Inter,sans-serif" font-size="4" fill="#64748b">Orders</text>
+        <text x="65" y="32" font-family="Inter,sans-serif" font-size="7" font-weight="800" fill="#0d1b2a">148</text>
+
+        <rect x="96" y="17" width="30" height="18" rx="2" fill="white" stroke="#e2e8f0" stroke-width="0.5"/>
+        <rect x="96" y="17" width="30" height="2.5" rx="2" fill="#059669"/>
+        <text x="99" y="25" font-family="Inter,sans-serif" font-size="4" fill="#64748b">In Stock</text>
+        <text x="99" y="32" font-family="Inter,sans-serif" font-size="7" font-weight="800" fill="#0d1b2a">92%</text>
+
+        <rect x="130" y="17" width="24" height="18" rx="2" fill="#0d1b2a"/>
+        <text x="133" y="25" font-family="Inter,sans-serif" font-size="4" fill="rgba(255,255,255,0.7)">Active</text>
+        <text x="133" y="32" font-family="Inter,sans-serif" font-size="7" font-weight="800" fill="white">34</text>
+
+        <!-- Chart area -->
+        <rect x="28" y="39" width="78" height="38" rx="2" fill="white" stroke="#e2e8f0" stroke-width="0.5"/>
+        <text x="31" y="46" font-family="Inter,sans-serif" font-size="4" font-weight="700" fill="#0d1b2a">Monthly Revenue</text>
+        <rect x="31" y="51" width="5" height="18" rx="1" fill="#bfdbfe"/>
+        <rect x="38" y="47" width="5" height="22" rx="1" fill="#93c5fd"/>
+        <rect x="45" y="49" width="5" height="20" rx="1" fill="#0891b2"/>
+        <rect x="52" y="44" width="5" height="25" rx="1" fill="#0891b2"/>
+        <rect x="59" y="42" width="5" height="27" rx="1" fill="#0d1b2a"/>
+        <rect x="66" y="46" width="5" height="23" rx="1" fill="#2563eb"/>
+        <rect x="73" y="40" width="5" height="29" rx="1" fill="#0d1b2a"/>
+        <rect x="80" y="37" width="5" height="32" rx="1" fill="#0891b2" opacity="0.8"/>
+        <line x1="31" y1="69" x2="100" y2="69" stroke="#f1f5f9" stroke-width="0.5"/>
+
+        <!-- Right mini panels -->
+        <rect x="110" y="39" width="44" height="17" rx="2" fill="white" stroke="#e2e8f0" stroke-width="0.5"/>
+        <text x="113" y="46" font-family="Inter,sans-serif" font-size="4" font-weight="700" fill="#0d1b2a">Top Customers</text>
+        <rect x="113" y="49" width="28" height="3" rx="1" fill="#bfdbfe"/>
+        <rect x="113" y="54" width="20" height="3" rx="1" fill="#a5f3fc"/>
+
+        <rect x="110" y="59" width="44" height="10" rx="2" fill="#fff7ed" stroke="#fed7aa" stroke-width="0.5"/>
+        <text x="113" y="66" font-family="Inter,sans-serif" font-size="3.5" font-weight="700" fill="#c2410c">⚠ 3 Overdue Invoices</text>
+
+        <rect x="110" y="72" width="44" height="8" rx="2" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="0.5"/>
+        <text x="113" y="78" font-family="Inter,sans-serif" font-size="3.5" font-weight="700" fill="#166534">✓ All machines operational</text>
+
+        <!-- AI bar -->
+        <rect x="28" y="81" width="126" height="8" rx="2" fill="#0d1b2a"/>
+        <text x="32" y="87" font-family="Inter,sans-serif" font-size="4" fill="#a5f3fc" font-weight="600">🤖  Ask your ERP anything... (AI Chatbot)</text>
+
+        <!-- Laptop base -->
+        <rect x="0" y="108" width="160" height="5" rx="1" fill="#334155"/>
+        <rect x="55" y="113" width="50" height="3" rx="1" fill="#475569"/>
+        <rect x="35" y="116" width="90" height="2" rx="1" fill="#334155"/>
+      </svg>
+    </div>
+
+    <div class="p1-hero-content" style="max-width:100mm;">
+      <div class="p1-label">Enterprise Resource Planning · 2025</div>
+      <div class="p1-rule" style="margin-bottom:4mm;"></div>
+      <div class="p1-headline" style="font-size:17pt;">
+        Complete ERP for<br>
+        <span>Technical & Medical<br>Textile</span> Manufacturers
+      </div>
+      <div class="p1-tagline" style="margin-top:3mm;">"Building Intelligence Into Industry"</div>
+
+      <!-- 3 key points -->
+      <div style="display:flex;flex-direction:column;gap:2mm;margin-top:5mm;">
+        <div style="display:flex;align-items:center;gap:2.5mm;">
+          <div style="width:5px;height:5px;border-radius:50%;background:#06b6d4;flex-shrink:0;"></div>
+          <span style="font-size:6.5pt;color:rgba(255,255,255,0.85);">15 Modules · 50+ Pages · 100+ Features</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:2.5mm;">
+          <div style="width:5px;height:5px;border-radius:50%;background:#06b6d4;flex-shrink:0;"></div>
+          <span style="font-size:6.5pt;color:rgba(255,255,255,0.85);">AI Chatbot · Voice Input · AI Powered Intelligence</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:2.5mm;">
+          <div style="width:5px;height:5px;border-radius:50%;background:#06b6d4;flex-shrink:0;"></div>
+          <span style="font-size:6.5pt;color:rgba(255,255,255,0.85);">ISO 13485 · FDA · CE Compliance Built In</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p1-wave"></div>
+
+  <div class="p1-intro">
+    <p class="p1-intro-text">
+      <strong>MEI TEXZ ERP</strong> is a complete, production-ready Enterprise Resource Planning system built
+      specifically for <strong>Technical and Medical Textile manufacturers</strong>. It covers the entire business
+      operation — from raw material purchasing to customer invoicing, from machine work orders to payroll —
+      all in one intelligent platform. With built-in <strong>AI intelligence</strong>, smart analytics, voice-powered chatbot,
+      and industry-specific compliance modules, it is the only ERP your business needs.
+    </p>
+
+    <!-- Diamond stat boxes -->
+    <div class="diamond-row">
+      <div class="diamond-box">
+        <div class="diamond-shape" style="background:linear-gradient(135deg,#0891b2,#06b6d4);">
+          <div class="diamond-inner"><div class="dn">15</div><div class="dl">Modules</div></div>
+        </div>
+        <div class="diamond-label">Complete ERP</div>
+      </div>
+      <div class="diamond-box">
+        <div class="diamond-shape" style="background:linear-gradient(135deg,#2563eb,#3b82f6);">
+          <div class="diamond-inner"><div class="dn">50+</div><div class="dl">Pages</div></div>
+        </div>
+        <div class="diamond-label">Full Coverage</div>
+      </div>
+      <div class="diamond-box">
+        <div class="diamond-shape" style="background:linear-gradient(135deg,#0d1b2a,#1e3a5f);">
+          <div class="diamond-inner"><div class="dn">AI</div><div class="dl">Powered</div></div>
+        </div>
+        <div class="diamond-label">Smart AI</div>
+      </div>
+      <div class="diamond-box">
+        <div class="diamond-shape" style="background:linear-gradient(135deg,#059669,#10b981);">
+          <div class="diamond-inner"><div class="dn">ISO</div><div class="dl">Ready</div></div>
+        </div>
+        <div class="diamond-label">13485/FDA/CE</div>
+      </div>
+      <div class="diamond-box">
+        <div class="diamond-shape" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);">
+          <div class="diamond-inner"><div class="dn">☁</div><div class="dl">Cloud</div></div>
+        </div>
+        <div class="diamond-label">Hosted</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Module chips -->
+  <div class="p1-modules">
+    <div class="section-head">
+      <span class="sh-dot"></span>
+      <span class="sh-title">All Modules Included</span>
+      <span class="sh-line"></span>
+    </div>
+    <div class="mod-row">
+      <span class="mod-chip">Dashboard</span>
+      <span class="mod-chip">Purchasing</span>
+      <span class="mod-chip">Inventory</span>
+      <span class="mod-chip">Sales</span>
+      <span class="mod-chip">Finance</span>
+      <span class="mod-chip">HR & Payroll</span>
+      <span class="mod-chip">Production</span>
+      <span class="mod-chip">Technical Textile</span>
+      <span class="mod-chip">Medical Textile</span>
+      <span class="mod-chip">Customer Intelligence</span>
+      <span class="mod-chip">Smart Feed</span>
+      <span class="mod-chip">Reports</span>
+      <span class="mod-chip">AI Chatbot</span>
+      <span class="mod-chip">Settings & Roles</span>
+    </div>
+  </div>
+
+  <div class="p1-footer">
+    <div style="display:flex;align-items:center;gap:4mm;">
+      <!-- Small logo in footer -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="22" height="22">
+        <polygon points="40,4 68,20 68,52 40,68 12,52 12,20" fill="rgba(255,255,255,0.2)"/>
+        <line x1="16" y1="27" x2="64" y2="27" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        <line x1="13" y1="40" x2="67" y2="40" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        <line x1="16" y1="53" x2="64" y2="53" stroke="white" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <div class="co">
+        <strong>Santha Sree</strong>
+        CEO & Founder · MEI TEXZ Technologies<br>
+        +91 9176236675 · info@meitexz.com · Coimbatore, TN 641062
+      </div>
+    </div>
+    <div class="yr">2025</div>
+  </div>
+
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PAGE 2 — ERP SYSTEM OVERVIEW
+════════════════════════════════════════ -->
+<div class="page">
+
+  <div class="p2-header">
+    <h1>ERP System Overview</h1>
+    <p>Everything your business needs — connected in one intelligent platform</p>
+    <div class="tag-row">
+      <span class="p2-tag">React.js + Django</span>
+      <span class="p2-tag">PostgreSQL</span>
+      <span class="p2-tag">AI Powered</span>
+      <span class="p2-tag">Cloud Hosted</span>
+      <span class="p2-tag">Role-Based Access</span>
+    </div>
+  </div>
+
+  <div class="p2-body">
+
+    <!-- ERP Hub -->
+    <div>
+      <div class="section-head">
+        <span class="sh-dot"></span>
+        <span class="sh-title">Integrated ERP Architecture</span>
+        <span class="sh-line"></span>
+      </div>
+      <div class="erp-hub">
+        <div class="hub-col">
+          <div class="hub-item">📦 Purchasing<span>PO · GRN · Suppliers</span></div>
+          <div class="hub-item blue">💰 Finance<span>Accounts · Journal</span></div>
+          <div class="hub-item green">👥 HR & Payroll<span>Staff · Salary</span></div>
+        </div>
+        <div class="h-arrow">→</div>
+        <div class="hub-center">
+          <div class="ht">ERP</div>
+          <div class="hs">MEI TEXZ</div>
+        </div>
+        <div class="h-arrow">→</div>
+        <div class="hub-col">
+          <div class="hub-item">🛒 Sales<span>Inquiry → Invoice</span></div>
+          <div class="hub-item blue">🏭 Production<span>BOM · Work Orders</span></div>
+          <div class="hub-item green">📊 Analytics<span>RFM · Forecast</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature cards -->
+    <div>
+      <div class="section-head">
+        <span class="sh-dot"></span>
+        <span class="sh-title">Core Capabilities</span>
+        <span class="sh-line"></span>
+      </div>
+      <div class="feat-grid">
+        <div class="feat-card">
+          <div class="fc-icon teal">📦</div>
+          <div class="fc-text"><h4>Purchasing & Inventory</h4><p>Create purchase orders, receive goods (GRN), track stock levels, record movements (IN/OUT/Transfer/Adjustment) in real time.</p></div>
+        </div>
+        <div class="feat-card blue">
+          <div class="fc-icon blue">🛒</div>
+          <div class="fc-text"><h4>Sales Management</h4><p>Full sales cycle — Inquiry → Quotation → Sales Order → Invoice. Track every order's journey from enquiry to delivery.</p></div>
+        </div>
+        <div class="feat-card navy">
+          <div class="fc-icon navy">🏭</div>
+          <div class="fc-text"><h4>Production Control</h4><p>Bill of Materials, Work Orders, Machine status tracking, Quality checks, Batch tracking for full traceability.</p></div>
+        </div>
+        <div class="feat-card green">
+          <div class="fc-icon green">💰</div>
+          <div class="fc-text"><h4>Finance & HR</h4><p>Chart of Accounts, Journal Entries, Trial Balance. Employee records, attendance tracking and salary processing.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Process flow -->
+    <div>
+      <div class="section-head">
+        <span class="sh-dot"></span>
+        <span class="sh-title">Business Process Flow</span>
+        <span class="sh-line"></span>
+      </div>
+      <div class="flow-row">
+        <div class="flow-step">
+          <div class="flow-circle">1</div>
+          <div class="flow-label">Purchase<br>Order</div>
+        </div>
+        <div class="flow-arrow">▶</div>
+        <div class="flow-step">
+          <div class="flow-circle">2</div>
+          <div class="flow-label">Goods<br>Receipt</div>
+        </div>
+        <div class="flow-arrow">▶</div>
+        <div class="flow-step">
+          <div class="flow-circle">3</div>
+          <div class="flow-label">Stock<br>Update</div>
+        </div>
+        <div class="flow-arrow">▶</div>
+        <div class="flow-step">
+          <div class="flow-circle">4</div>
+          <div class="flow-label">Production<br>Order</div>
+        </div>
+        <div class="flow-arrow">▶</div>
+        <div class="flow-step">
+          <div class="flow-circle">5</div>
+          <div class="flow-label">Quality<br>Check</div>
+        </div>
+        <div class="flow-arrow">▶</div>
+        <div class="flow-step">
+          <div class="flow-circle">6</div>
+          <div class="flow-label">Sales<br>Order</div>
+        </div>
+        <div class="flow-arrow">▶</div>
+        <div class="flow-step">
+          <div class="flow-circle">7</div>
+          <div class="flow-label">Invoice<br>& Pay</div>
+        </div>
+        <div class="flow-arrow">▶</div>
+        <div class="flow-step">
+          <div class="flow-circle" style="background:linear-gradient(135deg,#059669,#10b981);">8</div>
+          <div class="flow-label">Finance<br>Entry</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="p2-footer">
+    <span>MEI TEXZ Technologies · Building Intelligence Into Industry</span>
+    <strong>Page 2 of 4</strong>
+  </div>
+
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PAGE 3 — INDUSTRY FEATURES + AI
+════════════════════════════════════════ -->
+<div class="page">
+
+  <!-- Split dark header -->
+  <div class="p3-top">
+    <div class="p3-left" style="padding:8mm 10mm;">
+      <div class="p3-sec-title">Technical Textile</div>
+      <div class="p3-sec-sub">Performance · Testing · R&D</div>
+      <div class="p3-rule"></div>
+      <ul class="wl">
+        <li>Product Categories & Performance Specifications</li>
+        <li>Sample Management — track samples sent to customers</li>
+        <li>Technical Data Sheets (TDS) generation & management</li>
+        <li>Testing Lab — record and manage all lab test results</li>
+        <li>R&D Projects — new product development tracking</li>
+        <li>Technical reports & documentation export</li>
+      </ul>
+      <div class="badge-row">
+        <span class="wbadge">Performance Specs</span>
+        <span class="wbadge">TDS Export</span>
+        <span class="wbadge">Lab Records</span>
+        <span class="wbadge">R&D Tracking</span>
+      </div>
+    </div>
+    <div class="p3-right" style="padding:8mm 10mm;">
+      <div class="p3-sec-title">Medical Textile</div>
+      <div class="p3-sec-sub">Compliance · Traceability · CAPA</div>
+      <div class="p3-rule" style="background:white;opacity:0.5;"></div>
+      <ul class="wl">
+        <li>ISO 13485 / FDA / CE certification status tracking</li>
+        <li>Batch Traceability — raw material to final dispatch</li>
+        <li>Sterility Records & testing results management</li>
+        <li>CAPA Management — corrective & preventive actions</li>
+        <li>Full Audit Trail — every action logged for regulators</li>
+        <li>Shelf Life & expiry date monitoring</li>
+      </ul>
+      <div class="badge-row">
+        <span class="wbadge">ISO 13485</span>
+        <span class="wbadge">FDA Ready</span>
+        <span class="wbadge">CE Marking</span>
+        <span class="wbadge">Audit Trail</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="p3-wave-sep"></div>
+
+  <!-- AI & Intelligence section -->
+  <div class="p3-ai">
+    <div>
+      <div class="section-head">
+        <span class="sh-dot"></span>
+        <span class="sh-title">AI & Intelligence Features</span>
+        <span class="sh-line"></span>
+      </div>
+      <div class="ai-grid">
+        <div class="ai-card">
+          <div class="ai-icon">🤖</div>
+          <h4>AI Chatbot</h4>
+          <p>Ask in plain English or by voice. "How many orders this week?" — instant answer.</p>
+        </div>
+        <div class="ai-card blue2">
+          <div class="ai-icon">📈</div>
+          <h4>Sales Forecasting</h4>
+          <p>3-month revenue projection using Python linear regression — plan ahead with confidence.</p>
+        </div>
+        <div class="ai-card navy2">
+          <div class="ai-icon">🎯</div>
+          <h4>RFM Segmentation</h4>
+          <p>Auto-score every customer on Recency, Frequency & Monetary value. Know your best customers.</p>
+        </div>
+        <div class="ai-card">
+          <div class="ai-icon">⚠️</div>
+          <h4>Churn Prediction</h4>
+          <p>Identify customers about to leave — with revenue at risk flagged clearly.</p>
+        </div>
+        <div class="ai-card blue2">
+          <div class="ai-icon">💡</div>
+          <h4>Smart Business Feed</h4>
+          <p>Daily AI-curated business insights, textile industry news, books & courses.</p>
+        </div>
+        <div class="ai-card navy2">
+          <div class="ai-icon">🔮</div>
+          <h4>What-If Simulator</h4>
+          <p>Model price changes, customer loss, upsell impact — see revenue effect instantly.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics numbers -->
+    <div class="analytics-row">
+      <div class="ar-left">
+        <h4>Customer Intelligence Dashboard</h4>
+        <p>Six analytics tabs — RFM, Churn, Forecast, Products, What-If Simulator. Resizable charts on every page. All powered by pure Python ML — no external dependencies.</p>
+      </div>
+      <div class="ar-stats">
+        <div class="ars"><div class="n">6</div><div class="l">Analytics Tabs</div></div>
+        <div class="ars"><div class="n">12+</div><div class="l">Query Types</div></div>
+        <div class="ars"><div class="n">10</div><div class="l">UI Themes</div></div>
+        <div class="ars"><div class="n">∞</div><div class="l">Resizable</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p3-footer">
+    <span>MEI TEXZ Technologies · info@meitexz.com · +91 9176236675 · Coimbatore, TN 641062</span>
+    <span>Page 3 of 4</span>
+  </div>
+
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PAGE 4 — QUOTE + TECH + CONTACT
+════════════════════════════════════════ -->
+<div class="page">
+
+  <!-- Hero Quote -->
+  <div class="p4-quote-section">
+    <div class="quote-mark">"</div>
+    <div class="quote-text">
+      Most ERP systems are <span>generic.</span><br>
+      This one is built for <span>you.</span>
+    </div>
+    <div class="quote-attr">— MEI TEXZ Technologies · Purpose-built ERP for Technical & Medical Textile manufacturers</div>
+  </div>
+
+  <!-- Why Choose + Focus -->
+  <div class="p4-why">
+    <div class="p4-why-left">
+      <div class="section-head" style="margin-bottom:3mm;">
+        <span class="sh-dot"></span>
+        <span class="sh-title">Why Choose MEI TEXZ</span>
+        <span class="sh-line"></span>
+      </div>
+      <div class="why-card"><div class="wc-num">01</div><div class="wc-text"><h4>Industry-Specific Design</h4><p>Built from scratch for textile — not a generic ERP adapted to fit</p></div></div>
+      <div class="why-card blue"><div class="wc-num" style="color:var(--blue);">02</div><div class="wc-text"><h4>AI Built In</h4><p>AI chatbot, voice input, smart daily feed — intelligence everywhere</p></div></div>
+      <div class="why-card green"><div class="wc-num" style="color:#059669;">03</div><div class="wc-text"><h4>Cloud Hosted</h4><p>No servers — access from any device, anywhere in the world</p></div></div>
+      <div class="why-card"><div class="wc-num">04</div><div class="wc-text"><h4>Fast Go-Live</h4><p>Deployed and trained within weeks — not months</p></div></div>
+    </div>
+    <div class="p4-why-right">
+      <div class="section-head" style="margin-bottom:3mm;">
+        <span class="sh-dot"></span>
+        <span class="sh-title">Focus of the Platform</span>
+        <span class="sh-line"></span>
+      </div>
+      <div class="why-card"><div class="wc-num">05</div><div class="wc-text"><h4>Regulatory Compliance</h4><p>ISO 13485, FDA, CE — built in, not bolted on</p></div></div>
+      <div class="why-card blue"><div class="wc-num" style="color:var(--blue);">06</div><div class="wc-text"><h4>Full Audit Trail</h4><p>Every action logged — user, module, timestamp, everywhere</p></div></div>
+      <div class="why-card green"><div class="wc-num" style="color:#059669;">07</div><div class="wc-text"><h4>Role-Based Access</h4><p>Admin and User roles — each person sees only what they need</p></div></div>
+      <div class="why-card"><div class="wc-num">08</div><div class="wc-text"><h4>Competitive Pricing</h4><p>Custom pricing — no per-user fees, no hidden charges</p></div></div>
+    </div>
+  </div>
+
+  <!-- Deployment & Support -->
+  <div class="p4-tech">
+    <div class="section-head">
+      <span class="sh-dot"></span>
+      <span class="sh-title">Is This You? Signs You Need an ERP</span>
+      <span class="sh-line"></span>
+    </div>
+    <div style="display:flex;gap:5mm;margin-bottom:4mm;">
+      <div style="flex:1;background:#f1f5f9;border-radius:6px;padding:4mm 5mm;border-left:4px solid var(--navy);">
+        <div style="font-size:7.5pt;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:1px;margin-bottom:3mm;">Signs You Need This ERP</div>
+        <ul style="list-style:none;padding:0;margin:0;">
+          <li style="font-size:6.5pt;color:#334155;padding:2px 0 2px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--navy);font-weight:700;">▸</span>ISO audits cause panic — records scattered everywhere</li>
+          <li style="font-size:6.5pt;color:#334155;padding:2px 0 2px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--navy);font-weight:700;">▸</span>No batch or yarn lot traceability from fibre to dispatch</li>
+          <li style="font-size:6.5pt;color:#334155;padding:2px 0 2px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--navy);font-weight:700;">▸</span>Quality test records on paper — easy to lose or falsify</li>
+          <li style="font-size:6.5pt;color:#334155;padding:2px 0 2px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--navy);font-weight:700;">▸</span>CAPA and NCR tracked in email chains and notebooks</li>
+          <li style="font-size:6.5pt;color:#334155;padding:2px 0 2px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--navy);font-weight:700;">▸</span>Production planning done manually in Excel every day</li>
+          <li style="font-size:6.5pt;color:#334155;padding:2px 0 2px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--navy);font-weight:700;">▸</span>Finance team waits days for inventory &amp; cost data</li>
+        </ul>
+      </div>
+      <div style="flex:1;background:linear-gradient(135deg,#ecfeff,#cffafe);border-radius:6px;padding:4mm 5mm;border-left:4px solid var(--teal);">
+        <div style="font-size:7.5pt;font-weight:800;color:#0c4a6e;text-transform:uppercase;letter-spacing:1px;margin-bottom:3mm;">After MEI TEXZ ERP</div>
+        <ul style="list-style:none;padding:0;margin:0;">
+          <li style="font-size:6.5pt;color:#0e4a6e;padding:2px 0 2px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--teal);font-weight:700;">✓</span>Full audit trail — every action logged with timestamp</li>
+          <li style="font-size:6.5pt;color:#0e4a6e;padding:2px 0 2px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--teal);font-weight:700;">✓</span>Complete batch traceability from raw material to dispatch</li>
+          <li style="font-size:6.5pt;color:#0e4a6e;padding:2px 0 2px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--teal);font-weight:700;">✓</span>Digital QC records — searchable, exportable, tamper-proof</li>
+          <li style="font-size:6.5pt;color:#0e4a6e;padding:2px 0 2px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--teal);font-weight:700;">✓</span>CAPA &amp; NCR workflow built-in — closed-loop quality control</li>
+          <li style="font-size:6.5pt;color:#0e4a6e;padding:2px 0 2px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--teal);font-weight:700;">✓</span>Production scheduled and tracked live on your dashboard</li>
+          <li style="font-size:6.5pt;color:#0e4a6e;padding:2px 0 2px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--teal);font-weight:700;">✓</span>Real-time cost and profit visible the moment it happens</li>
+        </ul>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,var(--navy),#1a3a6b,var(--teal));border-radius:6px;padding:5mm 8mm;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-size:10pt;font-weight:900;color:white;margin-bottom:1mm;">Transform Your Business</div>
+        <div style="font-size:6pt;color:rgba(255,255,255,0.75);line-height:1.6;">Book a free 30-minute demo — we show your own business<br>running inside MEI TEXZ ERP. No pressure. No commitment.</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;margin-left:6mm;">
+        <div style="font-size:10pt;font-weight:800;color:#a5f3fc;line-height:1.4;">+91 9176236675</div>
+        <div style="font-size:7pt;color:rgba(255,255,255,0.85);">info@meitexz.com</div>
+        <div style="font-size:6pt;color:rgba(255,255,255,0.55);margin-top:1mm;">Coimbatore, TN 641062</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Footer -->
+  <div class="p4-contact">
+    <div>
+      <div class="logo-w">MEI TEXZ</div>
+      <div class="logo-sw">TECHNOLOGIES</div>
+    </div>
+    <div class="p4-cta">
+      <h4>Book a Free Demo</h4>
+      <p>See the full ERP live — no commitment</p>
+    </div>
+    <div class="contact-info">
+      <h4>Santha Sree · CEO & Founder</h4>
+      <p>📞 +91 9176236675<br>✉ info@meitexz.com<br>📍 Coimbatore, TN 641062</p>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

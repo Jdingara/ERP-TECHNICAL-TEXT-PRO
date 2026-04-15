@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MEI TEXZ — Business Cards</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --navy:#0d1b2a; --navy2:#1e3a5f; --blue:#2563eb; --teal:#0891b2; --sky:#bfdbfe; --white:#fff; }
+  body { font-family:'Inter',sans-serif; background:#d1d5db; padding:20px; }
+
+  h2 { text-align:center; color:#374151; font-size:11pt; margin-bottom:15px; font-weight:600; }
+
+  .card-row { display:flex; gap:15px; justify-content:center; margin-bottom:30px; flex-wrap:wrap; }
+
+  /* Standard business card: 85mm x 55mm */
+  .card {
+    width:85mm;
+    height:55mm;
+    border-radius:3mm;
+    overflow:hidden;
+    box-shadow:0 4px 20px rgba(0,0,0,0.25);
+    position:relative;
+    flex-shrink:0;
+  }
+
+  /* ─── CARD 1: CEO ─── */
+  .card-1-front {
+    background:linear-gradient(140deg, var(--navy) 0%, var(--navy2) 55%, var(--blue) 100%);
+    color:white;
+    padding:6mm 7mm;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    position:relative;
+    overflow:hidden;
+  }
+  .card-1-front::before {
+    content:'';
+    position:absolute;
+    top:-8mm; right:-8mm;
+    width:30mm; height:30mm;
+    border-radius:50%;
+    background:rgba(255,255,255,0.04);
+  }
+  .card-1-front::after {
+    content:'';
+    position:absolute;
+    bottom:-5mm; left:-5mm;
+    width:22mm; height:22mm;
+    border-radius:50%;
+    background:rgba(59,130,246,0.15);
+  }
+  .c1-logo { font-size:13pt; font-weight:900; letter-spacing:2px; position:relative; z-index:2; line-height:1; }
+  .c1-logos { font-size:4.5pt; letter-spacing:3px; color:var(--sky); margin-top:1px; }
+  .c1-line { width:20px; height:2px; background:var(--sky); margin:3mm 0; }
+  .c1-name { font-size:11pt; font-weight:800; position:relative; z-index:2; line-height:1.1; }
+  .c1-role { font-size:6.5pt; color:var(--sky); font-weight:600; margin-top:1.5mm; letter-spacing:1px; text-transform:uppercase; }
+  .c1-contact { font-size:6pt; color:rgba(255,255,255,0.8); line-height:2; position:relative; z-index:2; }
+  .c1-tag { font-size:5pt; color:rgba(255,255,255,0.4); font-style:italic; position:relative; z-index:2; }
+
+  /* ─── CARD 1 BACK ─── */
+  .card-1-back {
+    background:var(--navy);
+    color:white;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:3mm;
+    position:relative;
+    overflow:hidden;
+  }
+  .card-1-back::before {
+    content:'';
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    width:40mm; height:40mm;
+    border-radius:50%;
+    background:rgba(59,130,246,0.08);
+  }
+  .cb-logo { font-size:18pt; font-weight:900; letter-spacing:3px; color:white; position:relative; z-index:2; }
+  .cb-logos { font-size:5.5pt; letter-spacing:4px; color:var(--sky); position:relative; z-index:2; }
+  .cb-hl { width:25px; height:2px; background:var(--blue); }
+  .cb-tag { font-size:6pt; color:rgba(255,255,255,0.5); font-style:italic; position:relative; z-index:2; }
+
+  /* ─── CARD 2: TECH ─── */
+  .card-2-front {
+    background:linear-gradient(140deg, #0d1b2a 0%, #0f3460 50%, var(--teal) 100%);
+    color:white;
+    padding:6mm 7mm;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    position:relative;
+    overflow:hidden;
+  }
+  .card-2-front::before {
+    content:'';
+    position:absolute;
+    top:-8mm; right:-8mm;
+    width:28mm; height:28mm;
+    border-radius:50%;
+    background:rgba(255,255,255,0.04);
+  }
+  .c2-accent { position:absolute; bottom:0; right:0; width:15mm; height:55mm; background:rgba(8,145,178,0.2); }
+  .c2-logo { font-size:12pt; font-weight:900; letter-spacing:2px; position:relative; z-index:2; }
+  .c2-logos { font-size:4.5pt; letter-spacing:3px; color:#a5f3fc; margin-top:1px; }
+  .c2-line { width:20px; height:2px; background:#a5f3fc; margin:3mm 0; }
+  .c2-name { font-size:11pt; font-weight:800; position:relative; z-index:2; line-height:1.1; }
+  .c2-role { font-size:6pt; color:#a5f3fc; font-weight:600; margin-top:1.5mm; letter-spacing:0.8px; text-transform:uppercase; }
+  .c2-spec { font-size:5.5pt; color:rgba(255,255,255,0.6); margin-top:1mm; }
+  .c2-contact { font-size:6pt; color:rgba(255,255,255,0.8); line-height:2; position:relative; z-index:2; }
+
+  /* ─── CARD 3: COMPANY ─── */
+  .card-3-front {
+    background:white;
+    padding:6mm 7mm;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    border:1px solid #e2e8f0;
+  }
+  .c3-top { display:flex; align-items:flex-start; justify-content:space-between; }
+  .c3-logo { font-size:13pt; font-weight:900; letter-spacing:2px; color:var(--navy); }
+  .c3-logos { font-size:4.5pt; letter-spacing:3px; color:var(--blue); }
+  .c3-box {
+    width:12mm; height:12mm;
+    background:linear-gradient(135deg, var(--navy), var(--blue));
+    border-radius:2mm;
+    display:flex; align-items:center; justify-content:center;
+    color:white; font-size:7pt; font-weight:900;
+  }
+  .c3-line { height:2px; background:linear-gradient(90deg, var(--navy), var(--blue)); margin:3mm 0; }
+  .c3-tag { font-size:7pt; font-weight:700; color:var(--navy2); }
+  .c3-sub { font-size:5.5pt; color:#64748b; margin-top:1mm; line-height:1.6; }
+  .c3-contact { font-size:6pt; color:var(--navy2); line-height:2; font-weight:600; }
+  .c3-slogan { font-size:5pt; color:#94a3b8; font-style:italic; }
+
+  .card-3-back {
+    background:linear-gradient(140deg, var(--navy) 0%, var(--navy2) 60%, var(--blue) 100%);
+    color:white;
+    padding:6mm 7mm;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+  }
+  .c3b-title { font-size:8pt; font-weight:800; color:var(--sky); text-transform:uppercase; letter-spacing:1px; margin-bottom:2mm; }
+  .c3b-list { list-style:none; }
+  .c3b-list li { font-size:6pt; color:rgba(255,255,255,0.85); padding:1.5px 0 1.5px 8px; position:relative; }
+  .c3b-list li::before { content:'▸'; color:var(--sky); position:absolute; left:0; font-size:5.5pt; }
+  .c3b-tag { font-size:5pt; color:rgba(255,255,255,0.4); font-style:italic; }
+
+  .section-label {
+    text-align:center;
+    font-size:9pt;
+    font-weight:700;
+    color:#6b7280;
+    margin:10px 0 5px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+  }
+
+  .print-note {
+    text-align:center;
+    font-size:8pt;
+    color:#9ca3af;
+    margin:20px auto;
+    max-width:200mm;
+    line-height:1.6;
+  }
+
+  @media print {
+    * { -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
+    body { background:white; padding:10mm; }
+    .print-note { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<h2>MEI TEXZ — Business Cards (Print-Ready)</h2>
+
+<div class="print-note">
+  Print on 300gsm card stock · Cut along card edges · Each card: 85mm × 55mm (standard size)<br>
+  Open in browser → Ctrl+P → Set paper to A4 · Scale: 100% · No margins → Save as PDF → Print
+</div>
+
+<!-- ═══════════ FRONTS ═══════════ -->
+<div class="section-label">— FRONT SIDE —</div>
+<div class="card-row">
+
+  <!-- CARD 1 FRONT: CEO -->
+  <div class="card">
+    <div class="card-1-front">
+      <div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="118" height="30" style="display:block;margin-bottom:2mm;">
+          <defs><linearGradient id="icBC1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#06b6d4"/><stop offset="50%" style="stop-color:#0891b2"/><stop offset="100%" style="stop-color:#0d1b2a"/></linearGradient></defs>
+          <polygon points="40,4 68,20 68,52 40,68 12,52 12,20" fill="url(#icBC1)"/>
+          <line x1="16" y1="26" x2="64" y2="26" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="13" y1="36" x2="67" y2="36" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="16" y1="46" x2="64" y2="46" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="28" cy="36" r="2.5" fill="#a5f3fc" opacity="0.95"/><circle cx="40" cy="36" r="3.5" fill="white"/><circle cx="52" cy="36" r="2.5" fill="#a5f3fc" opacity="0.95"/>
+          <text x="84" y="44" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="28" font-weight="900" letter-spacing="3" fill="white">MEI TEXZ</text>
+          <line x1="84" y1="50" x2="298" y2="50" stroke="#0891b2" stroke-width="1.5" opacity="0.6"/>
+          <text x="84" y="63" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="9" font-weight="500" letter-spacing="5" fill="#bfdbfe">TECHNOLOGIES</text>
+        </svg>
+        <div class="c1-line"></div>
+        <div class="c1-name">Santha Sree</div>
+        <div class="c1-role">CEO &amp; Founder</div>
+      </div>
+      <div>
+        <div class="c1-contact">
+          📞 +91 9176236675<br>
+          ✉ info@meitexz.com
+        </div>
+        <div class="c1-tag">Building Intelligence Into Industry</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 2 FRONT: TECH -->
+  <div class="card">
+    <div class="card-2-front">
+      <div class="c2-accent"></div>
+      <div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="118" height="30" style="display:block;margin-bottom:2mm;">
+          <defs><linearGradient id="icBC2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#06b6d4"/><stop offset="50%" style="stop-color:#0891b2"/><stop offset="100%" style="stop-color:#0d1b2a"/></linearGradient></defs>
+          <polygon points="40,4 68,20 68,52 40,68 12,52 12,20" fill="url(#icBC2)"/>
+          <line x1="16" y1="26" x2="64" y2="26" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="13" y1="36" x2="67" y2="36" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="16" y1="46" x2="64" y2="46" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="28" cy="36" r="2.5" fill="#a5f3fc" opacity="0.95"/><circle cx="40" cy="36" r="3.5" fill="white"/><circle cx="52" cy="36" r="2.5" fill="#a5f3fc" opacity="0.95"/>
+          <text x="84" y="44" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="28" font-weight="900" letter-spacing="3" fill="white">MEI TEXZ</text>
+          <line x1="84" y1="50" x2="298" y2="50" stroke="#06b6d4" stroke-width="1.5" opacity="0.6"/>
+          <text x="84" y="63" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="9" font-weight="500" letter-spacing="5" fill="#a5f3fc">TECHNOLOGIES</text>
+        </svg>
+        <div class="c2-line"></div>
+        <div class="c2-name">Santha Sree</div>
+        <div class="c2-role">ERP Solutions Architect</div>
+        <div class="c2-spec">React · Django · AI · Cloud</div>
+      </div>
+      <div>
+        <div class="c2-contact">
+          📞 +91 9176236675<br>
+          ✉ info@meitexz.com
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 3 FRONT: COMPANY -->
+  <div class="card">
+    <div class="card-3-front">
+      <div class="c3-top">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="110" height="28" style="display:block;">
+            <defs>
+              <linearGradient id="icBC3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#06b6d4"/><stop offset="50%" style="stop-color:#0891b2"/><stop offset="100%" style="stop-color:#0d1b2a"/></linearGradient>
+              <linearGradient id="tgBC3" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#0d1b2a"/><stop offset="100%" style="stop-color:#1e3a5f"/></linearGradient>
+            </defs>
+            <polygon points="40,4 68,20 68,52 40,68 12,52 12,20" fill="url(#icBC3)"/>
+            <line x1="16" y1="26" x2="64" y2="26" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="13" y1="36" x2="67" y2="36" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="16" y1="46" x2="64" y2="46" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="40" cy="36" r="3.5" fill="white"/>
+            <text x="84" y="44" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="28" font-weight="900" letter-spacing="3" fill="url(#tgBC3)">MEI TEXZ</text>
+            <text x="84" y="63" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="9" font-weight="500" letter-spacing="5" fill="#0891b2">TECHNOLOGIES</text>
+          </svg>
+        </div>
+        <div class="c3-box">ERP</div>
+      </div>
+      <div>
+        <div class="c3-line"></div>
+        <div class="c3-tag">Custom ERP Solutions</div>
+        <div class="c3-sub">
+          Textile · Manufacturing · Retail<br>
+          Healthcare · Hospitality · Any Sector
+        </div>
+      </div>
+      <div>
+        <div class="c3-contact">
+          📞 +91 9176236675<br>
+          ✉ info@meitexz.com
+        </div>
+        <div class="c3-slogan">Building Intelligence Into Industry</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ BACKS ═══════════ -->
+<div class="section-label">— BACK SIDE —</div>
+<div class="card-row">
+
+  <!-- CARD 1 BACK -->
+  <div class="card">
+    <div class="card-1-back">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="130" height="33" style="display:block;position:relative;z-index:2;">
+        <defs><linearGradient id="icBC1b" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#06b6d4"/><stop offset="50%" style="stop-color:#0891b2"/><stop offset="100%" style="stop-color:#0d1b2a"/></linearGradient></defs>
+        <polygon points="40,4 68,20 68,52 40,68 12,52 12,20" fill="url(#icBC1b)"/>
+        <line x1="16" y1="26" x2="64" y2="26" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="13" y1="36" x2="67" y2="36" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="16" y1="46" x2="64" y2="46" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="28" cy="36" r="2.5" fill="#a5f3fc" opacity="0.95"/><circle cx="40" cy="36" r="3.5" fill="white"/><circle cx="52" cy="36" r="2.5" fill="#a5f3fc" opacity="0.95"/>
+        <text x="84" y="44" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="28" font-weight="900" letter-spacing="3" fill="white">MEI TEXZ</text>
+        <line x1="84" y1="50" x2="298" y2="50" stroke="#2563eb" stroke-width="1.5" opacity="0.6"/>
+        <text x="84" y="63" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="9" font-weight="500" letter-spacing="5" fill="#bfdbfe">TECHNOLOGIES</text>
+      </svg>
+      <div class="cb-hl"></div>
+      <div class="cb-tag">Building Intelligence Into Industry</div>
+    </div>
+  </div>
+
+  <!-- CARD 2 BACK -->
+  <div class="card">
+    <div style="background:linear-gradient(140deg,#0d1b2a,#0f3460,#0891b2); height:100%; padding:6mm 7mm; display:flex; flex-direction:column; justify-content:space-between;">
+      <div style="font-size:7.5pt; font-weight:800; color:#a5f3fc; text-transform:uppercase; letter-spacing:1px;">We Build ERP For</div>
+      <ul style="list-style:none;">
+        <li style="font-size:6pt; color:rgba(255,255,255,0.85); padding:1.5px 0 1.5px 8px; position:relative;"><span style="position:absolute;left:0;color:#a5f3fc;">▸</span>Technical & Medical Textile</li>
+        <li style="font-size:6pt; color:rgba(255,255,255,0.85); padding:1.5px 0 1.5px 8px; position:relative;"><span style="position:absolute;left:0;color:#a5f3fc;">▸</span>Any Manufacturing Sector</li>
+        <li style="font-size:6pt; color:rgba(255,255,255,0.85); padding:1.5px 0 1.5px 8px; position:relative;"><span style="position:absolute;left:0;color:#a5f3fc;">▸</span>Hotels, Restaurants, Retail</li>
+        <li style="font-size:6pt; color:rgba(255,255,255,0.85); padding:1.5px 0 1.5px 8px; position:relative;"><span style="position:absolute;left:0;color:#a5f3fc;">▸</span>Healthcare & Education</li>
+        <li style="font-size:6pt; color:rgba(255,255,255,0.85); padding:1.5px 0 1.5px 8px; position:relative;"><span style="position:absolute;left:0;color:#a5f3fc;">▸</span>Any Company with inventory</li>
+      </ul>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="120" height="30" style="display:block;margin:0 auto;">
+        <defs><linearGradient id="icBC2b" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#06b6d4"/><stop offset="50%" style="stop-color:#0891b2"/><stop offset="100%" style="stop-color:#0d1b2a"/></linearGradient></defs>
+        <polygon points="40,4 68,20 68,52 40,68 12,52 12,20" fill="url(#icBC2b)"/>
+        <line x1="16" y1="26" x2="64" y2="26" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="13" y1="36" x2="67" y2="36" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="16" y1="46" x2="64" y2="46" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="40" cy="36" r="3.5" fill="white"/>
+        <text x="84" y="44" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="28" font-weight="900" letter-spacing="3" fill="white">MEI TEXZ</text>
+        <text x="84" y="63" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="9" font-weight="500" letter-spacing="5" fill="#a5f3fc">TECHNOLOGIES</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- CARD 3 BACK -->
+  <div class="card">
+    <div class="card-3-back">
+      <div class="c3b-title">What We Deliver</div>
+      <ul class="c3b-list">
+        <li>Full ERP — 15 modules, 50+ pages</li>
+        <li>AI chatbot with voice input</li>
+        <li>Customer intelligence & forecasting</li>
+        <li>Cloud hosted — no servers needed</li>
+        <li>Role-based access & audit trail</li>
+        <li>10 professional UI themes</li>
+        <li>Fast deployment within weeks</li>
+      </ul>
+      <div class="c3b-tag">Building Intelligence Into Industry</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="print-note" style="margin-top:10px;">
+  ✅ 3 Card designs × 2 sides = 6 cards total &nbsp;|&nbsp;
+  Card 1: CEO &amp; Founder &nbsp;|&nbsp;
+  Card 2: ERP Solutions Architect &nbsp;|&nbsp;
+  Card 3: General Company Card
+</div>
+
+</body>
+</html>

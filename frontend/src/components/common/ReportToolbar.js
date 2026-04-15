@@ -72,7 +72,7 @@ function handleExcel(title, onExcel) {
 
 // ── COMPONENT ─────────────────────────────────────────────────
 export default function ReportToolbar({ title, printRef, onExcel }) {
-    const shareMessage = `${title}\nGenerated from SASI ERP\nDate: ${new Date().toLocaleDateString('en-IN')}`;
+    const shareMessage = `${title}\nGenerated from MEI TEXZ ERP\nDate: ${new Date().toLocaleDateString('en-IN')}`;
 
     return (
         <Box
@@ -104,7 +104,7 @@ export default function ReportToolbar({ title, printRef, onExcel }) {
             <ShareWidget
                 title={title}
                 message={shareMessage}
-                subject={`${title} — SASI ERP`}
+                subject={`${title} — MEI TEXZ ERP`}
                 onPrint={() => handlePrint(printRef)}
             />
 

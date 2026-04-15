@@ -238,7 +238,7 @@ function ActivityLogPage() {
                             const url  = URL.createObjectURL(blob);
                             const a    = document.createElement('a');
                             a.href     = url;
-                            a.download = `SASI_ERP_Support_Log_${new Date().toISOString().slice(0,10)}.csv`;
+                            a.download = `MEITEXZ_ERP_Support_Log_${new Date().toISOString().slice(0,10)}.csv`;
                             a.click();
                             URL.revokeObjectURL(url);
                         }}

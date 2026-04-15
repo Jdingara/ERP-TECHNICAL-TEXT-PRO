@@ -156,7 +156,7 @@ export default function ShareWidget({
     const [apiInfo, setApiInfo] = useState(null);
 
     // Resolved subject / body from template or props
-    const [emailSubject, setEmailSubject] = useState(subject || `${title} — SASI ERP`);
+    const [emailSubject, setEmailSubject] = useState(subject || `${title} — MEI TEXZ ERP`);
     const [emailBody,    setEmailBody]    = useState(message || title);
     const [waBody,       setWaBody]       = useState(message || title);
 

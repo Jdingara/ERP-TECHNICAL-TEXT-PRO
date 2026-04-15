@@ -79,13 +79,13 @@ function CardIcon({ name, color }) {
 
 // ── Type badge config ─────────────────────────────────────────
 const TYPE_CONFIG = {
-    alert:   { label: 'Alert',          bg: '#fef2f2', border: '#fca5a5', badge: '#dc2626' },
-    insight: { label: 'Insight',        bg: '#eff6ff', border: '#93c5fd', badge: '#1d4ed8' },
-    book:    { label: 'Book',           bg: '#f0fdf4', border: '#86efac', badge: '#15803d' },
-    course:  { label: 'Course',         bg: '#faf5ff', border: '#c4b5fd', badge: '#7c3aed' },
-    tip:     { label: 'Improvement Tip',bg: '#fffbeb', border: '#fcd34d', badge: '#b45309' },
-    market:  { label: 'Market News',    bg: '#f0f9ff', border: '#7dd3fc', badge: '#0369a1' },
-    ai:      { label: 'AI Insight',     bg: '#fdf4ff', border: '#d8b4fe', badge: '#7e22ce' },
+    alert:   { label: 'Alert',          bg: 'rgba(220,38,38,0.07)',   border: 'rgba(220,38,38,0.25)',   badge: '#dc2626' },
+    insight: { label: 'Insight',        bg: 'rgba(29,78,216,0.07)',   border: 'rgba(29,78,216,0.25)',   badge: '#1d4ed8' },
+    book:    { label: 'Book',           bg: 'rgba(21,128,61,0.07)',   border: 'rgba(21,128,61,0.25)',   badge: '#15803d' },
+    course:  { label: 'Course',         bg: 'rgba(124,58,237,0.07)',  border: 'rgba(124,58,237,0.25)',  badge: '#7c3aed' },
+    tip:     { label: 'Improvement Tip',bg: 'rgba(180,83,9,0.07)',    border: 'rgba(180,83,9,0.30)',    badge: '#b45309' },
+    market:  { label: 'Market News',    bg: 'rgba(3,105,161,0.07)',   border: 'rgba(3,105,161,0.25)',   badge: '#0369a1' },
+    ai:      { label: 'AI Insight',     bg: 'rgba(126,34,206,0.07)',  border: 'rgba(126,34,206,0.25)',  badge: '#7e22ce' },
 };
 
 const FILTER_OPTIONS = [

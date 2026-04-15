@@ -29,7 +29,7 @@ export default function BulkShareDialog({ open, onClose, docType, rows }) {
     const tmpl = templates[docType] || {};
 
     const getEmailHref = (row) => {
-        const subj = fillTemplate(tmpl.email_subject || `${row.title} — SASI ERP`, row.vars);
+        const subj = fillTemplate(tmpl.email_subject || `${row.title} — MEI TEXZ ERP`, row.vars);
         const body = fillTemplate(tmpl.email_body    || row.title, row.vars);
         return `mailto:${row.email || ''}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
     };

@@ -169,7 +169,7 @@ export default function MessageTemplatesPage() {
                     onSelect={e => trackCursor('email_subject', e)}
                     onClick={e => trackCursor('email_subject', e)}
                     onKeyUp={e => trackCursor('email_subject', e)}
-                    placeholder={`e.g. Quotation {{document_number}} from SASI ERP`}
+                    placeholder={`e.g. Quotation {{document_number}} from MEI TEXZ ERP`}
                     sx={{ mb: 1.5 }}
                 />
 
@@ -200,7 +200,7 @@ export default function MessageTemplatesPage() {
                     onSelect={e => trackCursor('email_body', e)}
                     onClick={e => trackCursor('email_body', e)}
                     onKeyUp={e => trackCursor('email_body', e)}
-                    placeholder={`Dear {{customer_name}},\n\nPlease find attached your ${DOC_TYPES[tab].label} {{document_number}}.\n\nAmount: {{amount}}\nDate: {{date}}\n\nThank you,\nSASI ERP`}
+                    placeholder={`Dear {{customer_name}},\n\nPlease find attached your ${DOC_TYPES[tab].label} {{document_number}}.\n\nAmount: {{amount}}\nDate: {{date}}\n\nThank you,\nMEI TEXZ ERP`}
                     sx={{ mb: 1 }}
                 />
 
@@ -239,7 +239,7 @@ export default function MessageTemplatesPage() {
                     onSelect={e => trackCursor('whatsapp_body', e)}
                     onClick={e => trackCursor('whatsapp_body', e)}
                     onKeyUp={e => trackCursor('whatsapp_body', e)}
-                    placeholder={`Hello {{customer_name}},\n\nYour ${DOC_TYPES[tab].label} {{document_number}} for ₹{{amount}} is ready.\nDate: {{date}}\n\nThank you — SASI ERP`}
+                    placeholder={`Hello {{customer_name}},\n\nYour ${DOC_TYPES[tab].label} {{document_number}} for ₹{{amount}} is ready.\nDate: {{date}}\n\nThank you — MEI TEXZ ERP`}
                     sx={{ mb: 1 }}
                 />
 

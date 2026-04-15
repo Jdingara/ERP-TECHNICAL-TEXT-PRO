@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MEI TEXZ — ERP for Any Business</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Poppins:wght@700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--navy:#0d1b2a;--navy2:#1a2f4a;--blue:#2563eb;--teal:#0891b2;--teal2:#06b6d4;--sky:#bfdbfe;--tsky:#a5f3fc;--white:#fff;--grey:#f1f5f9;--lgrey:#e2e8f0;--text:#1e293b;--muted:#64748b;}
+body{font-family:'Inter',sans-serif;background:#94a3b8;}
+.page{width:210mm;min-height:297mm;background:white;margin:15px auto;box-shadow:0 8px 40px rgba(0,0,0,0.25);page-break-after:always;overflow:hidden;position:relative;display:flex;flex-direction:column;}
+.page-nav{background:white;padding:3mm 10mm;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e2e8f0;}
+.sh{display:flex;align-items:center;gap:3mm;margin-bottom:3mm;}
+.sh-line{flex:1;height:1px;background:var(--lgrey);}
+.sh-title{font-size:7.5pt;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap;}
+.sh-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;}
+.ph{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);padding:6mm 12mm;position:relative;overflow:hidden;}
+.ph::after{content:'';position:absolute;top:0;right:0;bottom:0;width:40mm;background:linear-gradient(135deg,transparent,rgba(8,145,178,0.2));}
+.ph h1{font-size:14pt;font-weight:900;color:white;}
+.ph p{font-size:6.5pt;color:var(--tsky);margin-top:1.5mm;}
+.ph .tr{display:flex;gap:2mm;margin-top:3mm;}
+.ptag{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;font-size:5.5pt;font-weight:600;padding:1.5px 6px;border-radius:10px;}
+.pb{flex:1;padding:6mm 12mm;display:flex;flex-direction:column;gap:4mm;}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:3mm;}
+.fc{background:white;border-radius:5px;padding:4mm;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-top:3px solid var(--teal);display:flex;gap:3mm;align-items:flex-start;}
+.fc.bl{border-color:var(--blue);}.fc.nv{border-color:var(--navy);}.fc.gr{border-color:#10b981;}.fc.or{border-color:#f59e0b;}.fc.pu{border-color:#7c3aed;}
+.fci{width:9mm;height:9mm;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11pt;}
+.fci.te{background:linear-gradient(135deg,var(--teal),var(--teal2));}.fci.bl{background:linear-gradient(135deg,var(--blue),#3b82f6);}.fci.nv{background:linear-gradient(135deg,var(--navy),var(--navy2));}.fci.gr{background:linear-gradient(135deg,#059669,#10b981);}.fci.or{background:linear-gradient(135deg,#d97706,#f59e0b);}.fci.pu{background:linear-gradient(135deg,#6d28d9,#7c3aed);}
+.fct h4{font-size:7pt;font-weight:800;color:var(--navy);}
+.fct p{font-size:5.5pt;color:var(--muted);line-height:1.5;margin-top:0.5mm;}
+ul.fl{list-style:none;margin-bottom:3mm;}
+ul.fl li{font-size:6.5pt;color:var(--text);padding:2px 0 2px 10px;position:relative;line-height:1.5;}
+ul.fl li::before{content:'▸';color:var(--blue);position:absolute;left:0;}
+ul.wl{list-style:none;}
+ul.wl li{font-size:6pt;color:rgba(255,255,255,0.9);padding:2px 0 2px 10px;position:relative;line-height:1.5;}
+ul.wl li::before{content:'▸';color:var(--tsky);position:absolute;left:0;font-size:5.5pt;}
+.tc{display:grid;grid-template-columns:1fr 1fr;gap:2.5mm;margin-bottom:4mm;}
+.mc{background:var(--grey);border-radius:4px;padding:3mm 3.5mm;border-left:2px solid var(--teal);}
+.mc.bl{border-color:var(--blue);}.mc.gr{border-color:#10b981;}
+.mc h4{font-size:6.5pt;font-weight:700;color:var(--navy);}
+.mc p{font-size:5pt;color:var(--muted);margin-top:0.5mm;}
+.hb{background:linear-gradient(135deg,#ecfeff,#cffafe);border:1px solid #a5f3fc;border-radius:5px;padding:4mm 5mm;}
+.hb h4{font-size:7.5pt;font-weight:700;color:#0c4a6e;margin-bottom:2mm;}
+.hb p{font-size:6pt;color:#0e7490;line-height:1.6;}
+.sb{background:linear-gradient(135deg,var(--navy),var(--navy2));border-radius:6px;padding:4mm 5mm;display:flex;gap:4mm;align-items:center;}
+.sb-l{flex:1;}.sb-l h4{font-size:8pt;font-weight:800;color:white;margin-bottom:1mm;}
+.sb-l p{font-size:6pt;color:rgba(255,255,255,0.7);line-height:1.6;}
+.sb-s{display:flex;gap:3mm;}
+.sbs{background:rgba(255,255,255,0.08);border-radius:4px;padding:3mm;text-align:center;min-width:16mm;}
+.sbs .n{font-size:12pt;font-weight:900;color:var(--tsky);line-height:1;}
+.sbs .l{font-size:5pt;color:rgba(255,255,255,0.6);}
+.spt{display:flex;height:70mm;}
+.spl{width:50%;background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 60%,#1e4a7a 100%);padding:8mm;position:relative;overflow:hidden;}
+.spl::after{content:'';position:absolute;bottom:-10mm;right:-10mm;width:40mm;height:40mm;border-radius:50%;background:rgba(8,145,178,0.15);}
+.spr{width:50%;background:linear-gradient(160deg,#0891b2 0%,#0e7490 60%,#1e3a5f 100%);padding:8mm;position:relative;overflow:hidden;}
+.spr::after{content:'';position:absolute;top:-10mm;left:-10mm;width:40mm;height:40mm;border-radius:50%;background:rgba(255,255,255,0.08);}
+.st2{font-size:9pt;font-weight:800;color:white;margin-bottom:1mm;}
+.ss2{font-size:5.5pt;color:rgba(255,255,255,0.65);margin-bottom:4mm;}
+.sr2{width:20mm;height:2px;background:var(--tsky);border-radius:1px;margin-bottom:4mm;}
+.br{display:flex;flex-wrap:wrap;gap:1.5mm;margin-top:3mm;}
+.wb{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:white;font-size:5pt;font-weight:600;padding:1.5px 6px;border-radius:10px;}
+.wsep{height:12mm;background:white;clip-path:ellipse(110% 100% at 50% 100%);margin-top:-6mm;position:relative;z-index:5;}
+.ag{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3mm;}
+.ac{border-radius:5px;padding:4mm;background:var(--grey);border-bottom:3px solid var(--teal);text-align:center;}
+.ac.bl{border-color:var(--blue);}.ac.nv{border-color:var(--navy);}
+.ai{font-size:14pt;margin-bottom:2mm;}
+.ac h4{font-size:6.5pt;font-weight:800;color:var(--navy);margin-bottom:1.5mm;}
+.ac p{font-size:5.5pt;color:var(--muted);line-height:1.5;}
+.dr{display:flex;justify-content:space-around;align-items:center;padding:4mm 6mm;gap:4mm;}
+.db{display:flex;flex-direction:column;align-items:center;}
+.ds{width:22mm;height:22mm;transform:rotate(45deg);border-radius:3px;display:flex;align-items:center;justify-content:center;margin-bottom:3mm;}
+.di{transform:rotate(-45deg);text-align:center;line-height:1.2;}
+.di .dn{font-size:14pt;font-weight:900;color:white;line-height:1;}
+.di .dl{font-size:5pt;color:rgba(255,255,255,0.8);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.dlb{font-size:6.5pt;font-weight:700;color:var(--navy);text-align:center;margin-top:1mm;}
+.mr{display:flex;gap:2.5mm;flex-wrap:wrap;}
+.ch{background:var(--grey);border-radius:20px;padding:2mm 4mm;border-left:2px solid var(--teal);font-size:6pt;font-weight:700;color:var(--navy);white-space:nowrap;}
+.pf{background:var(--grey);padding:3mm 12mm;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--lgrey);}
+.pf span{font-size:5.5pt;color:var(--muted);}
+.pf strong{font-size:6pt;color:var(--navy);}
+.wc{background:var(--grey);border-radius:5px;padding:3.5mm 4mm;border-left:3px solid var(--teal);margin-bottom:2.5mm;display:flex;gap:2.5mm;align-items:flex-start;}
+.wc.bl{border-color:var(--blue);}.wc.gr{border-color:#10b981;}
+.wcn{font-size:10pt;font-weight:900;color:var(--teal);line-height:1;flex-shrink:0;min-width:5mm;}
+.wct h4{font-size:6.5pt;font-weight:700;color:var(--navy);}
+.wct p{font-size:5.5pt;color:var(--muted);line-height:1.4;}
+/* BIZ GRID */
+.biz-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2.5mm;margin-bottom:3mm;}
+.biz-card{background:var(--grey);border-radius:4px;padding:3mm;text-align:center;border-top:2px solid var(--teal);}
+.biz-card .ico{font-size:12pt;}
+.biz-card .nm{font-size:6pt;font-weight:700;color:var(--navy);margin-top:1.5mm;}
+.biz-card .ds{font-size:5pt;color:var(--muted);}
+/* COVER */
+.hero{height:115mm;background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 55%,#1e3a5f 100%);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:10mm 12mm;}
+.hero .bgerp{position:absolute;top:-5mm;right:-8mm;font-family:'Poppins',sans-serif;font-size:90pt;font-weight:900;color:rgba(255,255,255,0.04);letter-spacing:-3px;line-height:1;user-select:none;}
+.hero .tb{position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--teal),var(--blue),var(--teal2));}
+.hc{position:relative;z-index:5;}
+.hl{font-size:7pt;letter-spacing:4px;color:var(--tsky);font-weight:600;text-transform:uppercase;margin-bottom:3mm;}
+.hr{width:40mm;height:3px;background:linear-gradient(90deg,var(--teal2),var(--blue));border-radius:2px;margin:4mm 0;}
+.ht{font-size:17pt;font-weight:700;color:white;line-height:1.3;max-width:130mm;font-family:'Poppins',sans-serif;}
+.ht span{color:var(--teal2);}
+.htag{font-size:7.5pt;color:rgba(255,255,255,0.6);font-style:italic;margin-top:2mm;}
+.hw{height:12mm;background:white;clip-path:ellipse(110% 100% at 50% 100%);margin-top:-6mm;position:relative;z-index:4;}
+.it{font-size:7.5pt;color:var(--text);line-height:1.8;text-align:justify;}
+.it strong{color:var(--navy);font-weight:700;}
+.qs{background:linear-gradient(135deg,var(--navy) 0%,#1a3a6b 50%,var(--teal) 100%);padding:10mm 15mm;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:55mm;}
+.qm{font-size:60pt;line-height:0.5;color:rgba(255,255,255,0.12);font-family:Georgia,serif;position:absolute;top:8mm;left:12mm;}
+.qt{font-size:13pt;font-weight:700;color:white;text-align:center;line-height:1.4;position:relative;z-index:2;max-width:160mm;}
+.qt span{color:var(--teal2);}
+.qa{font-size:7pt;color:rgba(255,255,255,0.6);margin-top:4mm;font-style:italic;position:relative;z-index:2;}
+.p1f{margin-top:auto;background:linear-gradient(135deg,var(--navy),var(--navy2));padding:5mm 12mm;display:flex;justify-content:space-between;align-items:center;}
+.p1f .co{font-size:6pt;color:rgba(255,255,255,0.6);line-height:1.9;}
+.p1f .co strong{color:white;font-size:7pt;}
+.p1f .yr{font-size:24pt;font-weight:900;color:rgba(255,255,255,0.07);font-family:'Poppins',sans-serif;}
+.cf{background:var(--navy);padding:6mm 12mm;display:flex;justify-content:space-between;align-items:center;margin-top:auto;}
+.cf-logo .lw{font-size:14pt;font-weight:900;letter-spacing:2px;color:white;}
+.cf-logo .ls{font-size:5pt;letter-spacing:3px;color:var(--tsky);}
+.cf-cta{background:linear-gradient(135deg,var(--teal),var(--blue));border-radius:4px;padding:3mm 6mm;text-align:center;}
+.cf-cta h4{font-size:7pt;font-weight:800;color:white;}
+.cf-cta p{font-size:5.5pt;color:rgba(255,255,255,0.8);}
+.cf-info{text-align:right;}
+.cf-info h4{font-size:7pt;font-weight:700;color:white;margin-bottom:1mm;}
+.cf-info p{font-size:6pt;color:var(--tsky);line-height:2;font-weight:600;}
+@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}body{background:white;}.page{margin:0;box-shadow:none;}}
+</style>
+</head>
+<body>
+
+<!-- ═══ PAGE 1 — COVER ═══ -->
+<div class="page">
+  <div class="page-nav">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="140" height="35">
+      <defs>
+        <linearGradient id="igAC" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#06b6d4"/><stop offset="50%" style="stop-color:#0891b2"/><stop offset="100%" style="stop-color:#0d1b2a"/></linearGradient>
+        <linearGradient id="tgAC" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#0d1b2a"/><stop offset="100%" style="stop-color:#1e3a5f"/></linearGradient>
+      </defs>
+      <polygon points="40,4 68,20 68,52 40,68 12,52 12,20" fill="url(#igAC)"/>
+      <polygon points="40,10 62,23 62,49 40,62 18,49 18,23" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <line x1="16" y1="26" x2="64" y2="26" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="13" y1="36" x2="67" y2="36" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="16" y1="46" x2="64" y2="46" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="28" y1="14" x2="28" y2="58" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="40" y1="8" x2="40" y2="64" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="52" y1="14" x2="52" y2="58" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="28" cy="26" r="2.5" fill="white" opacity="0.95"/><circle cx="40" cy="26" r="2.5" fill="white" opacity="0.95"/><circle cx="52" cy="26" r="2.5" fill="white" opacity="0.95"/>
+      <circle cx="28" cy="36" r="2.5" fill="#a5f3fc" opacity="0.95"/><circle cx="40" cy="36" r="3.5" fill="white"/><circle cx="52" cy="36" r="2.5" fill="#a5f3fc" opacity="0.95"/>
+      <circle cx="28" cy="46" r="2.5" fill="white" opacity="0.95"/><circle cx="40" cy="46" r="2.5" fill="white" opacity="0.95"/><circle cx="52" cy="46" r="2.5" fill="white" opacity="0.95"/>
+      <text x="84" y="44" font-family="Inter,Arial,sans-serif" font-size="28" font-weight="900" letter-spacing="3" fill="url(#tgAC)">MEI TEXZ</text>
+      <line x1="84" y1="50" x2="298" y2="50" stroke="#0891b2" stroke-width="1.5" opacity="0.6"/>
+      <text x="84" y="63" font-family="Inter,Arial,sans-serif" font-size="9" font-weight="500" letter-spacing="5" fill="#0891b2">TECHNOLOGIES</text>
+      <circle cx="302" cy="44" r="3" fill="#06b6d4" opacity="0.8"/>
+    </svg>
+    <div style="font-size:6pt;color:#64748b;text-align:right;line-height:1.8;">Enterprise Resource Planning<br><strong style="color:#0d1b2a;">For Any Business · Any Size</strong></div>
+  </div>
+
+  <div class="hero">
+    <div class="tb"></div>
+    <div class="bgerp">ERP</div>
+    <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.06) 1px,transparent 1px);background-size:12px 12px;z-index:1;"></div>
+    <div class="hc" style="max-width:140mm;">
+      <div class="hl">Smart Business ERP · Any Company · 2025</div>
+      <div class="hr"></div>
+      <div class="ht">Your Business.<br><span>One Smart ERP System.</span></div>
+      <div class="htag">"Building Intelligence Into Industry"</div>
+      <div style="display:flex;flex-direction:column;gap:2mm;margin-top:5mm;">
+        <div style="display:flex;align-items:center;gap:2.5mm;"><div style="width:5px;height:5px;border-radius:50%;background:#06b6d4;flex-shrink:0;"></div><span style="font-size:6.5pt;color:rgba(255,255,255,0.85);">Hotels · Restaurants · Retail · Factories · Healthcare · Construction</span></div>
+        <div style="display:flex;align-items:center;gap:2.5mm;"><div style="width:5px;height:5px;border-radius:50%;background:#06b6d4;flex-shrink:0;"></div><span style="font-size:6.5pt;color:rgba(255,255,255,0.85);">Bakeries · Logistics · Education · Agriculture · Any Business Type</span></div>
+        <div style="display:flex;align-items:center;gap:2.5mm;"><div style="width:5px;height:5px;border-radius:50%;background:#06b6d4;flex-shrink:0;"></div><span style="font-size:6.5pt;color:rgba(255,255,255,0.85);">Replace Excel — One smart system for sales, stock, finance & HR</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hw"></div>
+
+  <div style="padding:0 12mm 4mm;display:flex;flex-direction:column;gap:4mm;">
+    <p class="it"><strong>MEI TEXZ ERP</strong> is for every business that buys, sells, or manages resources. Whether you run a hotel, a bakery, a clinic, a retail shop, a factory, or a logistics company — this ERP connects all your operations in one smart platform. Replace spreadsheets, eliminate manual work, and see your business clearly in real time.</p>
+    <div class="dr">
+      <div class="db"><div class="ds" style="background:linear-gradient(135deg,#0891b2,#06b6d4);"><div class="di"><div class="dn">15</div><div class="dl">Modules</div></div></div><div class="dlb">Complete ERP</div></div>
+      <div class="db"><div class="ds" style="background:linear-gradient(135deg,#2563eb,#3b82f6);"><div class="di"><div class="dn">50+</div><div class="dl">Pages</div></div></div><div class="dlb">Full Coverage</div></div>
+      <div class="db"><div class="ds" style="background:linear-gradient(135deg,#0d1b2a,#1e3a5f);"><div class="di"><div class="dn">AI</div><div class="dl">Powered</div></div></div><div class="dlb">Smart AI</div></div>
+      <div class="db"><div class="ds" style="background:linear-gradient(135deg,#059669,#10b981);"><div class="di"><div class="dn">Any</div><div class="dl">Sector</div></div></div><div class="dlb">All Business Types</div></div>
+      <div class="db"><div class="ds" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);"><div class="di"><div class="dn">☁</div><div class="dl">Cloud</div></div></div><div class="dlb">Hosted</div></div>
+    </div>
+  </div>
+
+  <div style="padding:0 12mm 5mm;">
+    <div class="sh"><span class="sh-dot"></span><span class="sh-title">We Serve These Businesses</span><span class="sh-line"></span></div>
+    <div class="biz-grid">
+      <div class="biz-card"><div class="ico">🏨</div><div class="nm">Hotels</div><div class="ds">Hospitality</div></div>
+      <div class="biz-card"><div class="ico">🍽️</div><div class="nm">Restaurants</div><div class="ds">Food & Cafe</div></div>
+      <div class="biz-card"><div class="ico">🎂</div><div class="nm">Bakeries</div><div class="ds">Cake Shops</div></div>
+      <div class="biz-card"><div class="ico">🏪</div><div class="nm">Retail</div><div class="ds">Shops & Trade</div></div>
+      <div class="biz-card"><div class="ico">🏭</div><div class="nm">Factories</div><div class="ds">Any Manufacturing</div></div>
+      <div class="biz-card"><div class="ico">🏥</div><div class="nm">Healthcare</div><div class="ds">Clinics & Labs</div></div>
+      <div class="biz-card"><div class="ico">🚚</div><div class="nm">Logistics</div><div class="ds">Transport & Fleet</div></div>
+      <div class="biz-card"><div class="ico">🏗️</div><div class="nm">Construction</div><div class="ds">Projects</div></div>
+    </div>
+  </div>
+
+  <div class="p1f">
+    <div style="display:flex;align-items:center;gap:4mm;">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="22" height="22"><polygon points="40,4 68,20 68,52 40,68 12,52 12,20" fill="rgba(255,255,255,0.2)"/><line x1="16" y1="27" x2="64" y2="27" stroke="white" stroke-width="3" stroke-linecap="round"/><line x1="13" y1="40" x2="67" y2="40" stroke="white" stroke-width="3" stroke-linecap="round"/><line x1="16" y1="53" x2="64" y2="53" stroke="white" stroke-width="3" stroke-linecap="round"/></svg>
+      <div class="co"><strong>Santha Sree</strong> CEO & Founder · MEI TEXZ Technologies<br>+91 9176236675 · info@meitexz.com · Coimbatore, TN 641062</div>
+    </div>
+    <div class="yr">2025</div>
+  </div>
+</div>
+
+
+<!-- ═══ PAGE 2 — WHAT EVERY BUSINESS GETS ═══ -->
+<div class="page">
+  <div class="ph"><h1>What Every Business Gets</h1><p>Core ERP modules — same powerful platform, configured to your business type</p><div class="tr"><span class="ptag">Sales & Billing</span><span class="ptag">Stock Control</span><span class="ptag">Finance</span><span class="ptag">HR & Payroll</span><span class="ptag">AI</span><span class="ptag">Reports</span></div></div>
+  <div class="pb">
+    <div class="sh"><span class="sh-dot"></span><span class="sh-title">Core ERP Modules</span><span class="sh-line"></span></div>
+    <div class="fg">
+      <div class="fc"><div class="fci te">📦</div><div class="fct"><h4>Purchasing & Suppliers</h4><p>Purchase orders, goods receipt, supplier master, price comparison, payment terms, outstanding supplier payments — all in one screen.</p></div></div>
+      <div class="fc bl"><div class="fci bl">🏬</div><div class="fct"><h4>Inventory & Stock</h4><p>Real-time stock levels, stock movements (IN/OUT/Transfer), reorder alerts, multiple locations, item-wise stock value.</p></div></div>
+      <div class="fc nv"><div class="fci nv">🛒</div><div class="fct"><h4>Sales & Billing</h4><p>Inquiry → Quotation → Order → Invoice → Receipt. Customer-wise outstanding, follow-up reminders, payment collection tracking.</p></div></div>
+      <div class="fc gr"><div class="fci gr">💰</div><div class="fct"><h4>Finance & Accounts</h4><p>Chart of Accounts, journal entries, trial balance, profit & loss — live. Accounts payable and receivable with due date tracking.</p></div></div>
+      <div class="fc or"><div class="fci or">👥</div><div class="fct"><h4>HR & Payroll</h4><p>Employee records, attendance, shift management, leave tracking, payroll with PF/ESI deductions, pay slip generation.</p></div></div>
+      <div class="fc pu"><div class="fci pu">🏭</div><div class="fct"><h4>Production (if applicable)</h4><p>Bill of Materials, work orders, production recording, finished goods entry, waste tracking — for businesses that manufacture.</p></div></div>
+    </div>
+    <div class="hb">
+      <h4>Still Managing on Spreadsheets?</h4>
+      <p>MEI TEXZ ERP replaces all your Excel files with one connected, intelligent system. Your stock, sales, purchases, and accounts are all linked — a sale automatically reduces stock and creates an accounting entry. No more copy-paste, no more manual totals, no more month-end panic. Your dashboard shows your business health in real time — from anywhere, on any device.</p>
+    </div>
+  </div>
+  <div class="pf"><span>MEI TEXZ Technologies · info@meitexz.com · +91 9176236675</span><strong>Page 2 of 4</strong></div>
+</div>
+
+
+<!-- ═══ PAGE 3 — AI + PLATFORM + WHY CHOOSE ═══ -->
+<div class="page">
+  <div class="spt">
+    <div class="spl" style="padding:8mm 10mm;">
+      <div class="st2">AI & Smart Features</div>
+      <div class="ss2">Intelligence built into your ERP</div>
+      <div class="sr2"></div>
+      <ul class="wl">
+        <li>AI chatbot — ask "what is my profit this month?" — instant answer</li>
+        <li>Voice input — speak your question, no typing needed</li>
+        <li>Smart daily feed — morning business insights on your dashboard</li>
+        <li>Customer RFM scoring — know your best buyers automatically</li>
+        <li>Churn prediction — spot customers reducing orders early</li>
+        <li>Sales forecasting — 3-month revenue projection</li>
+        <li>What-If simulator — see impact of price changes instantly</li>
+      </ul>
+      <div class="br"><span class="wb">Voice Input</span><span class="wb">Chatbot</span><span class="wb">Forecasting</span></div>
+    </div>
+    <div class="spr" style="padding:8mm 10mm;">
+      <div class="st2">Platform Features</div>
+      <div class="ss2">Professional tools for every team</div>
+      <div class="sr2" style="background:white;opacity:0.5;"></div>
+      <ul class="wl">
+        <li>10 UI themes — dark, light, teal, ocean and more</li>
+        <li>Role-based access — each staff sees only what they need</li>
+        <li>Full audit trail — every action logged, user and time stamped</li>
+        <li>WhatsApp & email templates built in for customer communication</li>
+        <li>Cloud hosted — no servers, access from phone or laptop</li>
+        <li>7 report types — sales, purchase, stock, finance, HR and more</li>
+        <li>Dashboard with live KPIs and business alerts</li>
+      </ul>
+      <div class="br"><span class="wb">10 Themes</span><span class="wb">Audit Log</span><span class="wb">7 Reports</span></div>
+    </div>
+  </div>
+  <div class="wsep"></div>
+  <div class="pb" style="padding-top:3mm;">
+    <div class="sh"><span class="sh-dot"></span><span class="sh-title">Why Businesses Choose MEI TEXZ</span><span class="sh-line"></span></div>
+    <div class="fg">
+      <div class="fc"><div class="fci te">🎯</div><div class="fct"><h4>Built for Your Business</h4><p>We configure the system to your exact workflow — your documents, your terms, your processes. Not generic.</p></div></div>
+      <div class="fc bl"><div class="fci bl">🚀</div><div class="fct"><h4>Go Live Fast</h4><p>Deployed, configured and your team trained within weeks — not months. You can start using it quickly.</p></div></div>
+      <div class="fc nv"><div class="fci nv">💰</div><div class="fct"><h4>Competitive Pricing</h4><p>Custom pricing for your size. No per-user fees, no hidden licence charges. Pay what makes sense for you.</p></div></div>
+      <div class="fc gr"><div class="fci gr">🛡️</div><div class="fct"><h4>Secure & Reliable</h4><p>Encrypted cloud hosting with 99.9% uptime and daily automated backups. Your data is always safe.</p></div></div>
+    </div>
+  </div>
+  <div class="pf"><span>MEI TEXZ Technologies · Coimbatore, TN 641062</span><strong>Page 3 of 4</strong></div>
+</div>
+
+
+<!-- ═══ PAGE 4 — QUOTE + SIGNS + CONTACT ═══ -->
+<div class="page">
+  <div class="qs">
+    <div class="qm">"</div>
+    <div class="qt">Every great business deserves a system<br>as smart as the <span>people running it.</span></div>
+    <div class="qa">— MEI TEXZ Technologies · Smart ERP for Any Business</div>
+  </div>
+
+  <div style="padding:5mm 12mm;display:flex;gap:5mm;flex:1;">
+    <div style="flex:1;">
+      <div class="sh" style="margin-bottom:3mm;"><span class="sh-dot"></span><span class="sh-title">Signs You Need This ERP</span><span class="sh-line"></span></div>
+      <div class="wc"><div class="wcn">01</div><div class="wct"><h4>Still Using Spreadsheets</h4><p>Managing stock, sales and accounts in separate Excel files — and they never match</p></div></div>
+      <div class="wc bl"><div class="wcn" style="color:var(--blue);">02</div><div class="wct"><h4>Don't Know Your Profit</h4><p>You have to wait until month end to know if the business is profitable</p></div></div>
+      <div class="wc gr"><div class="wcn" style="color:#059669;">03</div><div class="wct"><h4>Stock Surprises</h4><p>You run out of stock unexpectedly or carry too much dead stock</p></div></div>
+      <div class="wc"><div class="wcn">04</div><div class="wct"><h4>Manual Billing</h4><p>Creating invoices manually takes too long and leads to errors</p></div></div>
+      <div class="wc bl"><div class="wcn" style="color:var(--blue);">05</div><div class="wct"><h4>No Visibility</h4><p>You can't quickly answer: what stock do I have? who owes me money?</p></div></div>
+      <div class="wc gr"><div class="wcn" style="color:#059669;">06</div><div class="wct"><h4>Reports Take Days</h4><p>Building a monthly report takes your team hours of manual work</p></div></div>
+    </div>
+    <div style="flex:1;">
+      <div class="sh" style="margin-bottom:3mm;"><span class="sh-dot"></span><span class="sh-title">After MEI TEXZ ERP</span><span class="sh-line"></span></div>
+      <div class="wc"><div class="wcn">✓</div><div class="wct"><h4>One System — Everything Connected</h4><p>Stock, sales, purchases, accounts and HR all in one live platform</p></div></div>
+      <div class="wc bl"><div class="wcn" style="color:var(--blue);">✓</div><div class="wct"><h4>Live Profit & Dashboard</h4><p>See today's revenue, stock value and profit on one screen, right now</p></div></div>
+      <div class="wc gr"><div class="wcn" style="color:#059669;">✓</div><div class="wct"><h4>Always Know Your Stock</h4><p>Real-time stock levels with auto reorder alerts — no surprises</p></div></div>
+      <div class="wc"><div class="wcn">✓</div><div class="wct"><h4>Invoices in One Click</h4><p>Professional GST invoices generated in seconds from any device</p></div></div>
+      <div class="wc bl"><div class="wcn" style="color:var(--blue);">✓</div><div class="wct"><h4>Ask the AI</h4><p>"What sold most this week?" — your AI chatbot answers instantly</p></div></div>
+      <div class="wc gr"><div class="wcn" style="color:#059669;">✓</div><div class="wct"><h4>Reports Ready Instantly</h4><p>7 report types generated in one click — sales, finance, stock, HR</p></div></div>
+    </div>
+  </div>
+
+  <div class="cf">
+    <div class="cf-logo"><div class="lw">MEI TEXZ</div><div class="ls">TECHNOLOGIES</div></div>
+    <div class="cf-cta"><h4>Start With a Free Demo</h4><p>30 minutes — see your business in our ERP</p></div>
+    <div class="cf-info">
+      <h4>Santha Sree · CEO &amp; Founder</h4>
+      <p>📞 +91 9176236675<br>✉ info@meitexz.com<br>📍 Coimbatore, TN 641062</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

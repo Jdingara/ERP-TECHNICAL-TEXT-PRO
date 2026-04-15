@@ -6,6 +6,10 @@
 // ============================================================
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTheme } from '@mui/material/styles';
+import { ResizableChartPanel }   from '../../components/common/ResizableChartPanel';
+import { ResizablePanelRowInner } from '../../components/common/ResizablePanelRow';
+import { useColumnResize }        from '../../components/common/useColumnResize';
 import {
     Box, Typography, Paper, Grid, Card, CardContent,
     Tabs, Tab, Chip, Table, TableBody, TableCell,
@@ -124,68 +128,68 @@ function OverviewTab({ summary, rfmData, churnData }) {
                 </Grid>
             </Grid>
 
-            <Grid container spacing={2}>
+            <ResizablePanelRowInner storageKey="analytics_overview" defaultPercents={[50, 50]}>
                 {/* Segment donut */}
-                <Grid item xs={12} md={6}>
-                    <Paper sx={{ p: 2, borderRadius: 2, boxShadow: 1 }}>
-                        <Typography fontWeight={700} mb={2}>Customer Segments</Typography>
-                        {segEntries.length > 0 ? (
-                            <ResponsiveContainer width="100%" height={260}>
-                                <PieChart>
-                                    <Pie data={segEntries} dataKey="count" nameKey="name"
-                                        cx="50%" cy="50%" outerRadius={90} label={({ name, count }) => `${name}: ${count}`}>
-                                        {segEntries.map((e, i) => <Cell key={i} fill={e.fill} />)}
-                                    </Pie>
-                                    <RechartsTip formatter={(val, name) => [val, name]} />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        ) : (
-                            <Typography color="text.secondary" textAlign="center" py={4}>No order data yet</Typography>
-                        )}
-                    </Paper>
-                </Grid>
+                <ResizableChartPanel storageKey="analytics_overview_seg" defaultHeight={260} title="Customer Segments">
+                    {segEntries.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie data={segEntries} dataKey="count" nameKey="name"
+                                    cx="50%" cy="50%" outerRadius={90} label={({ name, count }) => `${name}: ${count}`}>
+                                    {segEntries.map((e, i) => <Cell key={i} fill={e.fill} />)}
+                                </Pie>
+                                <RechartsTip formatter={(val, name) => [val, name]} />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <Typography color="text.secondary" textAlign="center" py={4}>No order data yet</Typography>
+                    )}
+                </ResizableChartPanel>
 
                 {/* Churn risk donut */}
-                <Grid item xs={12} md={6}>
-                    <Paper sx={{ p: 2, borderRadius: 2, boxShadow: 1 }}>
-                        <Typography fontWeight={700} mb={2}>Churn Risk Breakdown</Typography>
-                        {riskBreakdown.length > 0 ? (
-                            <>
-                                <ResponsiveContainer width="100%" height={200}>
-                                    <PieChart>
-                                        <Pie data={riskBreakdown} dataKey="value" nameKey="name"
-                                            cx="50%" cy="50%" outerRadius={80}>
-                                            {riskBreakdown.map((r, i) => <Cell key={i} fill={RISK_COLORS[r.name]} />)}
-                                        </Pie>
-                                        <RechartsTip />
-                                        <Legend />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                                <Box display="flex" gap={1} flexWrap="wrap" mt={1}>
-                                    {['Critical','High','Medium','Low'].map(r => {
-                                        const s = churnData.summary[r];
-                                        if (!s) return null;
-                                        return (
-                                            <Chip key={r} size="small"
-                                                label={`${r}: ${s.count} (₹${fmt(s.revenue_at_risk)} at risk)`}
-                                                sx={{ backgroundColor: RISK_COLORS[r], color: 'white', fontSize: 11 }} />
-                                        );
-                                    })}
-                                </Box>
-                            </>
-                        ) : (
-                            <Typography color="text.secondary" textAlign="center" py={4}>No order data yet</Typography>
-                        )}
-                    </Paper>
-                </Grid>
-            </Grid>
+                <ResizableChartPanel storageKey="analytics_overview_churn" defaultHeight={260} title="Churn Risk Breakdown"
+                    extra={
+                        <Box display="flex" gap={0.5} flexWrap="wrap">
+                            {['Critical','High','Medium','Low'].map(r => {
+                                const s = churnData?.summary?.[r];
+                                if (!s) return null;
+                                return (
+                                    <Chip key={r} size="small"
+                                        label={`${r}: ${s.count}`}
+                                        sx={{ backgroundColor: RISK_COLORS[r], color: 'white', fontSize: 10, height: 18 }} />
+                                );
+                            })}
+                        </Box>
+                    }>
+                    {riskBreakdown.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie data={riskBreakdown} dataKey="value" nameKey="name"
+                                    cx="50%" cy="50%" outerRadius={80}>
+                                    {riskBreakdown.map((r, i) => <Cell key={i} fill={RISK_COLORS[r.name]} />)}
+                                </Pie>
+                                <RechartsTip />
+                                <Legend />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <Typography color="text.secondary" textAlign="center" py={4}>No order data yet</Typography>
+                    )}
+                </ResizableChartPanel>
+            </ResizablePanelRowInner>
         </Box>
     );
 }
 
 // ── RFM Tab ───────────────────────────────────────────────────
 function RFMTab({ data }) {
+    const theme = useTheme();
+    const hdrBg = theme.palette.primary.main;
     const [filterSeg, setFilterSeg] = useState('');
+    const { widths: rfmW, Resizer: RfmResizer } = useColumnResize(
+        'analytics_rfm',
+        [160, 80, 110, 44, 44, 44, 58, 100, 60, 85, 105]
+    );
 
     if (!data) return <CircularProgress />;
     const { customers, segments } = data;
@@ -223,9 +227,8 @@ function RFMTab({ data }) {
 
             {/* Bar chart — segment revenue */}
             {segEntries.length > 0 && (
-                <Paper sx={{ p: 2, mb: 2, borderRadius: 2 }}>
-                    <Typography fontWeight={700} mb={1} fontSize={13}>Revenue by Segment</Typography>
-                    <ResponsiveContainer width="100%" height={160}>
+                <ResizableChartPanel storageKey="analytics_rfm_bar" defaultHeight={160} title="Revenue by Segment">
+                    <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={segEntries} margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" tick={{ fontSize: 11 }} />
@@ -236,16 +239,19 @@ function RFMTab({ data }) {
                             </Bar>
                         </BarChart>
                     </ResponsiveContainer>
-                </Paper>
+                </ResizableChartPanel>
             )}
 
             {/* Table */}
             <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 1 }}>
                 <Table size="small">
-                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
+                    <TableHead>
                         <TableRow>
-                            {['Customer', 'City', 'Segment', 'R', 'F', 'M', 'Score', 'Last Order', 'Orders', 'Avg Cycle', 'Total Spend'].map(h => (
-                                <TableCell key={h} sx={{ color: 'white', fontWeight: 700, fontSize: 11, whiteSpace: 'nowrap' }}>{h}</TableCell>
+                            {['Customer', 'City', 'Segment', 'R', 'F', 'M', 'Score', 'Last Order', 'Orders', 'Avg Cycle', 'Total Spend'].map((h, i) => (
+                                <TableCell key={h}
+                                    style={{ width: rfmW[i], backgroundColor: hdrBg, color: 'white', whiteSpace: 'nowrap', position: 'relative', userSelect: 'none', fontWeight: 700, fontSize: 11 }}>
+                                    {h} <RfmResizer index={i} />
+                                </TableCell>
                             ))}
                         </TableRow>
                     </TableHead>
@@ -294,7 +300,13 @@ function RFMTab({ data }) {
 
 // ── Churn Tab ─────────────────────────────────────────────────
 function ChurnTab({ data }) {
+    const theme = useTheme();
+    const hdrBg = theme.palette.primary.main;
     const [filterRisk, setFilterRisk] = useState('');
+    const { widths: churnW, Resizer: ChurnResizer } = useColumnResize(
+        'analytics_churn',
+        [160, 80, 90, 95, 100, 70, 80, 95, 60, 110, 105]
+    );
 
     if (!data) return <CircularProgress />;
     const { customers, summary } = data;
@@ -341,10 +353,13 @@ function ChurnTab({ data }) {
 
             <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 1 }}>
                 <Table size="small">
-                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
+                    <TableHead>
                         <TableRow>
-                            {['Customer', 'City', 'Risk', 'Risk %', 'Last Order', 'Recency', 'Avg Cycle', 'Days Overdue', 'Orders', 'Monthly Revenue', '3-Mo At Risk'].map(h => (
-                                <TableCell key={h} sx={{ color: 'white', fontWeight: 700, fontSize: 11, whiteSpace: 'nowrap' }}>{h}</TableCell>
+                            {['Customer', 'City', 'Risk', 'Risk %', 'Last Order', 'Recency', 'Avg Cycle', 'Days Overdue', 'Orders', 'Monthly Revenue', '3-Mo At Risk'].map((h, i) => (
+                                <TableCell key={h}
+                                    style={{ width: churnW[i], backgroundColor: hdrBg, color: 'white', whiteSpace: 'nowrap', position: 'relative', userSelect: 'none', fontWeight: 700, fontSize: 11 }}>
+                                    {h} <ChurnResizer index={i} />
+                                </TableCell>
                             ))}
                         </TableRow>
                     </TableHead>
@@ -390,6 +405,10 @@ function ForecastTab({ data }) {
     const [selectedCustomer, setSelectedCustomer] = useState('');
     const [custData, setCustData] = useState(null);
     const [loading, setLoading] = useState(false);
+    const { widths: foreW, Resizer: ForeResizer } = useColumnResize(
+        'analytics_forecast_table',
+        [200, 100, 160, 80, 80, 130]
+    );
 
     const loadCustomer = useCallback(async (cid) => {
         if (!cid) { setCustData(null); return; }
@@ -443,9 +462,10 @@ function ForecastTab({ data }) {
             </Box>
 
             {loading ? <CircularProgress size={24} /> : (
-                <Paper sx={{ p: 2, borderRadius: 2, mb: 2 }}>
-                    <Typography fontWeight={700} mb={1}>Monthly Revenue + Forecast</Typography>
-                    <ResponsiveContainer width="100%" height={300}>
+                <ResizableChartPanel storageKey="analytics_forecast" defaultHeight={300}
+                    title="Monthly Revenue + Forecast"
+                    subtitle="Orange dots = forecasted months">
+                    <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
                             <defs>
                                 <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
@@ -471,10 +491,7 @@ function ForecastTab({ data }) {
                             />
                         </AreaChart>
                     </ResponsiveContainer>
-                    <Typography fontSize={11} color="text.secondary" textAlign="right">
-                        Orange dots = forecasted months
-                    </Typography>
-                </Paper>
+                </ResizableChartPanel>
             )}
 
             {/* Top customers table */}
@@ -486,12 +503,12 @@ function ForecastTab({ data }) {
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: 'action.hover' }}>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 700, fontSize: 11 }}>#</TableCell>
-                                <TableCell sx={{ fontWeight: 700, fontSize: 11 }}>Customer</TableCell>
-                                <TableCell sx={{ fontWeight: 700, fontSize: 11 }}>Code</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 700, fontSize: 11 }}>Revenue</TableCell>
-                                <TableCell align="center" sx={{ fontWeight: 700, fontSize: 11 }}>Orders</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 700, fontSize: 11 }}>Avg per Order</TableCell>
+                                {['#', 'Customer', 'Code', 'Revenue', 'Orders', 'Avg per Order'].map((h, i) => (
+                                    <TableCell key={h} style={{ width: foreW[i] }}
+                                        sx={{ fontWeight: 700, fontSize: 11, position: 'relative', userSelect: 'none' }}>
+                                        {h} <ForeResizer index={i} />
+                                    </TableCell>
+                                ))}
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -517,8 +534,14 @@ function ForecastTab({ data }) {
 
 // ── Products Tab ──────────────────────────────────────────────
 function ProductsTab({ data }) {
+    const theme = useTheme();
+    const hdrBg = theme.palette.primary.main;
     const [sortBy, setSortBy] = useState('revenue');
     const [filterTrend, setFilterTrend] = useState('');
+    const { widths: prodW, Resizer: ProdResizer } = useColumnResize(
+        'analytics_products',
+        [170, 80, 80, 105, 80, 80, 95, 65, 90]
+    );
 
     if (!data) return <CircularProgress />;
     const { products } = data;
@@ -556,9 +579,9 @@ function ProductsTab({ data }) {
 
             {/* Top 8 bar chart */}
             {filtered.length > 0 && (
-                <Paper sx={{ p: 2, mb: 2, borderRadius: 2 }}>
-                    <Typography fontWeight={700} mb={1} fontSize={13}>Top Products by {sortBy === 'revenue' ? 'Revenue' : sortBy === 'customer_count' ? 'Customer Count' : 'Repeat Rate'}</Typography>
-                    <ResponsiveContainer width="100%" height={200}>
+                <ResizableChartPanel storageKey="analytics_products_bar" defaultHeight={200}
+                    title={`Top Products by ${sortBy === 'revenue' ? 'Revenue' : sortBy === 'customer_count' ? 'Customer Count' : 'Repeat Rate'}`}>
+                    <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={filtered.slice(0, 8)} layout="vertical" margin={{ left: 120, right: 20 }}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis type="number" tickFormatter={sortBy === 'revenue' ? v => fmtCr(v) : v => v} tick={{ fontSize: 10 }} />
@@ -567,15 +590,18 @@ function ProductsTab({ data }) {
                             <Bar dataKey={sortBy} name={sortBy} fill="#1565c0" radius={[0, 4, 4, 0]} />
                         </BarChart>
                     </ResponsiveContainer>
-                </Paper>
+                </ResizableChartPanel>
             )}
 
             <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 1 }}>
                 <Table size="small">
-                    <TableHead sx={{ backgroundColor: 'primary.main' }}>
+                    <TableHead>
                         <TableRow>
-                            {['Product', 'Code', 'Type', 'Revenue', 'Qty Sold', 'Customers', 'Repeat Rate', 'Orders', 'Trend'].map(h => (
-                                <TableCell key={h} sx={{ color: 'white', fontWeight: 700, fontSize: 11, whiteSpace: 'nowrap' }}>{h}</TableCell>
+                            {['Product', 'Code', 'Type', 'Revenue', 'Qty Sold', 'Customers', 'Repeat Rate', 'Orders', 'Trend'].map((h, i) => (
+                                <TableCell key={h}
+                                    style={{ width: prodW[i], backgroundColor: hdrBg, color: 'white', whiteSpace: 'nowrap', position: 'relative', userSelect: 'none', fontWeight: 700, fontSize: 11 }}>
+                                    {h} <ProdResizer index={i} />
+                                </TableCell>
                             ))}
                         </TableRow>
                     </TableHead>

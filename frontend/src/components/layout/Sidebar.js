@@ -199,7 +199,7 @@ function HorizontalSidebar({ visibleMenu, navigate, location, accent, isBottom }
                     <span style={{ fontWeight: 700, color: 'white', fontSize: 14 }}>S</span>
                 </div>
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#f1f5f9', whiteSpace: 'nowrap' }}>
-                    SASI ERP
+                    MEI TEXZ ERP
                 </span>
             </div>
 
@@ -464,7 +464,7 @@ function Sidebar({ permissions, isAdmin }) {
                     {!collapsed && (
                         <Box sx={{ overflow: 'hidden' }}>
                             <Typography fontWeight={700} color={TEXT_PRI} fontSize={fs(15)} lineHeight={1.2} noWrap>
-                                SASI ERP
+                                MEI TEXZ ERP
                             </Typography>
                             <Typography color={TEXT_SEC} fontSize={fs(9.5)} letterSpacing={0.5} noWrap>
                                 MEDICAL · TECHNICAL TEXTILE

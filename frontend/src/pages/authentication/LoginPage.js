@@ -86,7 +86,7 @@ function LoginPage({ onLoginSuccess }) {
                 </Box>
 
                 <Typography variant="h3" fontWeight={800} color="white" mb={1} lineHeight={1.1}>
-                    SASI ERP
+                    MEI TEXZ ERP
                 </Typography>
                 <Typography fontSize={16} color="#94a3b8" mb={4} maxWidth={380}>
                     Enterprise Resource Planning for Medical &amp; Technical Textile Manufacturers
@@ -128,7 +128,7 @@ function LoginPage({ onLoginSuccess }) {
                             Welcome back
                         </Typography>
                         <Typography color="text.secondary" fontSize={14}>
-                            Sign in to your SASI ERP account
+                            Sign in to your MEI TEXZ ERP account
                         </Typography>
                     </Box>
 
@@ -210,7 +210,7 @@ function LoginPage({ onLoginSuccess }) {
                     </form>
 
                     <Typography mt={4} fontSize={12} color="#94a3b8" textAlign="center">
-                        SASI ERP v1.0 · Medical &amp; Technical Textile
+                        MEI TEXZ ERP v1.0 · Medical &amp; Technical Textile
                     </Typography>
                 </Box>
             </Box>

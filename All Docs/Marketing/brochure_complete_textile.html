@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MEI TEXZ — Complete Textile Sector ERP</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Poppins:wght@700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --navy:#0d1b2a;--navy2:#1a2f4a;--blue:#2563eb;
+  --teal:#0891b2;--teal2:#06b6d4;--sky:#bfdbfe;
+  --tsky:#a5f3fc;--white:#fff;--grey:#f1f5f9;
+  --lgrey:#e2e8f0;--text:#1e293b;--muted:#64748b;
+}
+body{font-family:'Inter',sans-serif;background:#94a3b8;}
+.page{width:210mm;min-height:297mm;background:white;margin:15px auto;box-shadow:0 8px 40px rgba(0,0,0,0.25);page-break-after:always;overflow:hidden;position:relative;display:flex;flex-direction:column;}
+/* NAV */
+.page-nav{background:white;padding:3mm 10mm;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e2e8f0;}
+/* SECTION HEAD */
+.sh{display:flex;align-items:center;gap:3mm;margin-bottom:3mm;}
+.sh-line{flex:1;height:1px;background:var(--lgrey);}
+.sh-title{font-size:7.5pt;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap;}
+.sh-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;}
+/* PAGE HEADER */
+.ph{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);padding:6mm 12mm;position:relative;overflow:hidden;}
+.ph::after{content:'';position:absolute;top:0;right:0;bottom:0;width:40mm;background:linear-gradient(135deg,transparent,rgba(8,145,178,0.2));}
+.ph h1{font-size:14pt;font-weight:900;color:white;}
+.ph p{font-size:6.5pt;color:var(--tsky);margin-top:1.5mm;}
+.ph .tr{display:flex;gap:2mm;margin-top:3mm;}
+.ptag{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;font-size:5.5pt;font-weight:600;padding:1.5px 6px;border-radius:10px;}
+.pb{flex:1;padding:6mm 12mm;display:flex;flex-direction:column;gap:4mm;}
+/* FEAT CARDS */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:3mm;}
+.fc{background:white;border-radius:5px;padding:4mm;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-top:3px solid var(--teal);display:flex;gap:3mm;align-items:flex-start;}
+.fc.bl{border-color:var(--blue);}.fc.nv{border-color:var(--navy);}.fc.gr{border-color:#10b981;}.fc.or{border-color:#f59e0b;}.fc.pu{border-color:#7c3aed;}
+.fci{width:9mm;height:9mm;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11pt;}
+.fci.te{background:linear-gradient(135deg,var(--teal),var(--teal2));}.fci.bl{background:linear-gradient(135deg,var(--blue),#3b82f6);}.fci.nv{background:linear-gradient(135deg,var(--navy),var(--navy2));}.fci.gr{background:linear-gradient(135deg,#059669,#10b981);}.fci.or{background:linear-gradient(135deg,#d97706,#f59e0b);}.fci.pu{background:linear-gradient(135deg,#6d28d9,#7c3aed);}
+.fct h4{font-size:7pt;font-weight:800;color:var(--navy);}
+.fct p{font-size:5.5pt;color:var(--muted);line-height:1.5;margin-top:0.5mm;}
+/* LISTS */
+ul.fl{list-style:none;margin-bottom:3mm;}
+ul.fl li{font-size:6.5pt;color:var(--text);padding:2px 0 2px 10px;position:relative;line-height:1.5;}
+ul.fl li::before{content:'▸';color:var(--blue);position:absolute;left:0;}
+ul.wl{list-style:none;}
+ul.wl li{font-size:6pt;color:rgba(255,255,255,0.9);padding:2px 0 2px 10px;position:relative;line-height:1.5;}
+ul.wl li::before{content:'▸';color:var(--tsky);position:absolute;left:0;font-size:5.5pt;}
+/* TWO COL MINI */
+.tc{display:grid;grid-template-columns:1fr 1fr;gap:2.5mm;margin-bottom:4mm;}
+.mc{background:var(--grey);border-radius:4px;padding:3mm 3.5mm;border-left:2px solid var(--teal);}
+.mc.bl{border-color:var(--blue);}.mc.gr{border-color:#10b981;}
+.mc h4{font-size:6.5pt;font-weight:700;color:var(--navy);}
+.mc p{font-size:5pt;color:var(--muted);margin-top:0.5mm;}
+/* HBOX */
+.hb{background:linear-gradient(135deg,#ecfeff,#cffafe);border:1px solid #a5f3fc;border-radius:5px;padding:4mm 5mm;}
+.hb h4{font-size:7.5pt;font-weight:700;color:#0c4a6e;margin-bottom:2mm;}
+.hb p{font-size:6pt;color:#0e7490;line-height:1.6;}
+/* STATS BAR */
+.sb{background:linear-gradient(135deg,var(--navy),var(--navy2));border-radius:6px;padding:4mm 5mm;display:flex;gap:4mm;align-items:center;}
+.sb-l{flex:1;}.sb-l h4{font-size:8pt;font-weight:800;color:white;margin-bottom:1mm;}
+.sb-l p{font-size:6pt;color:rgba(255,255,255,0.7);line-height:1.6;}
+.sb-s{display:flex;gap:3mm;}
+.sbs{background:rgba(255,255,255,0.08);border-radius:4px;padding:3mm;text-align:center;min-width:16mm;}
+.sbs .n{font-size:12pt;font-weight:900;color:var(--tsky);line-height:1;}
+.sbs .l{font-size:5pt;color:rgba(255,255,255,0.6);}
+/* SPLIT DARK PANELS */
+.spt{display:flex;height:70mm;}
+.spl{width:50%;background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 60%,#1e4a7a 100%);padding:8mm;position:relative;overflow:hidden;}
+.spl::after{content:'';position:absolute;bottom:-10mm;right:-10mm;width:40mm;height:40mm;border-radius:50%;background:rgba(8,145,178,0.15);}
+.spr{width:50%;background:linear-gradient(160deg,#0891b2 0%,#0e7490 60%,#1e3a5f 100%);padding:8mm;position:relative;overflow:hidden;}
+.spr::after{content:'';position:absolute;top:-10mm;left:-10mm;width:40mm;height:40mm;border-radius:50%;background:rgba(255,255,255,0.08);}
+.st{font-size:9pt;font-weight:800;color:white;margin-bottom:1mm;}
+.ss{font-size:5.5pt;color:rgba(255,255,255,0.65);margin-bottom:4mm;}
+.sr{width:20mm;height:2px;background:var(--tsky);border-radius:1px;margin-bottom:4mm;}
+.br{display:flex;flex-wrap:wrap;gap:1.5mm;margin-top:3mm;}
+.wb{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:white;font-size:5pt;font-weight:600;padding:1.5px 6px;border-radius:10px;}
+.wsep{height:12mm;background:white;clip-path:ellipse(110% 100% at 50% 100%);margin-top:-6mm;position:relative;z-index:5;}
+/* AI GRID */
+.ag{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3mm;}
+.ac{border-radius:5px;padding:4mm;background:var(--grey);border-bottom:3px solid var(--teal);text-align:center;}
+.ac.bl{border-color:var(--blue);}.ac.nv{border-color:var(--navy);}
+.ai{font-size:14pt;margin-bottom:2mm;}
+.ac h4{font-size:6.5pt;font-weight:800;color:var(--navy);margin-bottom:1.5mm;}
+.ac p{font-size:5.5pt;color:var(--muted);line-height:1.5;}
+/* DIAMOND */
+.dr{display:flex;justify-content:space-around;align-items:center;padding:4mm 6mm;gap:4mm;}
+.db{display:flex;flex-direction:column;align-items:center;}
+.ds{width:22mm;height:22mm;transform:rotate(45deg);border-radius:3px;display:flex;align-items:center;justify-content:center;margin-bottom:3mm;}
+.di{transform:rotate(-45deg);text-align:center;line-height:1.2;}
+.di .dn{font-size:14pt;font-weight:900;color:white;line-height:1;}
+.di .dl{font-size:5pt;color:rgba(255,255,255,0.8);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.dlb{font-size:6.5pt;font-weight:700;color:var(--navy);text-align:center;margin-top:1mm;}
+/* CHIPS */
+.mr{display:flex;gap:2.5mm;flex-wrap:wrap;}
+.ch{background:var(--grey);border-radius:20px;padding:2mm 4mm;border-left:2px solid var(--teal);font-size:6pt;font-weight:700;color:var(--navy);white-space:nowrap;}
+/* PAGE FOOTER */
+.pf{background:var(--grey);padding:3mm 12mm;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--lgrey);}
+.pf span{font-size:5.5pt;color:var(--muted);}
+.pf strong{font-size:6pt;color:var(--navy);}
+/* WHY CARDS */
+.wc{background:var(--grey);border-radius:5px;padding:3.5mm 4mm;border-left:3px solid var(--teal);margin-bottom:2.5mm;display:flex;gap:2.5mm;align-items:flex-start;}
+.wc.bl{border-color:var(--blue);}.wc.gr{border-color:#10b981;}
+.wcn{font-size:10pt;font-weight:900;color:var(--teal);line-height:1;flex-shrink:0;min-width:5mm;}
+.wct h4{font-size:6.5pt;font-weight:700;color:var(--navy);}
+.wct p{font-size:5.5pt;color:var(--muted);line-height:1.4;}
+/* DEPLOY GRID */
+.dg{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;margin-top:3mm;}
+.di2{background:white;border-radius:4px;padding:3mm;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+.di2 .ti{font-size:10pt;margin-bottom:1mm;}
+.di2 h4{font-size:5.5pt;font-weight:700;color:var(--navy);}
+.di2 p{font-size:4.5pt;color:var(--muted);}
+/* CONTACT FOOTER */
+.cf{background:var(--navy);padding:6mm 12mm;display:flex;justify-content:space-between;align-items:center;margin-top:auto;}
+.cf-logo .lw{font-size:14pt;font-weight:900;letter-spacing:2px;color:white;}
+.cf-logo .ls{font-size:5pt;letter-spacing:3px;color:var(--tsky);}
+.cf-cta{background:linear-gradient(135deg,var(--teal),var(--blue));border-radius:4px;padding:3mm 6mm;text-align:center;}
+.cf-cta h4{font-size:7pt;font-weight:800;color:white;}
+.cf-cta p{font-size:5.5pt;color:rgba(255,255,255,0.8);}
+.cf-info{text-align:right;}
+.cf-info h4{font-size:7pt;font-weight:700;color:white;margin-bottom:1mm;}
+.cf-info p{font-size:6pt;color:var(--tsky);line-height:2;font-weight:600;}
+/* COVER */
+.hero{height:115mm;background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 55%,#1e3a5f 100%);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:10mm 12mm;}
+.hero .bgerp{position:absolute;top:-5mm;right:-8mm;font-family:'Poppins',sans-serif;font-size:90pt;font-weight:900;color:rgba(255,255,255,0.04);letter-spacing:-3px;line-height:1;user-select:none;}
+.hero .tb{position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--teal),var(--blue),var(--teal2));}
+.hc{position:relative;z-index:5;}
+.hl{font-size:7pt;letter-spacing:4px;color:var(--tsky);font-weight:600;text-transform:uppercase;margin-bottom:3mm;}
+.hr{width:40mm;height:3px;background:linear-gradient(90deg,var(--teal2),var(--blue));border-radius:2px;margin:4mm 0;}
+.ht{font-size:17pt;font-weight:700;color:white;line-height:1.3;max-width:130mm;font-family:'Poppins',sans-serif;}
+.ht span{color:var(--teal2);}
+.htag{font-size:7.5pt;color:rgba(255,255,255,0.6);font-style:italic;margin-top:2mm;}
+.hw{height:12mm;background:white;clip-path:ellipse(110% 100% at 50% 100%);margin-top:-6mm;position:relative;z-index:4;}
+/* INTRO */
+.it{font-size:7.5pt;color:var(--text);line-height:1.8;text-align:justify;}
+.it strong{color:var(--navy);font-weight:700;}
+/* QUOTE */
+.qs{background:linear-gradient(135deg,var(--navy) 0%,#1a3a6b 50%,var(--teal) 100%);padding:12mm 15mm;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:55mm;}
+.qm{font-size:60pt;line-height:0.5;color:rgba(255,255,255,0.12);font-family:Georgia,serif;position:absolute;top:8mm;left:12mm;}
+.qt{font-size:13pt;font-weight:700;color:white;text-align:center;line-height:1.4;position:relative;z-index:2;max-width:160mm;}
+.qt span{color:var(--teal2);}
+.qa{font-size:7pt;color:rgba(255,255,255,0.6);margin-top:4mm;font-style:italic;position:relative;z-index:2;}
+/* FLOW */
+.flow{display:flex;align-items:center;justify-content:space-between;background:var(--grey);border-radius:6px;padding:4mm 5mm;gap:1mm;}
+.fs{display:flex;flex-direction:column;align-items:center;flex:1;}
+.fc2{width:10mm;height:10mm;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--teal));display:flex;align-items:center;justify-content:center;font-size:5pt;font-weight:800;color:white;margin-bottom:1.5mm;}
+.fl2{font-size:5pt;font-weight:700;color:var(--navy);text-align:center;}
+.fa{font-size:9pt;color:var(--teal);flex-shrink:0;margin-top:-3mm;}
+/* HUB */
+.hub{background:var(--grey);border-radius:6px;padding:5mm;display:flex;align-items:center;justify-content:center;}
+.hub-c{width:22mm;height:22mm;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--teal));display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(8,145,178,0.4);flex-shrink:0;margin:0 4mm;}
+.hub-c .ht2{font-size:9pt;font-weight:900;color:white;font-family:'Poppins',sans-serif;}
+.hub-c .hs{font-size:5pt;color:var(--tsky);letter-spacing:1px;}
+.hub-col{display:flex;flex-direction:column;gap:2mm;}
+.hub-item{background:white;border-radius:4px;padding:2.5mm 4mm;border-left:2.5px solid var(--teal);font-size:6pt;font-weight:700;color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,0.06);min-width:26mm;}
+.hub-item.bl{border-color:var(--blue);}.hub-item.gr{border-color:#10b981;}
+.hub-item span{display:block;font-weight:400;color:var(--muted);font-size:5pt;}
+.ha{font-size:8pt;color:var(--lgrey);}
+/* P1 FOOTER */
+.p1f{margin-top:auto;background:linear-gradient(135deg,var(--navy),var(--navy2));padding:5mm 12mm;display:flex;justify-content:space-between;align-items:center;}
+.p1f .co{font-size:6pt;color:rgba(255,255,255,0.6);line-height:1.9;}
+.p1f .co strong{color:white;font-size:7pt;}
+.p1f .yr{font-size:24pt;font-weight:900;color:rgba(255,255,255,0.07);font-family:'Poppins',sans-serif;}
+/* DEPLOY BG */
+.deploy-bg{background:linear-gradient(135deg,#f0f9ff,#e0f2fe);padding:5mm 12mm;border-top:2px solid var(--teal);border-bottom:2px solid var(--teal);}
+@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}body{background:white;}.page{margin:0;box-shadow:none;}}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ PAGE 1 — COVER ═══════════════════════════ -->
+<div class="page">
+  <div class="page-nav">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="140" height="35">
+      <defs>
+        <linearGradient id="igCT" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#06b6d4"/><stop offset="50%" style="stop-color:#0891b2"/><stop offset="100%" style="stop-color:#0d1b2a"/></linearGradient>
+        <linearGradient id="tgCT" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#0d1b2a"/><stop offset="100%" style="stop-color:#1e3a5f"/></linearGradient>
+      </defs>
+      <polygon points="40,4 68,20 68,52 40,68 12,52 12,20" fill="url(#igCT)"/>
+      <polygon points="40,10 62,23 62,49 40,62 18,49 18,23" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <line x1="16" y1="26" x2="64" y2="26" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="13" y1="36" x2="67" y2="36" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="16" y1="46" x2="64" y2="46" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="28" y1="14" x2="28" y2="58" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="40" y1="8" x2="40" y2="64" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="52" y1="14" x2="52" y2="58" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="28" cy="26" r="2.5" fill="white" opacity="0.95"/><circle cx="40" cy="26" r="2.5" fill="white" opacity="0.95"/><circle cx="52" cy="26" r="2.5" fill="white" opacity="0.95"/>
+      <circle cx="28" cy="36" r="2.5" fill="#a5f3fc" opacity="0.95"/><circle cx="40" cy="36" r="3.5" fill="white"/><circle cx="52" cy="36" r="2.5" fill="#a5f3fc" opacity="0.95"/>
+      <circle cx="28" cy="46" r="2.5" fill="white" opacity="0.95"/><circle cx="40" cy="46" r="2.5" fill="white" opacity="0.95"/><circle cx="52" cy="46" r="2.5" fill="white" opacity="0.95"/>
+      <text x="84" y="44" font-family="Inter,Arial,sans-serif" font-size="28" font-weight="900" letter-spacing="3" fill="url(#tgCT)">MEI TEXZ</text>
+      <line x1="84" y1="50" x2="298" y2="50" stroke="#0891b2" stroke-width="1.5" opacity="0.6"/>
+      <text x="84" y="63" font-family="Inter,Arial,sans-serif" font-size="9" font-weight="500" letter-spacing="5" fill="#0891b2">TECHNOLOGIES</text>
+      <circle cx="302" cy="44" r="3" fill="#06b6d4" opacity="0.8"/>
+    </svg>
+    <div style="font-size:6pt;color:#64748b;text-align:right;line-height:1.8;">Enterprise Resource Planning<br><strong style="color:#0d1b2a;">Complete Textile Sector</strong></div>
+  </div>
+
+  <div class="hero">
+    <div class="tb"></div>
+    <div class="bgerp">TEXTILE</div>
+    <div style="position:absolute;top:-20mm;right:30mm;width:70mm;height:70mm;border-radius:50%;background:radial-gradient(circle,rgba(8,145,178,0.3) 0%,transparent 70%);"></div>
+    <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.06) 1px,transparent 1px);background-size:12px 12px;z-index:1;"></div>
+    <div class="hc" style="max-width:130mm;">
+      <div class="hl">Complete Textile Sector · ERP 2025</div>
+      <div class="hr"></div>
+      <div class="ht">From <span>Raw Fibre</span> to<br><span>Finished Fabric & Garment</span></div>
+      <div class="htag">"Building Intelligence Into Industry"</div>
+      <div style="display:flex;flex-direction:column;gap:2mm;margin-top:5mm;">
+        <div style="display:flex;align-items:center;gap:2.5mm;"><div style="width:5px;height:5px;border-radius:50%;background:#06b6d4;flex-shrink:0;"></div><span style="font-size:6.5pt;color:rgba(255,255,255,0.85);">Spinning · Weaving · Knitting · Sizing · Dyeing · Finishing · Garment</span></div>
+        <div style="display:flex;align-items:center;gap:2.5mm;"><div style="width:5px;height:5px;border-radius:50%;background:#06b6d4;flex-shrink:0;"></div><span style="font-size:6.5pt;color:rgba(255,255,255,0.85);">Technical Textile · Quality Testing · Manpower Management</span></div>
+        <div style="display:flex;align-items:center;gap:2.5mm;"><div style="width:5px;height:5px;border-radius:50%;background:#06b6d4;flex-shrink:0;"></div><span style="font-size:6.5pt;color:rgba(255,255,255,0.85);">AI Chatbot · Voice Input · ISO / OEKO-TEX Compliance Ready</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hw"></div>
+
+  <div style="padding:0 12mm 5mm;display:flex;flex-direction:column;gap:4mm;">
+    <p class="it"><strong>MEI TEXZ Complete Textile ERP</strong> is the only system your textile business needs — covering the entire value chain from raw fibre procurement through spinning, weaving, knitting, sizing, dyeing, processing, finishing, and garment manufacturing. Every process is connected in one intelligent platform with built-in <strong>AI intelligence</strong>, quality testing lab management, manpower tracking, and full compliance support for ISO, OEKO-TEX, and export standards.</p>
+
+    <div class="dr">
+      <div class="db"><div class="ds" style="background:linear-gradient(135deg,#0891b2,#06b6d4);"><div class="di"><div class="dn">16+</div><div class="dl">Modules</div></div></div><div class="dlb">Complete ERP</div></div>
+      <div class="db"><div class="ds" style="background:linear-gradient(135deg,#2563eb,#3b82f6);"><div class="di"><div class="dn">8</div><div class="dl">Processes</div></div></div><div class="dlb">Full Chain</div></div>
+      <div class="db"><div class="ds" style="background:linear-gradient(135deg,#0d1b2a,#1e3a5f);"><div class="di"><div class="dn">AI</div><div class="dl">Powered</div></div></div><div class="dlb">Smart AI</div></div>
+      <div class="db"><div class="ds" style="background:linear-gradient(135deg,#059669,#10b981);"><div class="di"><div class="dn">ISO</div><div class="dl">Ready</div></div></div><div class="dlb">OEKO-TEX / ISO</div></div>
+      <div class="db"><div class="ds" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);"><div class="di"><div class="dn">☁</div><div class="dl">Cloud</div></div></div><div class="dlb">Hosted</div></div>
+    </div>
+  </div>
+
+  <div style="padding:0 12mm 5mm;">
+    <div class="sh"><span class="sh-dot"></span><span class="sh-title">All Modules Included</span><span class="sh-line"></span></div>
+    <div class="mr">
+      <span class="ch">Dashboard</span><span class="ch">Spinning</span><span class="ch">Weaving</span><span class="ch">Knitting</span><span class="ch">Sizing</span><span class="ch">Dyeing</span><span class="ch">Processing</span><span class="ch">Finishing</span><span class="ch">Garment</span><span class="ch">Technical Textile</span><span class="ch">Quality Testing</span><span class="ch">Purchasing</span><span class="ch">Sales</span><span class="ch">Finance</span><span class="ch">HR & Payroll</span><span class="ch">AI Chatbot</span>
+    </div>
+  </div>
+
+  <div class="p1f">
+    <div style="display:flex;align-items:center;gap:4mm;">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="22" height="22"><polygon points="40,4 68,20 68,52 40,68 12,52 12,20" fill="rgba(255,255,255,0.2)"/><line x1="16" y1="27" x2="64" y2="27" stroke="white" stroke-width="3" stroke-linecap="round"/><line x1="13" y1="40" x2="67" y2="40" stroke="white" stroke-width="3" stroke-linecap="round"/><line x1="16" y1="53" x2="64" y2="53" stroke="white" stroke-width="3" stroke-linecap="round"/></svg>
+      <div class="co"><strong>Santha Sree</strong> CEO & Founder · MEI TEXZ Technologies<br>+91 9176236675 · info@meitexz.com · Coimbatore, TN 641062</div>
+    </div>
+    <div class="yr">2025</div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════ PAGE 2 — TEXTILE VALUE CHAIN OVERVIEW ═══════════════════════════ -->
+<div class="page">
+  <div class="ph">
+    <h1>Complete Textile Value Chain</h1>
+    <p>One ERP connecting every stage — from raw material to finished product</p>
+    <div class="tr"><span class="ptag">Spinning</span><span class="ptag">Weaving & Knitting</span><span class="ptag">Processing</span><span class="ptag">Garment</span><span class="ptag">Technical Textile</span><span class="ptag">Quality Testing</span></div>
+  </div>
+  <div class="pb">
+
+    <div class="flow">
+      <div class="fs"><div class="fc2">🌾</div><div class="fl2">Raw<br>Material</div></div>
+      <div class="fa">▶</div>
+      <div class="fs"><div class="fc2">🧶</div><div class="fl2">Spinning<br>& Yarn</div></div>
+      <div class="fa">▶</div>
+      <div class="fs"><div class="fc2">📐</div><div class="fl2">Sizing &<br>Warping</div></div>
+      <div class="fa">▶</div>
+      <div class="fs"><div class="fc2">🪢</div><div class="fl2">Weaving /<br>Knitting</div></div>
+      <div class="fa">▶</div>
+      <div class="fs"><div class="fc2">🎨</div><div class="fl2">Dyeing &<br>Processing</div></div>
+      <div class="fa">▶</div>
+      <div class="fs"><div class="fc2">✂️</div><div class="fl2">Garment<br>Making</div></div>
+      <div class="fa">▶</div>
+      <div class="fs"><div class="fc2">🏭</div><div class="fl2">Technical<br>Textile</div></div>
+      <div class="fa">▶</div>
+      <div class="fs"><div class="fc2" style="background:linear-gradient(135deg,#059669,#10b981);">🧪</div><div class="fl2">Testing &<br>Dispatch</div></div>
+    </div>
+
+    <div>
+      <div class="sh"><span class="sh-dot"></span><span class="sh-title">ERP Core — Connecting All Processes</span><span class="sh-line"></span></div>
+      <div class="hub">
+        <div class="hub-col">
+          <div class="hub-item">🧶 Spinning<span>Yarn count · Ring · OE</span></div>
+          <div class="hub-item bl">📐 Sizing<span>Warp prep · Recipe</span></div>
+          <div class="hub-item gr">🎨 Dyeing<span>Lot · Recipe · Colour</span></div>
+        </div>
+        <div class="ha">→</div>
+        <div class="hub-c"><div class="ht2">ERP</div><div class="hs">MEI TEXZ</div></div>
+        <div class="ha">→</div>
+        <div class="hub-col">
+          <div class="hub-item">🪢 Weaving<span>Loom · Grey fabric</span></div>
+          <div class="hub-item bl">✂️ Garment<span>Style · SMV · QC</span></div>
+          <div class="hub-item gr">🧪 Testing<span>Lab · Compliance</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sh"><span class="sh-dot"></span><span class="sh-title">What This ERP Covers</span><span class="sh-line"></span></div>
+      <div class="fg">
+        <div class="fc"><div class="fci te">🧶</div><div class="fct"><h4>Yarn Manufacturing (Spinning)</h4><p>Raw fibre receipts, carding, drawing, ring spinning, OE spinning — yarn count, twist, lot and quality tracking throughout.</p></div></div>
+        <div class="fc bl"><div class="fci bl">🪢</div><div class="fct"><h4>Fabric Manufacturing (Weaving & Knitting)</h4><p>Warp beam management, loom scheduling, grey fabric inspection, knitting gauge and pattern management.</p></div></div>
+        <div class="fc nv"><div class="fci nv">🎨</div><div class="fct"><h4>Dyeing, Processing & Finishing</h4><p>Colour recipes, dye lot tracking, heat setting, mercerising, printing schedules and finishing quality records.</p></div></div>
+        <div class="fc gr"><div class="fci gr">✂️</div><div class="fct"><h4>Garment Manufacturing</h4><p>Style master, cut order planning, SMV/SAM, stitching line efficiency, inline QC, packing and shipment.</p></div></div>
+      </div>
+    </div>
+
+    <div class="sb">
+      <div class="sb-l">
+        <h4>Completely Integrated — One Database, All Departments</h4>
+        <p>Purchase of raw cotton feeds into spinning, spinning output feeds weaving, fabric feeds dyeing — all automatically linked. No manual re-entry between departments. One dashboard shows your entire factory status.</p>
+      </div>
+      <div class="sb-s">
+        <div class="sbs"><div class="n">16+</div><div class="l">Modules</div></div>
+        <div class="sbs"><div class="n">8</div><div class="l">Processes</div></div>
+        <div class="sbs"><div class="n">100+</div><div class="l">Features</div></div>
+      </div>
+    </div>
+
+  </div>
+  <div class="pf"><span>MEI TEXZ Technologies · info@meitexz.com · +91 9176236675</span><strong>Page 2 of 8</strong></div>
+</div>
+
+
+<!-- ═══════════════════════════ PAGE 3 — SPINNING & YARN MANUFACTURING ═══════════════════════════ -->
+<div class="page">
+  <div class="spt">
+    <div class="spl" style="padding:8mm 10mm;">
+      <div class="st">Ring Spinning</div>
+      <div class="ss">Short & long staple fibre processing</div>
+      <div class="sr"></div>
+      <ul class="wl">
+        <li>Raw fibre receipt — cotton, polyester, viscose, wool</li>
+        <li>Blow room, carding & drawing frame production records</li>
+        <li>Ring frame: spindle speed, twist per inch, yarn count</li>
+        <li>Winding: cone weight, knot count, quality grading</li>
+        <li>Yarn lot creation with full batch traceability</li>
+        <li>Production efficiency — actual vs target per shift</li>
+        <li>Machine-wise production and downtime records</li>
+      </ul>
+      <div class="br"><span class="wb">Cotton</span><span class="wb">Polyester</span><span class="wb">Viscose</span><span class="wb">Blends</span></div>
+    </div>
+    <div class="spr" style="padding:8mm 10mm;">
+      <div class="st">OE / Rotor Spinning</div>
+      <div class="ss">Open-end spinning for coarser counts</div>
+      <div class="sr" style="background:white;opacity:0.5;"></div>
+      <ul class="wl">
+        <li>Sliver feed management from draw frames</li>
+        <li>Rotor speed, opening roller settings per count</li>
+        <li>Yarn count: Ne, Nm, Tex — all systems supported</li>
+        <li>Waste percentage tracking — lap waste, sliver waste</li>
+        <li>Uster statistics and yarn quality log records</li>
+        <li>Shift-wise production summary and efficiency report</li>
+        <li>Cone / cheese / bobbin dispatch with lot numbers</li>
+      </ul>
+      <div class="br"><span class="wb">OE Count</span><span class="wb">Uster Stats</span><span class="wb">Lot Tracking</span></div>
+    </div>
+  </div>
+
+  <div class="wsep"></div>
+
+  <div class="pb" style="padding-top:3mm;">
+    <div>
+      <div class="sh"><span class="sh-dot"></span><span class="sh-title">Spinning ERP Module — Full Features</span><span class="sh-line"></span></div>
+      <div class="fg">
+        <div class="fc"><div class="fci te">📦</div><div class="fct"><h4>Raw Material Management</h4><p>Fibre bales, lot receipts, moisture %, micronaire, fibre length. Supplier-wise quality history and consumption planning.</p></div></div>
+        <div class="fc bl"><div class="fci bl">⚙️</div><div class="fct"><h4>Machine & Maintenance</h4><p>Machine master (blow room to winding), maintenance schedule, breakdown records, preventive maintenance alerts.</p></div></div>
+        <div class="fc nv"><div class="fci nv">📊</div><div class="fct"><h4>Production Planning</h4><p>Order-based production plans, count-wise programmes, yarn delivery schedules, machine utilisation planning.</p></div></div>
+        <div class="fc gr"><div class="fci gr">🧪</div><div class="fct"><h4>Yarn Quality Records</h4><p>CSP, TPI, U%, thin/thick places, neps — all test results stored per lot. Quality certificates generated automatically.</p></div></div>
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="mc"><h4>Shift Reports</h4><p>Production, efficiency, waste per shift</p></div>
+      <div class="mc bl"><h4>Count Programme</h4><p>Yarn count allocation by machine</p></div>
+      <div class="mc gr"><h4>Yarn Lot Control</h4><p>Lot numbers for full traceability</p></div>
+      <div class="mc"><h4>Waste Analysis</h4><p>Lap, sliver, invisible loss tracking</p></div>
+      <div class="mc bl"><h4>Cost per Kg</h4><p>Conversion cost calculated per count</p></div>
+      <div class="mc gr"><h4>Dispatch Register</h4><p>Yarn delivery to weaving / trading</p></div>
+    </div>
+  </div>
+  <div class="pf"><span>MEI TEXZ Technologies · Coimbatore, TN 641062</span><strong>Page 3 of 8</strong></div>
+</div>
+
+
+<!-- ═══════════════════════════ PAGE 4 — WEAVING, SIZING & KNITTING ═══════════════════════════ -->
+<div class="page">
+  <div class="spt">
+    <div class="spl" style="padding:8mm 10mm;">
+      <div class="st">Weaving & Sizing</div>
+      <div class="ss">Warp preparation and loom management</div>
+      <div class="sr"></div>
+      <ul class="wl">
+        <li>Warp beam preparation — sizing recipe, chemical dosing</li>
+        <li>Loom scheduling: loom-wise fabric allocation</li>
+        <li>Weaving production: picks per minute, efficiency %</li>
+        <li>Grey fabric inspection — 4-point system grading</li>
+        <li>Fabric roll register: metre, weight, width per roll</li>
+        <li>Reed and heald maintenance records</li>
+        <li>Defect analysis: broken ends, drop wires, loom stops</li>
+      </ul>
+      <div class="br"><span class="wb">4-Point Grading</span><span class="wb">Beam Planning</span><span class="wb">Loom Efficiency</span></div>
+    </div>
+    <div class="spr" style="padding:8mm 10mm;">
+      <div class="st">Knitting</div>
+      <div class="ss">Circular, flat and seamless knitting</div>
+      <div class="sr" style="background:white;opacity:0.5;"></div>
+      <ul class="wl">
+        <li>Machine master — gauge, machine dia, number of feeders</li>
+        <li>Programme card / design allocation per machine</li>
+        <li>Grey fabric production: kg per shift, roll weights</li>
+        <li>Yarn consumption per programme / per kg of fabric</li>
+        <li>Knit defect records — dropped loops, holes, streaks</li>
+        <li>Machine utilisation and idle time report</li>
+        <li>Customer order-based production scheduling</li>
+      </ul>
+      <div class="br"><span class="wb">Circular</span><span class="wb">Flat Knitting</span><span class="wb">Gauge Mgmt</span></div>
+    </div>
+  </div>
+
+  <div class="wsep"></div>
+
+  <div class="pb" style="padding-top:3mm;">
+    <div>
+      <div class="sh"><span class="sh-dot"></span><span class="sh-title">Weaving & Knitting ERP — Full Features</span><span class="sh-line"></span></div>
+      <div class="fg">
+        <div class="fc"><div class="fci te">📐</div><div class="fct"><h4>Sizing Module</h4><p>Sizing recipe formulation, chemical stock, size box settings, warp beam register with set no. and metres.</p></div></div>
+        <div class="fc bl"><div class="fci bl">🏭</div><div class="fct"><h4>Loom Management</h4><p>Loom-wise fabric programme, reed plan, design card, production per loom per day — all tracked and reported.</p></div></div>
+        <div class="fc nv"><div class="fci nv">📋</div><div class="fct"><h4>Fabric Inspection</h4><p>4-point inspection system, roll-wise grade, defect type classification, pass/fail decisions, inspection certificates.</p></div></div>
+        <div class="fc gr"><div class="fci gr">📊</div><div class="fct"><h4>Efficiency Reports</h4><p>Department-wise efficiency, loom efficiency trend, EPI/PPI analysis, downtime cause report by shift.</p></div></div>
+      </div>
+    </div>
+
+    <div class="hb">
+      <h4>Integrated Stock Flow — Yarn to Fabric</h4>
+      <p>When weaving or knitting is completed and grey fabric passes inspection, the stock is automatically updated in the inventory module. Sales orders for fabric can see live availability. No manual Excel entries. Yarn consumed from spinning is automatically deducted. Every metre of fabric is traced to the yarn lot it came from.</p>
+    </div>
+  </div>
+  <div class="pf"><span>MEI TEXZ Technologies · info@meitexz.com · +91 9176236675</span><strong>Page 4 of 8</strong></div>
+</div>
+
+
+<!-- ═══════════════════════════ PAGE 5 — DYEING, PROCESSING & FINISHING ═══════════════════════════ -->
+<div class="page">
+  <div class="spt">
+    <div class="spl" style="padding:8mm 10mm;">
+      <div class="st">Dyeing & Printing</div>
+      <div class="ss">Colour management and lot tracking</div>
+      <div class="sr"></div>
+      <ul class="wl">
+        <li>Colour recipe management — dye formulation library</li>
+        <li>Dye lot creation with fabric batch input quantity</li>
+        <li>Chemical stock management — dyes, auxiliaries, acids</li>
+        <li>Machine-wise lot scheduling: jets, jiggers, padders</li>
+        <li>Colour matching records and repeat shade approval</li>
+        <li>Lab dip register — shade number, customer approval</li>
+        <li>Printing: screen allocation, table scheduling, paste usage</li>
+      </ul>
+      <div class="br"><span class="wb">Recipe Library</span><span class="wb">Lab Dip</span><span class="wb">Shade Approval</span></div>
+    </div>
+    <div class="spr" style="padding:8mm 10mm;">
+      <div class="st">Processing & Finishing</div>
+      <div class="ss">Pre-treatment, finishing and heat-setting</div>
+      <div class="sr" style="background:white;opacity:0.5;"></div>
+      <ul class="wl">
+        <li>Pre-treatment records: scouring, bleaching, singeing</li>
+        <li>Mercerising and caustic concentration records</li>
+        <li>Heat setting: temperature, speed, overfeed % — per batch</li>
+        <li>Finishing chemicals: softeners, FR, water repellent</li>
+        <li>Calendering and compacting records per fabric type</li>
+        <li>Fabric shrinkage, GSM, width after finishing — test log</li>
+        <li>Finishing certificate with quality parameters per roll</li>
+      </ul>
+      <div class="br"><span class="wb">FR Finish</span><span class="wb">Water Repellent</span><span class="wb">Heat Set</span></div>
+    </div>
+  </div>
+
+  <div class="wsep"></div>
+
+  <div class="pb" style="padding-top:3mm;">
+    <div>
+      <div class="sh"><span class="sh-dot"></span><span class="sh-title">Processing ERP Module — Key Features</span><span class="sh-line"></span></div>
+      <div class="fg">
+        <div class="fc"><div class="fci te">🧪</div><div class="fct"><h4>Chemical Inventory</h4><p>All dyes and auxiliaries tracked — receipts from suppliers, consumption per batch, reorder alerts, expiry monitoring.</p></div></div>
+        <div class="fc bl"><div class="fci bl">🎨</div><div class="fct"><h4>Shade & Colour Records</h4><p>Full colour history per customer, shade numbers, approved lab dips, colour matching tolerance records.</p></div></div>
+        <div class="fc nv"><div class="fci nv">📏</div><div class="fct"><h4>Fabric Test After Processing</h4><p>GSM, width, shrinkage, elongation, colour fastness — all test results attached to lot and customer order.</p></div></div>
+        <div class="fc gr"><div class="fci gr">🚚</div><div class="fct"><h4>Finished Fabric Despatch</h4><p>Packing list, roll-wise metres, delivery challans, export invoice, GST billing — all from one screen.</p></div></div>
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="mc"><h4>Dye Cost per Metre</h4><p>Auto-calculated from recipe</p></div>
+      <div class="mc bl"><h4>Shade Repeat Tracking</h4><p>Customer colour history</p></div>
+      <div class="mc gr"><h4>OEKO-TEX Compliance</h4><p>Restricted chemicals flagged</p></div>
+      <div class="mc"><h4>Lot Reconciliation</h4><p>Input vs output metres per lot</p></div>
+      <div class="mc bl"><h4>Processing Schedule</h4><p>Machine-wise day plan</p></div>
+      <div class="mc gr"><h4>QC Certificate</h4><p>Auto-generated per delivery</p></div>
+    </div>
+  </div>
+  <div class="pf"><span>MEI TEXZ Technologies · Coimbatore, TN 641062</span><strong>Page 5 of 8</strong></div>
+</div>
+
+
+<!-- ═══════════════════════════ PAGE 6 — GARMENT MANUFACTURING ═══════════════════════════ -->
+<div class="page">
+  <div class="ph">
+    <h1>Garment Manufacturing Module</h1>
+    <p>From style creation to shipment — complete garment factory management</p>
+    <div class="tr"><span class="ptag">Style Master</span><span class="ptag">Cut Order</span><span class="ptag">SMV / SAM</span><span class="ptag">Line Balancing</span><span class="ptag">QC</span><span class="ptag">Packing & Export</span></div>
+  </div>
+
+  <div class="pb">
+    <div>
+      <div class="sh"><span class="sh-dot"></span><span class="sh-title">Garment ERP — Process Flow</span><span class="sh-line"></span></div>
+      <div class="flow">
+        <div class="fs"><div class="fc2">📋</div><div class="fl2">Style<br>Order</div></div>
+        <div class="fa">▶</div>
+        <div class="fs"><div class="fc2">📏</div><div class="fl2">Pattern &<br>Marker</div></div>
+        <div class="fa">▶</div>
+        <div class="fs"><div class="fc2">✂️</div><div class="fl2">Fabric<br>Cutting</div></div>
+        <div class="fa">▶</div>
+        <div class="fs"><div class="fc2">🧵</div><div class="fl2">Stitching<br>Line</div></div>
+        <div class="fa">▶</div>
+        <div class="fs"><div class="fc2">🔍</div><div class="fl2">Inline &<br>Final QC</div></div>
+        <div class="fa">▶</div>
+        <div class="fs"><div class="fc2">📦</div><div class="fl2">Packing &<br>Folding</div></div>
+        <div class="fa">▶</div>
+        <div class="fs"><div class="fc2" style="background:linear-gradient(135deg,#059669,#10b981);">🚢</div><div class="fl2">Export<br>Shipment</div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sh"><span class="sh-dot"></span><span class="sh-title">Core Garment Features</span><span class="sh-line"></span></div>
+      <div class="fg">
+        <div class="fc"><div class="fci te">👗</div><div class="fct"><h4>Style Master & BOM</h4><p>Style-wise bill of materials — fabric, trims, threads, buttons, zips. Cost sheet per style with fabric consumption and target price.</p></div></div>
+        <div class="fc bl"><div class="fci bl">✂️</div><div class="fct"><h4>Cut Order Planning</h4><p>Size-wise quantity planning, fabric spreading plan, lay plan, marker efficiency, actual vs planned consumption per cut lot.</p></div></div>
+        <div class="fc nv"><div class="fci nv">⏱️</div><div class="fct"><h4>SMV & Efficiency</h4><p>Operation-wise SMV, line balancing, hourly production target, operator efficiency tracking, WIP between operations.</p></div></div>
+        <div class="fc gr"><div class="fci gr">🔍</div><div class="fct"><h4>Inline & Final QC</h4><p>Defect type master, inline QC checkpoints, final audit, AQL sampling, alteration tracking, rejection records.</p></div></div>
+        <div class="fc or"><div class="fci or">📦</div><div class="fct"><h4>Packing & Finishing</h4><p>Size set packing, carton details, country of origin, HS code, packing list generation for export and domestic.</p></div></div>
+        <div class="fc pu"><div class="fci pu">🚢</div><div class="fct"><h4>Export Documentation</h4><p>Commercial invoice, packing list, GST invoice, e-way bill, buyer-wise shipment tracking and delivery confirmation.</p></div></div>
+      </div>
+    </div>
+
+    <div class="tc">
+      <div class="mc"><h4>SAM Analysis</h4><p>Operation-wise time study</p></div>
+      <div class="mc bl"><h4>Daily Production Report</h4><p>Line-wise output vs target</p></div>
+      <div class="mc gr"><h4>Trim & Accessory Stock</h4><p>Interlining, buttons, zips</p></div>
+      <div class="mc"><h4>Buyer-wise Orders</h4><p>Export order management</p></div>
+    </div>
+  </div>
+  <div class="pf"><span>MEI TEXZ Technologies · info@meitexz.com · +91 9176236675</span><strong>Page 6 of 8</strong></div>
+</div>
+
+
+<!-- ═══════════════════════════ PAGE 7 — QUALITY TESTING, TECHNICAL TEXTILE + AI ═══════════════════════════ -->
+<div class="page">
+  <div class="spt">
+    <div class="spl" style="padding:8mm 10mm;">
+      <div class="st">Quality Testing Lab</div>
+      <div class="ss">Physical · Chemical · Performance</div>
+      <div class="sr"></div>
+      <ul class="wl">
+        <li>Test request management — from production or customer</li>
+        <li>Physical tests: GSM, tensile, tear, pilling, abrasion</li>
+        <li>Chemical tests: colorfastness, pH, formaldehyde, heavy metals</li>
+        <li>Performance tests: water repellency, flammability, breathability</li>
+        <li>Test result entry with pass/fail and tolerance limits</li>
+        <li>Test certificates auto-generated per lot or delivery</li>
+        <li>Third-party lab results upload and archive</li>
+        <li>OEKO-TEX / ISO 17025 test record management</li>
+      </ul>
+      <div class="br"><span class="wb">OEKO-TEX</span><span class="wb">ISO 17025</span><span class="wb">AATCC</span><span class="wb">IS / BS / EN</span></div>
+    </div>
+    <div class="spr" style="padding:8mm 10mm;">
+      <div class="st">Technical Textile</div>
+      <div class="ss">Performance specs · TDS · Compliance</div>
+      <div class="sr" style="background:white;opacity:0.5;"></div>
+      <ul class="wl">
+        <li>Product category master with performance specifications</li>
+        <li>Technical Data Sheet (TDS) creation and export</li>
+        <li>Sample management — track samples sent to customers</li>
+        <li>R&D project tracking — new product development</li>
+        <li>ISO 13485 / FDA / CE certification status records</li>
+        <li>Batch traceability from raw material to despatch</li>
+        <li>CAPA management — corrective and preventive actions</li>
+        <li>Full audit trail — every action logged with timestamp</li>
+      </ul>
+      <div class="br"><span class="wb">ISO 13485</span><span class="wb">FDA Ready</span><span class="wb">CE Marking</span><span class="wb">CAPA</span></div>
+    </div>
+  </div>
+
+  <div class="wsep"></div>
+
+  <div class="pb" style="padding-top:3mm;">
+    <div>
+      <div class="sh"><span class="sh-dot"></span><span class="sh-title">AI & Intelligence Features</span><span class="sh-line"></span></div>
+      <div class="ag">
+        <div class="ac"><div class="ai">🤖</div><h4>AI Chatbot</h4><p>Ask in plain English or by voice: "How much yarn did we produce today?" — instant answer.</p></div>
+        <div class="ac bl"><div class="ai">📈</div><h4>Sales Forecasting</h4><p>3-month revenue projection — plan production and raw material purchasing ahead with confidence.</p></div>
+        <div class="ac nv"><div class="ai">🎯</div><h4>Customer RFM Score</h4><p>Auto-score every buyer on Recency, Frequency & Monetary — know your most valuable customers.</p></div>
+        <div class="ac"><div class="ai">⚠️</div><h4>Churn Prediction</h4><p>Identify buyers who are reducing orders — with revenue at risk clearly flagged.</p></div>
+        <div class="ac bl"><div class="ai">💡</div><h4>Smart Business Feed</h4><p>Daily textile industry insights, export news, pricing trends — every morning on your dashboard.</p></div>
+        <div class="ac nv"><div class="ai">🔮</div><h4>What-If Simulator</h4><p>See the effect of yarn price change, order cancellation, or upsell on your revenue instantly.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="pf"><span>MEI TEXZ Technologies · Coimbatore, TN 641062</span><strong>Page 7 of 8</strong></div>
+</div>
+
+
+<!-- ═══════════════════════════ PAGE 8 — MANPOWER + WHY CHOOSE + CONTACT ═══════════════════════════ -->
+<div class="page">
+
+  <div class="qs">
+    <div class="qm">"</div>
+    <div class="qt">The textile industry is one of the most complex in the world.<br><span>Your ERP should be able to keep up.</span></div>
+    <div class="qa">— MEI TEXZ Technologies · Purpose-built for the Complete Textile Sector</div>
+  </div>
+
+  <div style="padding:5mm 12mm;display:flex;gap:5mm;flex:1;">
+    <div style="flex:1;">
+      <div class="sh" style="margin-bottom:3mm;"><span class="sh-dot"></span><span class="sh-title">HR & Manpower Management</span><span class="sh-line"></span></div>
+      <div class="wc"><div class="wcn">01</div><div class="wct"><h4>Worker & Staff Records</h4><p>Department-wise headcount, designation, joining date, shift assignment, skill category</p></div></div>
+      <div class="wc bl"><div class="wcn" style="color:var(--blue);">02</div><div class="wct"><h4>Attendance & Shift</h4><p>Daily attendance, shift roster, OT calculation, leave management, absenteeism reports</p></div></div>
+      <div class="wc gr"><div class="wcn" style="color:#059669;">03</div><div class="wct"><h4>Payroll Processing</h4><p>Auto salary calculation with OT, deductions, PF, ESI, advance — pay slips generated</p></div></div>
+      <div class="wc"><div class="wcn">04</div><div class="wct"><h4>Labour Costing</h4><p>Conversion cost per kg or per metre — operator-wise cost allocation per production order</p></div></div>
+
+      <div class="sh" style="margin:3mm 0;"><span class="sh-dot"></span><span class="sh-title">Why Choose MEI TEXZ</span><span class="sh-line"></span></div>
+      <div class="wc bl"><div class="wcn" style="color:var(--blue);">05</div><div class="wct"><h4>Built for Textile — Not Adapted</h4><p>Every module designed around how textile factories actually work</p></div></div>
+      <div class="wc gr"><div class="wcn" style="color:#059669;">06</div><div class="wct"><h4>All Processes in One System</h4><p>Spinning to garment — no separate systems, no data silos</p></div></div>
+    </div>
+    <div style="flex:1;">
+      <div class="sh" style="margin-bottom:3mm;"><span class="sh-dot"></span><span class="sh-title">Signs You Need This ERP</span><span class="sh-line"></span></div>
+      <ul style="list-style:none;padding:0;margin:0 0 3mm 0;background:#f1f5f9;border-radius:6px;padding:3mm 4mm;border-left:4px solid var(--navy);">
+        <li style="font-size:6.5pt;color:#334155;padding:1.5px 0 1.5px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--navy);font-weight:700;">▸</span>Departments using separate spreadsheets — no connected view</li>
+        <li style="font-size:6.5pt;color:#334155;padding:1.5px 0 1.5px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--navy);font-weight:700;">▸</span>Paper shift logs — production data hard to track or verify</li>
+        <li style="font-size:6.5pt;color:#334155;padding:1.5px 0 1.5px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--navy);font-weight:700;">▸</span>No yarn lot or batch traceability from spinning to dispatch</li>
+        <li style="font-size:6.5pt;color:#334155;padding:1.5px 0 1.5px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--navy);font-weight:700;">▸</span>Colour recipes and technical specs in physical notebooks</li>
+        <li style="font-size:6.5pt;color:#334155;padding:1.5px 0 1.5px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--navy);font-weight:700;">▸</span>ISO audits cause stress — records not ready or inconsistent</li>
+      </ul>
+      <div class="sh" style="margin-bottom:3mm;"><span class="sh-dot"></span><span class="sh-title">After MEI TEXZ ERP</span><span class="sh-line"></span></div>
+      <ul style="list-style:none;padding:0;margin:0 0 3mm 0;background:linear-gradient(135deg,#ecfeff,#cffafe);border-radius:6px;padding:3mm 4mm;border-left:4px solid var(--teal);">
+        <li style="font-size:6.5pt;color:#0e4a6e;padding:1.5px 0 1.5px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--teal);font-weight:700;">✓</span>One system connects every department — live data everywhere</li>
+        <li style="font-size:6.5pt;color:#0e4a6e;padding:1.5px 0 1.5px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--teal);font-weight:700;">✓</span>Digital shift logs — production tracked in real time</li>
+        <li style="font-size:6.5pt;color:#0e4a6e;padding:1.5px 0 1.5px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--teal);font-weight:700;">✓</span>Full traceability — yarn lot to finished roll, instant report</li>
+        <li style="font-size:6.5pt;color:#0e4a6e;padding:1.5px 0 1.5px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--teal);font-weight:700;">✓</span>Recipes and specs stored digitally — searchable, version-controlled</li>
+        <li style="font-size:6.5pt;color:#0e4a6e;padding:1.5px 0 1.5px 10px;position:relative;line-height:1.6;"><span style="position:absolute;left:0;color:var(--teal);font-weight:700;">✓</span>Audit-ready always — full trail with timestamps, no stress</li>
+      </ul>
+      <div style="background:linear-gradient(135deg,var(--navy),#1a3a6b,var(--teal));border-radius:6px;padding:4mm 5mm;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:9pt;font-weight:900;color:white;margin-bottom:1mm;">Transform Your Business</div>
+          <div style="font-size:5.5pt;color:rgba(255,255,255,0.75);line-height:1.6;">Free 30-min demo — your textile process<br>running inside MEI TEXZ ERP.</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:4mm;">
+          <div style="font-size:9pt;font-weight:800;color:#a5f3fc;line-height:1.4;">+91 9176236675</div>
+          <div style="font-size:6.5pt;color:rgba(255,255,255,0.85);">info@meitexz.com</div>
+          <div style="font-size:5.5pt;color:rgba(255,255,255,0.55);margin-top:1mm;">Coimbatore, TN 641062</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cf">
+    <div class="cf-logo"><div class="lw">MEI TEXZ</div><div class="ls">TECHNOLOGIES</div></div>
+    <div class="cf-cta"><h4>Book a Free Demo</h4><p>See the full Textile ERP live</p></div>
+    <div class="cf-info">
+      <h4>Santha Sree · CEO &amp; Founder</h4>
+      <p>📞 +91 9176236675<br>✉ info@meitexz.com<br>📍 Coimbatore, TN 641062</p>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

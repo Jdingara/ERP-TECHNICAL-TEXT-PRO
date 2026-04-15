@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MEI TEXZ — ERP for All Sectors Leaflet</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --navy:#0d1b2a; --navy2:#1e3a5f; --blue:#2563eb; --sky:#bfdbfe; --grey:#f1f5f9; --muted:#64748b; }
+  @page { size: A4 portrait; margin: 0; }
+  body { font-family:'Inter',sans-serif; background:#e2e8f0; }
+
+  .leaflet { width:210mm; min-height:297mm; background:white; margin:20px auto; display:flex; box-shadow:0 8px 40px rgba(0,0,0,0.2); page-break-after:always; }
+
+  .accent { width:68mm; background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 55%,var(--blue) 100%); color:white; padding:10mm 8mm; display:flex; flex-direction:column; justify-content:space-between; overflow:hidden; position:relative; }
+  .accent::after { content:''; position:absolute; bottom:-8mm; left:-10mm; width:45mm; height:45mm; border-radius:50%; background:rgba(59,130,246,0.15); }
+  .logo { font-size:20pt; font-weight:900; letter-spacing:3px; }
+  .logos { font-size:6pt; letter-spacing:4px; color:var(--sky); }
+  .hl { width:28px; height:3px; background:var(--sky); margin:3mm 0; }
+  .ah { font-size:11pt; font-weight:800; line-height:1.3; }
+  .ah span { color:var(--sky); }
+  .at { font-size:6pt; color:rgba(255,255,255,0.65); font-style:italic; margin-top:2mm; }
+
+  .main { flex:1; padding:8mm; display:flex; flex-direction:column; gap:4mm; }
+  .st { font-size:7.5pt; font-weight:800; color:var(--navy); text-transform:uppercase; letter-spacing:1px; border-bottom:2px solid var(--blue); padding-bottom:2px; display:inline-block; margin-bottom:2mm; }
+  .sector-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:2mm; }
+  .sc { background:var(--grey); border-radius:4px; padding:2.5mm 3mm; border-left:2px solid var(--blue); text-align:center; }
+  .sc .ico { font-size:10pt; }
+  .sc .nm { font-size:5.5pt; font-weight:700; color:var(--navy); margin-top:1mm; }
+  .sc .ds { font-size:4.5pt; color:var(--muted); }
+
+  .feat-row { display:grid; grid-template-columns:1fr 1fr; gap:2mm; }
+  .fc { background:linear-gradient(135deg,#eff6ff,#dbeafe); border:1px solid #bfdbfe; border-radius:4px; padding:2.5mm 3mm; }
+  .fc h4 { font-size:6.5pt; font-weight:700; color:var(--navy); }
+  .fc p { font-size:5pt; color:var(--muted); margin-top:1px; }
+
+  .back { width:210mm; min-height:297mm; background:white; margin:20px auto; display:flex; box-shadow:0 8px 40px rgba(0,0,0,0.2); }
+  .bm { flex:1; padding:10mm 8mm; background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%); color:white; }
+  .bs { width:72mm; padding:10mm 8mm; background:var(--grey); display:flex; flex-direction:column; gap:4mm; }
+
+  .bst { font-size:7.5pt; font-weight:800; color:white; text-transform:uppercase; letter-spacing:1px; border-bottom:2px solid var(--sky); padding-bottom:2px; display:inline-block; margin-bottom:3mm; }
+  .col2 { display:grid; grid-template-columns:1fr 1fr; gap:2mm; margin-bottom:4mm; }
+  .bc { background:rgba(255,255,255,0.08); border-radius:4px; padding:2.5mm 3mm; border-left:2px solid var(--sky); }
+  .bc h4 { font-size:6.5pt; font-weight:700; color:white; }
+  .bc p { font-size:5pt; color:rgba(255,255,255,0.65); }
+
+  ul.wl { list-style:none; margin-bottom:4mm; }
+  ul.wl li { font-size:6.5pt; color:rgba(255,255,255,0.85); padding:2px 0 2px 10px; position:relative; line-height:1.5; }
+  ul.wl li::before { content:'▸'; color:var(--sky); position:absolute; left:0; }
+
+  .cta { background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.25); border-radius:6px; padding:5mm; text-align:center; margin-top:auto; }
+  .cta h3 { font-size:9.5pt; font-weight:900; color:white; }
+  .cta p { font-size:5.5pt; color:rgba(255,255,255,0.7); margin:1mm 0 2mm; }
+  .cta .ct { font-size:7pt; color:var(--sky); font-weight:700; line-height:2; }
+
+  .sts { font-size:7.5pt; font-weight:800; color:var(--navy); text-transform:uppercase; letter-spacing:1px; }
+  .sm { background:white; border-radius:4px; padding:2.5mm 3.5mm; border-left:2px solid var(--blue); margin-bottom:2mm; }
+  .sm h4 { font-size:6.5pt; font-weight:700; color:var(--navy); }
+  .sm p { font-size:5pt; color:var(--muted); }
+
+  @media print { *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;} body{background:white;} .leaflet,.back{margin:0;box-shadow:none;} }
+</style>
+</head>
+<body>
+
+<!-- FRONT -->
+<div class="leaflet">
+  <div class="accent">
+    <div>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="155" height="39" style="display:block;margin-bottom:1mm;">
+        <defs><linearGradient id="icL2a" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#06b6d4"/><stop offset="50%" style="stop-color:#0891b2"/><stop offset="100%" style="stop-color:#0d1b2a"/></linearGradient></defs>
+        <polygon points="40,4 68,20 68,52 40,68 12,52 12,20" fill="url(#icL2a)"/>
+        <polygon points="40,10 62,23 62,49 40,62 18,49 18,23" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+        <line x1="16" y1="26" x2="64" y2="26" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="13" y1="36" x2="67" y2="36" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="16" y1="46" x2="64" y2="46" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="28" y1="14" x2="28" y2="58" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="40" y1="8" x2="40" y2="64" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="52" y1="14" x2="52" y2="58" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="28" cy="26" r="2.5" fill="white" opacity="0.95"/><circle cx="40" cy="26" r="2.5" fill="white" opacity="0.95"/><circle cx="52" cy="26" r="2.5" fill="white" opacity="0.95"/>
+        <circle cx="28" cy="36" r="2.5" fill="#a5f3fc" opacity="0.95"/><circle cx="40" cy="36" r="3.5" fill="white"/><circle cx="52" cy="36" r="2.5" fill="#a5f3fc" opacity="0.95"/>
+        <circle cx="28" cy="46" r="2.5" fill="white" opacity="0.95"/><circle cx="40" cy="46" r="2.5" fill="white" opacity="0.95"/><circle cx="52" cy="46" r="2.5" fill="white" opacity="0.95"/>
+        <text x="84" y="44" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="28" font-weight="900" letter-spacing="3" fill="white">MEI TEXZ</text>
+        <line x1="84" y1="50" x2="298" y2="50" stroke="#0891b2" stroke-width="1.5" opacity="0.6"/>
+        <text x="84" y="63" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="9" font-weight="500" letter-spacing="5" fill="#a5f3fc">TECHNOLOGIES</text>
+      </svg>
+      <div class="hl" style="margin-top:1mm;"></div>
+      <div class="ah">ERP for <span>Any<br>Manufacturing<br>Sector</span></div>
+      <div class="at">"Building Intelligence Into Industry"</div>
+    </div>
+    <div style="font-size:5.5pt; color:rgba(255,255,255,0.55); position:relative; z-index:2;">
+      Santha Sree — CEO & Founder<br>+91 9176236675
+    </div>
+  </div>
+
+  <div class="main">
+    <div>
+      <div class="st">12+ Sectors We Serve</div>
+      <div class="sector-grid">
+        <div class="sc"><div class="ico">🧵</div><div class="nm">Textile</div><div class="ds">Technical & Medical</div></div>
+        <div class="sc"><div class="ico">👗</div><div class="nm">Garment</div><div class="ds">Apparel & Fashion</div></div>
+        <div class="sc"><div class="ico">💊</div><div class="nm">Pharma</div><div class="ds">GMP & Compliance</div></div>
+        <div class="sc"><div class="ico">🍞</div><div class="nm">Food</div><div class="ds">F&B Processing</div></div>
+        <div class="sc"><div class="ico">⚙️</div><div class="nm">Engineering</div><div class="ds">Metal & Fabrication</div></div>
+        <div class="sc"><div class="ico">🔌</div><div class="nm">Electronics</div><div class="ds">PCB & Assembly</div></div>
+        <div class="sc"><div class="ico">🚗</div><div class="nm">Automotive</div><div class="ds">Parts & OEM</div></div>
+        <div class="sc"><div class="ico">🧴</div><div class="nm">Chemical</div><div class="ds">Rubber & Plastics</div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="st">Every Sector Gets</div>
+      <div class="feat-row">
+        <div class="fc"><h4>Full ERP Core</h4><p>Purchasing, Sales, Inventory, Finance, HR</p></div>
+        <div class="fc"><h4>AI Chatbot</h4><p>Ask business questions in plain English</p></div>
+        <div class="fc"><h4>Cloud Hosted</h4><p>Access from any device, anywhere</p></div>
+        <div class="fc"><h4>Custom Modules</h4><p>Built for your specific industry needs</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BACK -->
+<div class="back">
+  <div class="bm">
+    <div class="bst">Full ERP Capabilities</div>
+    <div class="col2">
+      <div class="bc"><h4>Purchasing</h4><p>PO, GRN, supplier management</p></div>
+      <div class="bc"><h4>Sales</h4><p>Inquiry, quotation, invoice</p></div>
+      <div class="bc"><h4>Inventory</h4><p>Stock levels & movements</p></div>
+      <div class="bc"><h4>Production</h4><p>BOM, work orders, machines</p></div>
+      <div class="bc"><h4>Finance</h4><p>Accounts, journals, trial balance</p></div>
+      <div class="bc"><h4>HR & Payroll</h4><p>Employees, attendance, salary</p></div>
+      <div class="bc"><h4>Analytics</h4><p>RFM, churn, forecasting</p></div>
+      <div class="bc"><h4>Reports</h4><p>7 built-in report types</p></div>
+    </div>
+
+    <div style="margin-bottom:3mm;"><div class="bst">Platform Features</div></div>
+    <ul class="wl">
+      <li>10 complete UI themes — dark, light, corporate styles</li>
+      <li>Role-based access — each user sees only what they need</li>
+      <li>Full audit trail — every action logged</li>
+      <li>WhatsApp & email templates built in</li>
+    </ul>
+
+    <div class="cta">
+      <h3>Your Sector. Our ERP.</h3>
+      <p>Book a free consultation — we will map our ERP to your exact workflow</p>
+      <div class="ct">📞 +91 9176236675<br>✉ info@meitexz.com</div>
+    </div>
+  </div>
+
+  <div class="bs">
+    <div class="sts">Our Promise</div>
+    <div class="sm"><h4>Fast Deployment</h4><p>Go live within weeks</p></div>
+    <div class="sm"><h4>Fully Customised</h4><p>Built for your workflow</p></div>
+    <div class="sm"><h4>No Large Fees</h4><p>Competitive custom pricing</p></div>
+    <div class="sm"><h4>Ongoing Support</h4><p>We stay with you</p></div>
+    <div class="sm"><h4>AI Powered</h4><p>Claude AI built in</p></div>
+
+    <div style="margin-top:auto; padding-top:4mm; border-top:1px solid #e2e8f0; text-align:center;">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="110" height="28" style="display:block;margin:0 auto 2px;">
+        <defs><linearGradient id="icL2b" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#06b6d4"/><stop offset="50%" style="stop-color:#0891b2"/><stop offset="100%" style="stop-color:#0d1b2a"/></linearGradient><linearGradient id="icL2t" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#0d1b2a"/><stop offset="100%" style="stop-color:#1e3a5f"/></linearGradient></defs>
+        <polygon points="40,4 68,20 68,52 40,68 12,52 12,20" fill="url(#icL2b)"/>
+        <line x1="16" y1="26" x2="64" y2="26" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="13" y1="36" x2="67" y2="36" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="16" y1="46" x2="64" y2="46" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="40" cy="36" r="3.5" fill="white"/>
+        <text x="84" y="44" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="28" font-weight="900" letter-spacing="3" fill="url(#icL2t)">MEI TEXZ</text>
+        <text x="84" y="63" font-family="'Inter','Helvetica Neue',Arial,sans-serif" font-size="9" font-weight="500" letter-spacing="5" fill="#0891b2">TECHNOLOGIES</text>
+      </svg>
+      <div style="font-size:5pt; color:var(--muted); text-align:center;">Building Intelligence Into Industry</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

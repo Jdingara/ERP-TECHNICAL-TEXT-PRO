@@ -303,7 +303,7 @@ function DashboardPage() {
             }}>
                 <Box>
                     <Typography variant="h5" fontWeight="bold" letterSpacing={0.5}>
-                        SASI ERP — Business Intelligence
+                        MEI TEXZ ERP — Business Intelligence
                     </Typography>
                     <Typography fontSize={12} sx={{ opacity: 0.65, mt: 0.3 }}>
                         Medical &amp; Technical Textile · Live Dashboard
@@ -650,7 +650,7 @@ function DashboardPage() {
 
             <Divider sx={{ mt: 2, mb: 1.5 }} />
             <Typography variant="caption" color="text.secondary">
-                SASI ERP — Medical &amp; Technical Textile &nbsp;|&nbsp;
+                MEI TEXZ ERP — Medical &amp; Technical Textile &nbsp;|&nbsp;
                 Last refreshed: {lastRefresh} &nbsp;|&nbsp; Data updates on page load
             </Typography>
         </Box>

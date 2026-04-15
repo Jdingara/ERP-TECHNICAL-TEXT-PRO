@@ -14,6 +14,101 @@ import CheckIcon       from '@mui/icons-material/Check';
 import WallpaperIcon   from '@mui/icons-material/Wallpaper';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import StyleIcon      from '@mui/icons-material/Style';
+
+// ── Theme presets ─────────────────────────────────────────────
+const THEME_PRESETS = [
+    {
+        id: 'sap_classic',
+        name: 'SAP Classic',
+        emoji: '🏢',
+        desc: 'Dense enterprise layout. Sharp corners, compact rows, formal blue — just like SAP.',
+        settings: { themeMode: 'light', accentColor: '#1565C0', fontFamily: 'Roboto',
+                    fontSize: 'small', borderRadius: 'sharp', density: 'compact', sidebarSide: 'left' },
+        preview: ['#1565C0', '#1976D2', '#BBDEFB'],
+    },
+    {
+        id: 'modern_pro',
+        name: 'Modern Pro',
+        emoji: '✨',
+        desc: 'Clean contemporary design. Rounded cards, comfortable spacing, indigo accent.',
+        settings: { themeMode: 'light', accentColor: '#6366f1', fontFamily: 'Inter',
+                    fontSize: 'medium', borderRadius: 'medium', density: 'normal', sidebarSide: 'left' },
+        preview: ['#6366f1', '#818cf8', '#e0e7ff'],
+    },
+    {
+        id: 'dark_executive',
+        name: 'Dark Executive',
+        emoji: '💼',
+        desc: 'Dark mode with gold accents. Sleek and boardroom-ready.',
+        settings: { themeMode: 'dark', accentColor: '#f59e0b', fontFamily: 'DM Sans',
+                    fontSize: 'medium', borderRadius: 'medium', density: 'normal', sidebarSide: 'left' },
+        preview: ['#0f172a', '#1e293b', '#f59e0b'],
+    },
+    {
+        id: 'midnight',
+        name: 'Midnight',
+        emoji: '🌙',
+        desc: 'Dark navy with electric blue. Focused, distraction-free interface.',
+        settings: { themeMode: 'dark', accentColor: '#3b82f6', fontFamily: 'Inter',
+                    fontSize: 'medium', borderRadius: 'medium', density: 'normal', sidebarSide: 'left' },
+        preview: ['#0f172a', '#1e293b', '#3b82f6'],
+    },
+    {
+        id: 'casual_breeze',
+        name: 'Casual Breeze',
+        emoji: '🌊',
+        desc: 'Airy, spacious, friendly. Very rounded cards with teal accents and large text.',
+        settings: { themeMode: 'light', accentColor: '#14b8a6', fontFamily: 'Poppins',
+                    fontSize: 'large', borderRadius: 'round', density: 'comfortable', sidebarSide: 'left' },
+        preview: ['#14b8a6', '#5eead4', '#f0fdfa'],
+    },
+    {
+        id: 'zinzi_trendy',
+        name: 'Zinzi Trendy',
+        emoji: '🔥',
+        desc: 'Gen-Z vibes. Dark mode, rose pink, ultra-rounded, bold everything.',
+        settings: { themeMode: 'dark', accentColor: '#f43f5e', fontFamily: 'Poppins',
+                    fontSize: 'medium', borderRadius: 'round', density: 'comfortable', sidebarSide: 'left' },
+        preview: ['#0f172a', '#f43f5e', '#fb7185'],
+    },
+    {
+        id: 'neon_gaming',
+        name: 'Neon Gaming',
+        emoji: '🎮',
+        desc: 'Cyberpunk dark UI. Neon green accent, sharp corners, tight compact density.',
+        settings: { themeMode: 'dark', accentColor: '#10b981', fontFamily: 'Roboto',
+                    fontSize: 'medium', borderRadius: 'sharp', density: 'compact', sidebarSide: 'left' },
+        preview: ['#020617', '#0f172a', '#10b981'],
+    },
+    {
+        id: 'retro_90s',
+        name: 'Retro 90s',
+        emoji: '💾',
+        desc: 'Windows 95 nostalgia. Light, violet, sharp edges, small dense text.',
+        settings: { themeMode: 'light', accentColor: '#8b5cf6', fontFamily: 'Roboto',
+                    fontSize: 'small', borderRadius: 'sharp', density: 'compact', sidebarSide: 'left' },
+        preview: ['#8b5cf6', '#a78bfa', '#ede9fe'],
+    },
+    {
+        id: 'nature_forest',
+        name: 'Nature Forest',
+        emoji: '🌿',
+        desc: 'Calm earthy greens. Light mode, rounded cards — easy on the eyes for long days.',
+        settings: { themeMode: 'light', accentColor: '#16a34a', fontFamily: 'DM Sans',
+                    fontSize: 'medium', borderRadius: 'round', density: 'normal', sidebarSide: 'left' },
+        preview: ['#16a34a', '#4ade80', '#f0fdf4'],
+    },
+    {
+        id: 'rose_gold',
+        name: 'Rose Gold',
+        emoji: '🌸',
+        desc: 'Elegant and refined. Light mode, rose accent, rounded cards.',
+        settings: { themeMode: 'light', accentColor: '#f43f5e', fontFamily: 'Poppins',
+                    fontSize: 'medium', borderRadius: 'round', density: 'normal', sidebarSide: 'left' },
+        preview: ['#f43f5e', '#fb7185', '#fff1f2'],
+    },
+];
 
 const ACCENT_COLORS = [
     { label: 'Indigo',   value: '#6366f1' },
@@ -36,9 +131,11 @@ const FONT_OPTIONS = [
 function Section({ title, subtitle, children }) {
     return (
         <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
-            <Typography variant="subtitle1" fontWeight={700} color="text.primary" mb={0.5}>
-                {title}
-            </Typography>
+            <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
+                <Typography variant="subtitle1" fontWeight={700} color="text.primary">
+                    {title}
+                </Typography>
+            </Box>
             {subtitle && (
                 <Typography variant="body2" color="text.secondary" mb={2}>{subtitle}</Typography>
             )}
@@ -61,6 +158,7 @@ const LAYOUT_MODULES = [
     { label: 'Medical Textile',   prefixes: ['col_w_medical', 'col_w_surgical', 'col_w_bandage'] },
     { label: 'Reports',           prefixes: ['panel_row_report', 'chart_h_report', 'col_w_report',
                                               'inventoryreport', 'salesreport', 'purchasereport', 'financereport', 'productionreport'] },
+    { label: 'Customer Intelligence', prefixes: ['col_w_analytics_', 'chart_h_analytics_', 'panel_row_analytics_'] },
 ];
 
 function clearLayoutKeys(prefixes) {
@@ -74,8 +172,15 @@ function clearLayoutKeys(prefixes) {
 }
 
 function SettingsPage() {
-    const { settings, updateSetting, resetSettings } = useSettings();
+    const { settings, updateSetting, resetSettings, applyPreset } = useSettings();
     const [layoutResetMsg, setLayoutResetMsg] = useState('');
+    const [appliedPreset, setAppliedPreset]   = useState(null);
+
+    const handleApplyPreset = (preset) => {
+        applyPreset(preset.settings);
+        setAppliedPreset(preset.id);
+        setTimeout(() => setAppliedPreset(null), 2000);
+    };
 
     const showResetMsg = (label) => {
         setLayoutResetMsg(`${label} layout reset. Refresh or navigate away and back to see the default sizes.`);
@@ -102,11 +207,82 @@ function SettingsPage() {
     };
 
     return (
-        <Box maxWidth={720}>
+        <Box maxWidth={900}>
             <Typography variant="h5" fontWeight={700} mb={0.5}>Settings</Typography>
             <Typography variant="body2" color="text.secondary" mb={3}>
                 Customize the look and feel of your ERP. Changes apply instantly.
             </Typography>
+
+            {/* ── UI Theme Presets ── */}
+            <Section
+                title={<Box display="flex" alignItems="center" gap={1}><StyleIcon fontSize="small" />UI Theme Presets</Box>}
+                subtitle="Apply a complete look instantly — changes theme, colors, fonts, border style, and density all at once.">
+                <Grid container spacing={1.5}>
+                    {THEME_PRESETS.map(preset => {
+                        const isActive = appliedPreset === preset.id;
+                        return (
+                            <Grid item xs={12} sm={6} md={4} key={preset.id}>
+                                <Paper
+                                    variant="outlined"
+                                    sx={{
+                                        p: 1.5, borderRadius: 2, cursor: 'pointer',
+                                        border: isActive
+                                            ? `2px solid ${settings.accentColor}`
+                                            : '1.5px solid',
+                                        borderColor: isActive ? settings.accentColor : 'divider',
+                                        backgroundColor: isActive
+                                            ? settings.accentColor + '0d'
+                                            : 'transparent',
+                                        transition: 'all 0.15s',
+                                        '&:hover': { borderColor: settings.accentColor, backgroundColor: settings.accentColor + '08' },
+                                    }}
+                                    onClick={() => handleApplyPreset(preset)}
+                                >
+                                    {/* Color preview strip */}
+                                    <Box display="flex" mb={1} borderRadius={1} overflow="hidden" height={8}>
+                                        {preset.preview.map((c, i) => (
+                                            <Box key={i} sx={{ flex: 1, backgroundColor: c }} />
+                                        ))}
+                                    </Box>
+
+                                    {/* Name + emoji */}
+                                    <Box display="flex" alignItems="center" justifyContent="space-between" mb={0.4}>
+                                        <Typography fontWeight={700} fontSize={13} color="text.primary">
+                                            {preset.emoji} {preset.name}
+                                        </Typography>
+                                        {isActive && (
+                                            <CheckIcon sx={{ fontSize: 16, color: settings.accentColor }} />
+                                        )}
+                                    </Box>
+
+                                    {/* Description */}
+                                    <Typography fontSize={11} color="text.secondary" lineHeight={1.4}>
+                                        {preset.desc}
+                                    </Typography>
+
+                                    {/* Mini badges */}
+                                    <Box display="flex" gap={0.5} mt={1} flexWrap="wrap">
+                                        <Chip label={preset.settings.themeMode} size="small"
+                                            sx={{ height: 16, fontSize: 10,
+                                                backgroundColor: preset.settings.themeMode === 'dark' ? '#1e293b' : '#f1f5f9',
+                                                color:           preset.settings.themeMode === 'dark' ? '#e2e8f0'  : '#475569',
+                                            }} />
+                                        <Chip label={preset.settings.borderRadius} size="small"
+                                            sx={{ height: 16, fontSize: 10, backgroundColor: 'action.hover', color: 'text.secondary' }} />
+                                        <Chip label={preset.settings.density} size="small"
+                                            sx={{ height: 16, fontSize: 10, backgroundColor: 'action.hover', color: 'text.secondary' }} />
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                        );
+                    })}
+                </Grid>
+                <Typography variant="caption" color="text.secondary" mt={1.5} display="block">
+                    After applying a preset, you can still fine-tune any individual setting below.
+                </Typography>
+            </Section>
+
+            <Divider sx={{ my: 2 }} />
 
             {/* ── Theme ── */}
             <Section title="Theme" subtitle="Choose between light and dark mode.">
@@ -264,6 +440,55 @@ function SettingsPage() {
                 </ToggleButtonGroup>
             </Section>
 
+            {/* ── Border Radius ── */}
+            <Section title="Corner Style" subtitle="Controls how rounded buttons, cards, and input fields are.">
+                <Box display="flex" gap={2} flexWrap="wrap">
+                    {[
+                        { value: 'sharp',  label: 'Sharp',  desc: 'Square corners',    icon: '▬' },
+                        { value: 'medium', label: 'Medium', desc: 'Slightly rounded',   icon: '▢' },
+                        { value: 'round',  label: 'Round',  desc: 'Fully rounded',      icon: '◯' },
+                    ].map(opt => (
+                        <Box key={opt.value}
+                            onClick={() => updateSetting('borderRadius', opt.value)}
+                            sx={{
+                                p: 2, borderRadius: opt.value === 'sharp' ? 0 : opt.value === 'round' ? 3 : 1.5,
+                                border: settings.borderRadius === opt.value
+                                    ? `2px solid ${settings.accentColor}`
+                                    : '2px solid transparent',
+                                backgroundColor: settings.borderRadius === opt.value
+                                    ? settings.accentColor + '10'
+                                    : 'action.hover',
+                                cursor: 'pointer', textAlign: 'center', minWidth: 110,
+                                transition: 'all 0.15s',
+                                '&:hover': { backgroundColor: settings.accentColor + '15' },
+                            }}>
+                            <Typography fontSize={22} lineHeight={1}>{opt.icon}</Typography>
+                            <Typography fontWeight={600} fontSize={13}
+                                color={settings.borderRadius === opt.value ? settings.accentColor : 'text.primary'}>
+                                {opt.label}
+                            </Typography>
+                            <Typography fontSize={11} color="text.secondary">{opt.desc}</Typography>
+                        </Box>
+                    ))}
+                </Box>
+            </Section>
+
+            {/* ── Density ── */}
+            <Section title="Layout Density" subtitle="Controls the spacing and padding throughout tables and panels.">
+                <ToggleButtonGroup
+                    value={settings.density}
+                    exclusive
+                    onChange={(_, v) => v && updateSetting('density', v)}
+                    size="small">
+                    <ToggleButton value="compact"     sx={{ px: 3 }}>Compact</ToggleButton>
+                    <ToggleButton value="normal"      sx={{ px: 3 }}>Normal</ToggleButton>
+                    <ToggleButton value="comfortable" sx={{ px: 3 }}>Comfortable</ToggleButton>
+                </ToggleButtonGroup>
+                <Typography variant="caption" color="text.secondary" mt={1} display="block">
+                    Compact — more rows visible. Comfortable — easier to read. Normal — balanced.
+                </Typography>
+            </Section>
+
             {/* ── Sidebar Position ── */}
             <Section title="Sidebar Position" subtitle="Move the navigation sidebar to any side of the screen.">
                 <ToggleButtonGroup
@@ -326,6 +551,8 @@ function SettingsPage() {
                     <Chip size="small" label={`Theme: ${settings.themeMode}`} />
                     <Chip size="small" label={`Font: ${settings.fontFamily}`} />
                     <Chip size="small" label={`Size: ${settings.fontSize}`} />
+                    <Chip size="small" label={`Corners: ${settings.borderRadius}`} />
+                    <Chip size="small" label={`Density: ${settings.density}`} />
                     <Chip size="small" label={`Sidebar: ${settings.sidebarSide}`} />
                     <Chip size="small"
                         label={`Accent: ${ACCENT_COLORS.find(c => c.value === settings.accentColor)?.label || 'Custom'}`}
@@ -334,7 +561,7 @@ function SettingsPage() {
             </Paper>
 
             <Button variant="outlined" color="error"
-                onClick={() => { resetSettings(); updateSetting('bgImage', null); }}>
+                onClick={() => { resetSettings(); }}>
                 Reset to Defaults
             </Button>
         </Box>

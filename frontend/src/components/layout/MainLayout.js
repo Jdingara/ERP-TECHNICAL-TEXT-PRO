@@ -109,7 +109,7 @@ function MainLayout({ children, currentUser, onLogout, permissions, isAdmin }) {
     const [anchor, setAnchor] = useState(null);
     const { settings } = useSettings();
 
-    const pageTitle  = PAGE_TITLES[location.pathname] || 'SASI ERP';
+    const pageTitle  = PAGE_TITLES[location.pathname] || 'MEI TEXZ ERP';
     const moduleChip = getModuleChip(location.pathname);
     const initials   = (currentUser?.first_name?.[0] || currentUser?.username?.[0] || 'U').toUpperCase();
 

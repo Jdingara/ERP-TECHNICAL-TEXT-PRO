@@ -149,8 +149,8 @@ export default function ReportViewPage() {
                     {tmpl && (
                         <ShareWidget
                             title={tmpl.name}
-                            subject={`${tmpl.name} — SASI ERP Report`}
-                            message={`${tmpl.name}\nSource: ${tmpl.source_label || tmpl.source_key}\nRows: ${rows.length}\nGenerated: ${new Date().toLocaleDateString('en-IN')}\n\nSASI ERP`}
+                            subject={`${tmpl.name} — MEI TEXZ ERP Report`}
+                            message={`${tmpl.name}\nSource: ${tmpl.source_label || tmpl.source_key}\nRows: ${rows.length}\nGenerated: ${new Date().toLocaleDateString('en-IN')}\n\nMEI TEXZ ERP`}
                             onPrint={() => window.print()}
                         />
                     )}
