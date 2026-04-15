@@ -8,7 +8,7 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from .models import FinancialYear, DocumentSeries, MessageTemplate
+from .models import FinancialYear, DocumentSeries, MessageTemplate, Company
 
 
 def _require_admin(request):
@@ -219,3 +219,106 @@ def message_template_update(request, doc_type):
     tmpl.whatsapp_body  = data.get('whatsapp_body',  tmpl.whatsapp_body)
     tmpl.save()
     return JsonResponse({'message': 'Template saved.', 'template': _tmpl_to_dict(tmpl)})
+
+
+# ─── Company Master ──────────────────────────────────────────
+
+@require_http_methods(["GET"])
+def company_list(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'Not logged in.'}, status=401)
+    companies = Company.objects.filter(is_active=True)
+    return JsonResponse([c.to_dict() for c in companies], safe=False)
+
+
+@require_http_methods(["GET"])
+def company_active(request):
+    """Returns the currently default/active company for print headers."""
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'Not logged in.'}, status=401)
+    company = Company.objects.filter(is_default=True, is_active=True).first()
+    if not company:
+        company = Company.objects.filter(is_active=True).first()
+    if not company:
+        return JsonResponse({}, safe=False)
+    return JsonResponse(company.to_dict())
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def company_create(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'Not logged in.'}, status=401)
+    data = json.loads(request.body)
+    is_first = not Company.objects.filter(is_active=True).exists()
+    company = Company.objects.create(
+        name           = data.get('name', '').strip(),
+        tagline        = data.get('tagline', ''),
+        address_line1  = data.get('address_line1', ''),
+        address_line2  = data.get('address_line2', ''),
+        city           = data.get('city', ''),
+        state          = data.get('state', ''),
+        pincode        = data.get('pincode', ''),
+        country        = data.get('country', 'India'),
+        phone          = data.get('phone', ''),
+        email          = data.get('email', ''),
+        website        = data.get('website', ''),
+        gstin          = data.get('gstin', ''),
+        pan_number     = data.get('pan_number', ''),
+        state_code     = data.get('state_code', ''),
+        contact_person = data.get('contact_person', ''),
+        contact_phone  = data.get('contact_phone', ''),
+        contact_email  = data.get('contact_email', ''),
+        is_default     = is_first,   # first company auto-becomes default
+    )
+    return JsonResponse({'message': 'Company created.', 'company': company.to_dict()}, status=201)
+
+
+@csrf_exempt
+@require_http_methods(["PUT"])
+def company_update(request, company_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'Not logged in.'}, status=401)
+    try:
+        company = Company.objects.get(id=company_id)
+    except Company.DoesNotExist:
+        return JsonResponse({'message': 'Company not found.'}, status=404)
+    data = json.loads(request.body)
+    for field in ['name','tagline','address_line1','address_line2','city','state',
+                  'pincode','country','phone','email','website','gstin','pan_number',
+                  'state_code','contact_person','contact_phone','contact_email']:
+        if field in data:
+            setattr(company, field, data[field])
+    company.save()
+    return JsonResponse({'message': 'Company updated.', 'company': company.to_dict()})
+
+
+@csrf_exempt
+@require_http_methods(["DELETE"])
+def company_delete(request, company_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'Not logged in.'}, status=401)
+    try:
+        company = Company.objects.get(id=company_id)
+    except Company.DoesNotExist:
+        return JsonResponse({'message': 'Company not found.'}, status=404)
+    if company.is_default:
+        return JsonResponse({'message': 'Cannot delete the active company. Set another as active first.'}, status=400)
+    company.is_active = False
+    company.save()
+    return JsonResponse({'message': 'Company deleted.'})
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def company_set_default(request, company_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'Not logged in.'}, status=401)
+    try:
+        company = Company.objects.get(id=company_id)
+    except Company.DoesNotExist:
+        return JsonResponse({'message': 'Company not found.'}, status=404)
+    Company.objects.all().update(is_default=False)
+    company.is_default = True
+    company.save()
+    return JsonResponse({'message': f'{company.name} is now the active company.', 'company': company.to_dict()})

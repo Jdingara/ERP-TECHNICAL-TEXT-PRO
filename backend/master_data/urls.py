@@ -24,6 +24,14 @@ urlpatterns = [
     path('settings/message-templates/',                      settings_views.message_template_list,   name='msg-tmpl-list'),
     path('settings/message-templates/<str:doc_type>/',       settings_views.message_template_update, name='msg-tmpl-update'),
 
+    # ── Company Master ────────────────────────────────────────
+    path('settings/companies/',                              settings_views.company_list,         name='company-list'),
+    path('settings/companies/active/',                       settings_views.company_active,       name='company-active'),
+    path('settings/companies/create/',                       settings_views.company_create,       name='company-create'),
+    path('settings/companies/<int:company_id>/',             settings_views.company_update,       name='company-update'),
+    path('settings/companies/<int:company_id>/delete/',      settings_views.company_delete,       name='company-delete'),
+    path('settings/companies/<int:company_id>/set-default/', settings_views.company_set_default,  name='company-set-default'),
+
 
     # Units of Measure
     path('units/',              views.unit_of_measure_list_and_create,  name='unit-list'),

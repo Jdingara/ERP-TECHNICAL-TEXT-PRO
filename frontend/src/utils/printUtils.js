@@ -5,14 +5,31 @@
 //          and opens them in a new window for browser printing.
 // ============================================================
 
-// Company info — update logo path once final logo is available
-const COMPANY = {
+// ────────────────────────────────────────────────────────────
+// Active company — loaded from localStorage (set by Company Master).
+// Falls back to defaults if no company has been configured yet.
+// ────────────────────────────────────────────────────────────
+function getActiveCompany() {
+    try {
+        const stored = localStorage.getItem('meitexz_active_company');
+        if (stored) return JSON.parse(stored);
+    } catch {}
+    return null;
+}
+
+function buildAddress(c) {
+    return [c.address_line1, c.address_line2, c.city, c.state, c.pincode]
+        .filter(Boolean).join(', ');
+}
+
+// Fallback when no company configured yet
+const COMPANY_FALLBACK = {
     name:    'MEI TEXZ Technologies',
     tagline: 'Medical & Technical Textiles',
     address: 'Coimbatore, Tamilnadu 641062',
     phone:   '+91 9176236675',
     email:   'info@meitexz.com',
-    gstin:   '33AABCS1234A1Z5',
+    gstin:   '',
     website: 'www.meitexz.com',
 };
 
@@ -144,16 +161,23 @@ function getPrintCSS() {
 // Shared header / footer builders
 // ────────────────────────────────────────────────────────────
 function companyHeader(docType, docNumber, docDate, extraDate = '') {
+    const co  = getActiveCompany();
+    const name    = co ? co.name    : COMPANY_FALLBACK.name;
+    const tagline = co ? co.tagline : COMPANY_FALLBACK.tagline;
+    const address = co ? buildAddress(co) : COMPANY_FALLBACK.address;
+    const phone   = co ? co.phone   : COMPANY_FALLBACK.phone;
+    const email   = co ? co.email   : COMPANY_FALLBACK.email;
+    const gstin   = co ? co.gstin   : COMPANY_FALLBACK.gstin;
     return `
     <div class="header">
       <div class="company-block">
         ${LOGO_SVG}
         <div class="company-info">
-          <h1>${COMPANY.name}</h1>
-          <div class="tagline">${COMPANY.tagline}</div>
-          <p>${COMPANY.address}</p>
-          <p>Tel: ${COMPANY.phone} &nbsp;|&nbsp; ${COMPANY.email}</p>
-          <p>GSTIN: ${COMPANY.gstin}</p>
+          <h1>${name}</h1>
+          ${tagline ? `<div class="tagline">${tagline}</div>` : ''}
+          ${address ? `<p>${address}</p>` : ''}
+          <p>${phone ? `Tel: ${phone}` : ''}${phone && email ? ' &nbsp;|&nbsp; ' : ''}${email || ''}</p>
+          ${gstin ? `<p>GSTIN: ${gstin}</p>` : ''}
         </div>
       </div>
       <div class="doc-title-block">
@@ -166,10 +190,15 @@ function companyHeader(docType, docNumber, docDate, extraDate = '') {
 }
 
 function pageFooter() {
+    const co      = getActiveCompany();
+    const name    = co ? co.name    : COMPANY_FALLBACK.name;
+    const address = co ? buildAddress(co) : COMPANY_FALLBACK.address;
+    const gstin   = co ? co.gstin   : COMPANY_FALLBACK.gstin;
+    const website = co ? co.website : COMPANY_FALLBACK.website;
     return `
     <div class="footer">
-      <span>${COMPANY.name} | ${COMPANY.address}</span>
-      <span>GSTIN: ${COMPANY.gstin} | ${COMPANY.website}</span>
+      <span>${name}${address ? ' | ' + address : ''}</span>
+      <span>${gstin ? 'GSTIN: ' + gstin + ' | ' : ''}${website || ''}</span>
     </div>`;
 }
 
@@ -275,7 +304,7 @@ export function printQuotation(qt) {
         </div>
         <div class="sig-box">
           <div class="sig-space"></div>
-          <div class="title">For ${COMPANY.name}</div>
+          <div class="title">For ${(getActiveCompany() || COMPANY_FALLBACK).name}</div>
           <div class="sub">Authorised Signatory</div>
         </div>
       </div>
@@ -366,7 +395,7 @@ export function printSalesOrder(so) {
         </div>
         <div class="sig-box">
           <div class="sig-space"></div>
-          <div class="title">For ${COMPANY.name}</div>
+          <div class="title">For ${(getActiveCompany() || COMPANY_FALLBACK).name}</div>
           <div class="sub">Sales Manager / Authorised Signatory</div>
         </div>
       </div>
@@ -434,7 +463,7 @@ export function printDeliveryChallan(so) {
         <div class="sig-box">
           <div class="sig-space"></div>
           <div class="title">Dispatched By</div>
-          <div class="sub">For ${COMPANY.name}</div>
+          <div class="sub">For ${(getActiveCompany() || COMPANY_FALLBACK).name}</div>
         </div>
       </div>
       ${pageFooter()}
@@ -531,7 +560,7 @@ export function printInvoice(inv, soLines = []) {
         <div class="info-box">
           <h3>Bank Details for Payment</h3>
           <p>Bank: <strong>HDFC Bank</strong></p>
-          <p>Account Name: <strong>${COMPANY.name}</strong></p>
+          <p>Account Name: <strong>${(getActiveCompany() || COMPANY_FALLBACK).name}</strong></p>
           <p>Account No.: <strong>HDFC123456789</strong></p>
           <p>IFSC: <strong>HDFC0001234</strong></p>
           <p>Branch: Tiruppur</p>
@@ -550,7 +579,7 @@ export function printInvoice(inv, soLines = []) {
         </div>
         <div class="sig-box">
           <div class="sig-space"></div>
-          <div class="title">For ${COMPANY.name}</div>
+          <div class="title">For ${(getActiveCompany() || COMPANY_FALLBACK).name}</div>
           <div class="sub">Authorised Signatory</div>
         </div>
       </div>
@@ -636,7 +665,7 @@ export function printPurchaseOrder(po) {
         </div>
         <div class="sig-box">
           <div class="sig-space"></div>
-          <div class="title">For ${COMPANY.name}</div>
+          <div class="title">For ${(getActiveCompany() || COMPANY_FALLBACK).name}</div>
           <div class="sub">Purchase Manager / Authorised Signatory</div>
         </div>
       </div>

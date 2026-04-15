@@ -63,6 +63,9 @@ const PAGE_TITLES = {
     '/reports/finance':                     'Finance Report',
     '/reports/hr':                          'HR Report',
     '/settings':                            'Settings',
+    '/settings/company-master':             'Company Master',
+    '/settings/format-panel':              'Format Panel',
+    '/settings/message-templates':         'Message Templates',
     '/admin':                               'Admin Panel',
 };
 

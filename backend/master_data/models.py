@@ -9,6 +9,104 @@ from django.db import models
 
 
 # ============================================================
+# COMPANY
+# The client's own company details — used in all print
+# headers (quotation, invoice, sales order, etc.)
+# A client can add multiple companies and switch between them.
+# ============================================================
+class Company(models.Model):
+
+    INDIAN_STATES = [
+        ('Andhra Pradesh', 'Andhra Pradesh'), ('Arunachal Pradesh', 'Arunachal Pradesh'),
+        ('Assam', 'Assam'), ('Bihar', 'Bihar'), ('Chhattisgarh', 'Chhattisgarh'),
+        ('Goa', 'Goa'), ('Gujarat', 'Gujarat'), ('Haryana', 'Haryana'),
+        ('Himachal Pradesh', 'Himachal Pradesh'), ('Jharkhand', 'Jharkhand'),
+        ('Karnataka', 'Karnataka'), ('Kerala', 'Kerala'), ('Madhya Pradesh', 'Madhya Pradesh'),
+        ('Maharashtra', 'Maharashtra'), ('Manipur', 'Manipur'), ('Meghalaya', 'Meghalaya'),
+        ('Mizoram', 'Mizoram'), ('Nagaland', 'Nagaland'), ('Odisha', 'Odisha'),
+        ('Punjab', 'Punjab'), ('Rajasthan', 'Rajasthan'), ('Sikkim', 'Sikkim'),
+        ('Tamil Nadu', 'Tamil Nadu'), ('Telangana', 'Telangana'), ('Tripura', 'Tripura'),
+        ('Uttar Pradesh', 'Uttar Pradesh'), ('Uttarakhand', 'Uttarakhand'),
+        ('West Bengal', 'West Bengal'),
+        ('Andaman and Nicobar Islands', 'Andaman and Nicobar Islands'),
+        ('Chandigarh', 'Chandigarh'), ('Dadra and Nagar Haveli and Daman and Diu', 'Dadra & NH and Daman & Diu'),
+        ('Delhi', 'Delhi'), ('Jammu and Kashmir', 'Jammu and Kashmir'),
+        ('Ladakh', 'Ladakh'), ('Lakshadweep', 'Lakshadweep'), ('Puducherry', 'Puducherry'),
+    ]
+
+    # Basic info
+    name            = models.CharField(max_length=200)
+    tagline         = models.CharField(max_length=200, blank=True)
+
+    # Address
+    address_line1   = models.CharField(max_length=255, blank=True)
+    address_line2   = models.CharField(max_length=255, blank=True)
+    city            = models.CharField(max_length=100, blank=True)
+    state           = models.CharField(max_length=100, blank=True, choices=INDIAN_STATES)
+    pincode         = models.CharField(max_length=10, blank=True)
+    country         = models.CharField(max_length=100, default='India')
+
+    # Contact
+    phone           = models.CharField(max_length=20, blank=True)
+    email           = models.EmailField(blank=True)
+    website         = models.CharField(max_length=100, blank=True)
+
+    # Tax info
+    gstin           = models.CharField(max_length=20, blank=True)
+    pan_number      = models.CharField(max_length=20, blank=True)
+    state_code      = models.CharField(max_length=5, blank=True)   # e.g. 33 for Tamil Nadu
+
+    # Contact person
+    contact_person  = models.CharField(max_length=100, blank=True)
+    contact_phone   = models.CharField(max_length=20, blank=True)
+    contact_email   = models.EmailField(blank=True)
+
+    # Status
+    is_default      = models.BooleanField(default=False)   # the active/selected company
+    is_active       = models.BooleanField(default=True)
+    created_at      = models.DateTimeField(auto_now_add=True)
+    updated_at      = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'master_company'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        # If this company is being set as default, clear all others
+        if self.is_default:
+            Company.objects.exclude(pk=self.pk).update(is_default=False)
+        super().save(*args, **kwargs)
+
+    def to_dict(self):
+        return {
+            'id':             self.id,
+            'name':           self.name,
+            'tagline':        self.tagline,
+            'address_line1':  self.address_line1,
+            'address_line2':  self.address_line2,
+            'city':           self.city,
+            'state':          self.state,
+            'pincode':        self.pincode,
+            'country':        self.country,
+            'phone':          self.phone,
+            'email':          self.email,
+            'website':        self.website,
+            'gstin':          self.gstin,
+            'pan_number':     self.pan_number,
+            'state_code':     self.state_code,
+            'contact_person': self.contact_person,
+            'contact_phone':  self.contact_phone,
+            'contact_email':  self.contact_email,
+            'is_default':     self.is_default,
+            'is_active':      self.is_active,
+            'created_at':     self.created_at.strftime('%Y-%m-%d'),
+        }
+
+
+# ============================================================
 # UNIT OF MEASURE
 # Examples: kg, meters, rolls, pieces, liters
 # ============================================================

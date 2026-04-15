@@ -114,6 +114,7 @@ const MENU_ITEMS = [
         { title: 'HR Report',         path: '/reports/hr' },
     ]},
     { title: 'Settings', icon: <TuneIcon />, children: [
+        { title: 'Company Master',     path: '/settings/company-master' },
         { title: 'Format Panel',       path: '/settings/format-panel' },
         { title: 'Message Templates',  path: '/settings/message-templates' },
     ]},
