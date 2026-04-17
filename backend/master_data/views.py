@@ -11,6 +11,7 @@ import json
 
 from .models import Item, ItemCategory, UnitOfMeasure, Supplier, Customer, Warehouse
 from .doc_series_utils import generate_next_number
+from .company_utils import get_active_company
 from authentication.audit import log_action, field_diff
 
 
@@ -127,12 +128,16 @@ def item_category_list_and_create(request):
 def item_list_and_create(request):
     """ GET = list all items | POST = create new item """
 
+    company = get_active_company(request)
+
     if request.method == 'GET':
         items = Item.objects.select_related('category', 'unit_of_measure').filter(is_active=True)
+        if company:
+            items = items.filter(company=company)
         search = request.GET.get('search', '')
         if search:
             items = items.filter(item_name__icontains=search) | \
-                    Item.objects.filter(item_code__icontains=search, is_active=True)
+                    items.filter(item_code__icontains=search)
         item_type = request.GET.get('item_type', '')
         if item_type:
             items = items.filter(item_type=item_type)
@@ -145,6 +150,7 @@ def item_list_and_create(request):
             if not item_code:
                 return JsonResponse({'message': 'Item code required. Enable auto-numbering in Settings → Format Panel.'}, status=400)
             item = Item.objects.create(
+                company             = company,
                 item_code           = item_code,
                 item_name           = data['item_name'],
                 item_type           = data['item_type'],
@@ -206,8 +212,12 @@ def item_detail_update_delete(request, item_id):
 def supplier_list_and_create(request):
     """ GET = list all suppliers | POST = create new supplier """
 
+    company = get_active_company(request)
+
     if request.method == 'GET':
         suppliers = Supplier.objects.filter(is_active=True)
+        if company:
+            suppliers = suppliers.filter(company=company)
         search = request.GET.get('search', '')
         if search:
             suppliers = suppliers.filter(supplier_name__icontains=search)
@@ -220,6 +230,7 @@ def supplier_list_and_create(request):
             if not supplier_code:
                 return JsonResponse({'message': 'Supplier code required. Enable auto-numbering in Settings → Format Panel.'}, status=400)
             supplier = Supplier.objects.create(
+                company         = company,
                 supplier_code   = supplier_code,
                 supplier_name   = data['supplier_name'],
                 supplier_type   = data.get('supplier_type', 'other'),
@@ -279,8 +290,12 @@ def supplier_detail_update_delete(request, supplier_id):
 def customer_list_and_create(request):
     """ GET = list all customers | POST = create new customer """
 
+    company = get_active_company(request)
+
     if request.method == 'GET':
         customers = Customer.objects.filter(is_active=True)
+        if company:
+            customers = customers.filter(company=company)
         search = request.GET.get('search', '')
         if search:
             customers = customers.filter(customer_name__icontains=search)
@@ -293,6 +308,7 @@ def customer_list_and_create(request):
             if not customer_code:
                 return JsonResponse({'message': 'Customer code required. Enable auto-numbering in Settings → Format Panel.'}, status=400)
             customer = Customer.objects.create(
+                company         = company,
                 customer_code   = customer_code,
                 customer_name   = data['customer_name'],
                 customer_type   = data.get('customer_type', 'domestic'),
@@ -353,8 +369,12 @@ def customer_detail_update_delete(request, customer_id):
 def warehouse_list_and_create(request):
     """ GET = list all warehouses | POST = create new warehouse """
 
+    company = get_active_company(request)
+
     if request.method == 'GET':
         warehouses = Warehouse.objects.filter(is_active=True)
+        if company:
+            warehouses = warehouses.filter(company=company)
         return JsonResponse({'warehouses': [warehouse_to_dict(w) for w in warehouses]})
 
     if request.method == 'POST':
@@ -364,6 +384,7 @@ def warehouse_list_and_create(request):
             if not wh_code:
                 return JsonResponse({'message': 'Warehouse code required. Enable auto-numbering in Settings → Format Panel.'}, status=400)
             warehouse = Warehouse.objects.create(
+                company = company,
                 name    = data['name'],
                 code    = wh_code,
                 address = data.get('address', ''),

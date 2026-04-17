@@ -13,6 +13,7 @@ from .models import SalesOrder, SalesOrderLine, Invoice, CustomerInquiry, Quotat
 from datetime import date
 from inventory.models import Stock, StockMovement
 from master_data.doc_series_utils import generate_next_number
+from master_data.company_utils import get_active_company
 from authentication.audit import log_action, field_diff
 
 
@@ -88,8 +89,12 @@ def invoice_to_dict(inv):
 def sales_order_list_and_create(request):
     """ GET = list all SOs | POST = create new SO """
 
+    company = get_active_company(request)
+
     if request.method == 'GET':
         orders = SalesOrder.objects.select_related('customer', 'warehouse').all()
+        if company:
+            orders = orders.filter(company=company)
         status_filter = request.GET.get('status', '')
         if status_filter:
             orders = orders.filter(status=status_filter)
@@ -103,6 +108,7 @@ def sales_order_list_and_create(request):
                 if not so_number:
                     return JsonResponse({'message': 'SO number required or enable auto-numbering in Format Panel.'}, status=400)
                 so = SalesOrder.objects.create(
+                    company         = company,
                     so_number       = so_number,
                     customer_id     = data['customer_id'],
                     warehouse_id    = data['warehouse_id'],
@@ -197,7 +203,7 @@ def sales_order_deliver(request, so_id):
 
                 # Check stock
                 try:
-                    stock = Stock.objects.get(item=line.item, warehouse=so.warehouse)
+                    stock = Stock.objects.get(item=line.item, warehouse=so.warehouse, company=so.company)
                 except Stock.DoesNotExist:
                     raise ValueError(f'No stock found for {line.item.item_code} in {so.warehouse.name}')
 
@@ -243,8 +249,12 @@ def sales_order_deliver(request, so_id):
 def invoice_list_and_create(request):
     """ GET = list all invoices | POST = create invoice from SO """
 
+    company = get_active_company(request)
+
     if request.method == 'GET':
         invoices = Invoice.objects.select_related('customer', 'sales_order').all()
+        if company:
+            invoices = invoices.filter(company=company)
         return JsonResponse({'invoices': [invoice_to_dict(i) for i in invoices], 'total': invoices.count()})
 
     if request.method == 'POST':
@@ -255,6 +265,7 @@ def invoice_list_and_create(request):
             if not inv_number:
                 return JsonResponse({'message': 'Invoice number required or enable auto-numbering in Format Panel.'}, status=400)
             invoice = Invoice.objects.create(
+                company         = company,
                 invoice_number  = inv_number,
                 sales_order     = so,
                 customer        = so.customer,
@@ -304,8 +315,12 @@ def inquiry_to_dict(inq):
 
 @csrf_exempt
 def inquiry_list_and_create(request):
+    company = get_active_company(request)
+
     if request.method == 'GET':
         inquiries = CustomerInquiry.objects.select_related('customer').all()
+        if company:
+            inquiries = inquiries.filter(company=company)
         status_filter = request.GET.get('status', '')
         if status_filter:
             inquiries = inquiries.filter(status=status_filter)
@@ -322,6 +337,7 @@ def inquiry_list_and_create(request):
             inq_number = f'{prefix}{str(next_num).zfill(3)}'
 
             inq = CustomerInquiry.objects.create(
+                company             = company,
                 inquiry_number      = inq_number,
                 customer_id         = data['customer_id'],
                 received_date       = data['received_date'],
@@ -413,8 +429,12 @@ def quotation_to_dict(qt):
 
 @csrf_exempt
 def quotation_list_and_create(request):
+    company = get_active_company(request)
+
     if request.method == 'GET':
         quotations = Quotation.objects.select_related('customer', 'inquiry').all()
+        if company:
+            quotations = quotations.filter(company=company)
         status_filter = request.GET.get('status', '')
         if status_filter:
             quotations = quotations.filter(status=status_filter)
@@ -442,6 +462,7 @@ def quotation_list_and_create(request):
                     customer_id = inquiry.customer_id
 
             qt = Quotation.objects.create(
+                company             = company,
                 quotation_number    = qt_number,
                 inquiry             = inquiry,
                 customer_id         = customer_id,

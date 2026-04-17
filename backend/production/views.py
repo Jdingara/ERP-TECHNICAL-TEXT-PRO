@@ -14,6 +14,7 @@ from datetime import date
 
 from .models import BillOfMaterials, BOMLine, WorkOrder, WorkOrderMaterialConsumption, Batch, QualityCheck, Machine
 from inventory.models import Stock, StockMovement
+from master_data.company_utils import get_active_company
 from authentication.audit import log_action, field_diff
 
 
@@ -84,8 +85,12 @@ def work_order_to_dict(wo, include_lines=False):
 
 @csrf_exempt
 def bom_list_and_create(request):
+    company = get_active_company(request)
+
     if request.method == 'GET':
         boms = BillOfMaterials.objects.select_related('finished_product').all()
+        if company:
+            boms = boms.filter(company=company)
         return JsonResponse({'boms': [bom_to_dict(b) for b in boms], 'total': boms.count()})
 
     if request.method == 'POST':
@@ -93,6 +98,7 @@ def bom_list_and_create(request):
         try:
             with transaction.atomic():
                 bom = BillOfMaterials.objects.create(
+                    company             = company,
                     bom_name            = data['bom_name'],
                     finished_product_id = data['finished_product_id'],
                     quantity_produced   = data.get('quantity_produced', 1),
@@ -132,8 +138,12 @@ def bom_detail(request, bom_id):
 
 @csrf_exempt
 def work_order_list_and_create(request):
+    company = get_active_company(request)
+
     if request.method == 'GET':
         wos = WorkOrder.objects.select_related('bom', 'finished_product', 'warehouse').all()
+        if company:
+            wos = wos.filter(company=company)
         status_filter = request.GET.get('status', '')
         if status_filter:
             wos = wos.filter(status=status_filter)
@@ -155,6 +165,7 @@ def work_order_list_and_create(request):
                 wo_number = f'{prefix}{str(next_num).zfill(3)}'
 
                 wo = WorkOrder.objects.create(
+                    company             = company,
                     work_order_number   = wo_number,
                     bom                 = bom,
                     finished_product    = bom.finished_product,
@@ -356,8 +367,12 @@ def machine_to_dict(m):
 
 @csrf_exempt
 def machine_list_and_create(request):
+    company = get_active_company(request)
+
     if request.method == 'GET':
         machines = Machine.objects.all()
+        if company:
+            machines = machines.filter(company=company)
         type_filter = request.GET.get('type', '')
         if type_filter:
             machines = machines.filter(machine_type=type_filter)
@@ -367,6 +382,7 @@ def machine_list_and_create(request):
         data = json.loads(request.body)
         try:
             machine = Machine.objects.create(
+                company       = company,
                 machine_code  = data['machine_code'],
                 machine_name  = data['machine_name'],
                 machine_type  = data['machine_type'],

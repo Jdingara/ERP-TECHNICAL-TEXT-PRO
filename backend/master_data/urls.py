@@ -31,6 +31,7 @@ urlpatterns = [
     path('settings/companies/<int:company_id>/',             settings_views.company_update,       name='company-update'),
     path('settings/companies/<int:company_id>/delete/',      settings_views.company_delete,       name='company-delete'),
     path('settings/companies/<int:company_id>/set-default/', settings_views.company_set_default,  name='company-set-default'),
+    path('settings/companies/switch/',                        settings_views.company_switch_session, name='company-switch'),
 
 
     # Units of Measure

@@ -148,6 +148,7 @@ class ItemCategory(models.Model):
 # used in the textile factory is stored here.
 # ============================================================
 class Item(models.Model):
+    company         = models.ForeignKey('Company', on_delete=models.CASCADE, null=True, blank=True, db_index=True)
 
     # Item type choices
     ITEM_TYPE_CHOICES = [
@@ -194,6 +195,7 @@ class Item(models.Model):
 # A factory can have multiple warehouses.
 # ============================================================
 class Warehouse(models.Model):
+    company     = models.ForeignKey('Company', on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     name        = models.CharField(max_length=100)
     code        = models.CharField(max_length=20, unique=True)
     address     = models.TextField(blank=True)
@@ -213,6 +215,7 @@ class Warehouse(models.Model):
 # Companies or people from whom you buy raw materials.
 # ============================================================
 class Supplier(models.Model):
+    company         = models.ForeignKey('Company', on_delete=models.CASCADE, null=True, blank=True, db_index=True)
 
     SUPPLIER_TYPE_CHOICES = [
         ('yarn_supplier',       'Yarn Supplier'),
@@ -261,6 +264,7 @@ class Supplier(models.Model):
 # Companies or people to whom you sell products.
 # ============================================================
 class Customer(models.Model):
+    company         = models.ForeignKey('Company', on_delete=models.CASCADE, null=True, blank=True, db_index=True)
 
     CUSTOMER_TYPE_CHOICES = [
         ('domestic',    'Domestic'),

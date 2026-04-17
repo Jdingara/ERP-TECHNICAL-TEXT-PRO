@@ -11,6 +11,7 @@ from django.db.models import Sum
 import json
 
 from .models import Account, AccountType, JournalEntry, JournalEntryLine
+from master_data.company_utils import get_active_company
 from authentication.audit import log_action, field_diff
 
 
@@ -69,8 +70,12 @@ def journal_to_dict(entry, include_lines=False):
 def account_list_and_create(request):
     """ GET = list all accounts | POST = create new account """
 
+    company = get_active_company(request)
+
     if request.method == 'GET':
         accounts = Account.objects.filter(is_active=True)
+        if company:
+            accounts = accounts.filter(company=company)
         category = request.GET.get('category', '')
         if category:
             accounts = accounts.filter(account_category=category)
@@ -83,6 +88,7 @@ def account_list_and_create(request):
         data = json.loads(request.body)
         try:
             account = Account.objects.create(
+                company             = company,
                 account_code        = data['account_code'],
                 account_name        = data['account_name'],
                 account_category    = data['account_category'],
@@ -122,8 +128,12 @@ def account_detail_update(request, account_id):
 def journal_entry_list_and_create(request):
     """ GET = list all journal entries | POST = create new entry """
 
+    company = get_active_company(request)
+
     if request.method == 'GET':
         entries = JournalEntry.objects.all()
+        if company:
+            entries = entries.filter(company=company)
         return JsonResponse({'journal_entries': [journal_to_dict(e) for e in entries], 'total': entries.count()})
 
     if request.method == 'POST':
@@ -131,6 +141,7 @@ def journal_entry_list_and_create(request):
         try:
             with transaction.atomic():
                 entry = JournalEntry.objects.create(
+                    company         = company,
                     entry_number    = data['entry_number'],
                     entry_date      = data['entry_date'],
                     description     = data['description'],

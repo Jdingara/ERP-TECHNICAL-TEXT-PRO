@@ -11,6 +11,7 @@ import json
 
 from .models import Department, Employee, Attendance, SalaryRecord
 from master_data.doc_series_utils import generate_next_number
+from master_data.company_utils import get_active_company
 from authentication.audit import log_action, field_diff
 
 
@@ -95,14 +96,19 @@ def salary_to_dict(s):
 
 @csrf_exempt
 def department_list_and_create(request):
+    company = get_active_company(request)
+
     if request.method == 'GET':
         depts = Department.objects.filter(is_active=True)
+        if company:
+            depts = depts.filter(company=company)
         return JsonResponse({'departments': [department_to_dict(d) for d in depts]})
 
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
             dept = Department.objects.create(
+                company=company,
                 name=data['name'], code=data['code'],
                 description=data.get('description', '')
             )
@@ -117,12 +123,16 @@ def department_list_and_create(request):
 
 @csrf_exempt
 def employee_list_and_create(request):
+    company = get_active_company(request)
+
     if request.method == 'GET':
         employees = Employee.objects.select_related('department').filter(status='active')
+        if company:
+            employees = employees.filter(company=company)
         search = request.GET.get('search', '')
         if search:
             employees = employees.filter(first_name__icontains=search) | \
-                        Employee.objects.filter(employee_code__icontains=search, status='active')
+                        employees.filter(employee_code__icontains=search)
         dept_id = request.GET.get('department_id', '')
         if dept_id:
             employees = employees.filter(department_id=dept_id)
@@ -135,6 +145,7 @@ def employee_list_and_create(request):
             if not emp_code:
                 return JsonResponse({'message': 'Employee code required or enable auto-numbering in Format Panel.'}, status=400)
             emp = Employee.objects.create(
+                company         = company,
                 employee_code   = emp_code,
                 first_name      = data['first_name'],
                 last_name       = data.get('last_name', ''),

@@ -7,7 +7,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from master_data.models import Item, Warehouse
+from master_data.models import Item, Warehouse, Company
 
 
 # ============================================================
@@ -16,6 +16,7 @@ from master_data.models import Item, Warehouse
 # This is the main stock balance table.
 # ============================================================
 class Stock(models.Model):
+    company     = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     item        = models.ForeignKey(Item, on_delete=models.CASCADE)
     warehouse   = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
     quantity    = models.DecimalField(max_digits=14, decimal_places=3, default=0)
@@ -49,6 +50,7 @@ class StockMovement(models.Model):
     ]
 
     # What moved
+    company         = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     item            = models.ForeignKey(Item, on_delete=models.CASCADE)
     warehouse       = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
     movement_type   = models.CharField(max_length=20, choices=MOVEMENT_TYPE_CHOICES)
@@ -82,6 +84,7 @@ class StockAdjustment(models.Model):
         ('confirmed',   'Confirmed'),
     ]
 
+    company             = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     adjustment_number   = models.CharField(max_length=50, unique=True)
     warehouse           = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
     adjustment_date     = models.DateField()

@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from .models import FinancialYear, DocumentSeries, MessageTemplate, Company
+from .company_utils import get_active_company
 
 
 def _require_admin(request):
@@ -233,12 +234,10 @@ def company_list(request):
 
 @require_http_methods(["GET"])
 def company_active(request):
-    """Returns the currently default/active company for print headers."""
+    """Returns the session-active company (session → default → first)."""
     if not request.user.is_authenticated:
         return JsonResponse({'message': 'Not logged in.'}, status=401)
-    company = Company.objects.filter(is_default=True, is_active=True).first()
-    if not company:
-        company = Company.objects.filter(is_active=True).first()
+    company = get_active_company(request)
     if not company:
         return JsonResponse({}, safe=False)
     return JsonResponse(company.to_dict())
@@ -322,3 +321,25 @@ def company_set_default(request, company_id):
     company.is_default = True
     company.save()
     return JsonResponse({'message': f'{company.name} is now the active company.', 'company': company.to_dict()})
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def company_switch_session(request):
+    """
+    Called by the frontend company-switcher.
+    Stores the chosen company_id in the Django session so all
+    subsequent API calls filter data for that company only.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({'message': 'Not logged in.'}, status=401)
+    data = json.loads(request.body)
+    company_id = data.get('company_id')
+    try:
+        company = Company.objects.get(id=company_id, is_active=True)
+    except Company.DoesNotExist:
+        return JsonResponse({'message': 'Company not found.'}, status=404)
+    # Set session — persists for the life of the browser session
+    request.session['company_id'] = company.id
+    request.session.modified = True
+    return JsonResponse({'message': f'Switched to {company.name}.', 'company': company.to_dict()})

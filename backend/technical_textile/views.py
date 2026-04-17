@@ -14,6 +14,7 @@ from .models import (
     TechnicalProductCategory, PerformanceSpec, Sample,
     TechnicalDataSheet, TestingLabRecord, RDProject
 )
+from master_data.company_utils import get_active_company
 
 
 # ── Helper: decimal or None ───────────────────────────────────
@@ -110,12 +111,17 @@ def rd_to_dict(r):
 # ============================================================
 @csrf_exempt
 def category_list(request):
+    company = get_active_company(request)
     if request.method == 'GET':
-        return JsonResponse({'categories': [category_to_dict(c) for c in TechnicalProductCategory.objects.all()]})
+        cats = TechnicalProductCategory.objects.all()
+        if company:
+            cats = cats.filter(company=company)
+        return JsonResponse({'categories': [category_to_dict(c) for c in cats]})
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
             cat = TechnicalProductCategory.objects.create(
+                company=company,
                 name=data['name'], code=data['code'],
                 description=data.get('description', ''), application=data.get('application', ''),
             )
@@ -147,13 +153,17 @@ def category_detail(request, cat_id):
 # ============================================================
 @csrf_exempt
 def spec_list(request):
+    company = get_active_company(request)
     if request.method == 'GET':
         specs = PerformanceSpec.objects.select_related('item', 'category').all()
+        if company:
+            specs = specs.filter(company=company)
         return JsonResponse({'specs': [spec_to_dict(s) for s in specs]})
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
             spec = PerformanceSpec.objects.create(
+                company=company,
                 item_id=data['item_id'], category_id=data.get('category_id') or None,
                 spec_version=data.get('spec_version', 'v1.0'), status=data.get('status', 'draft'),
                 gsm=dn(data.get('gsm')), width_cm=dn(data.get('width_cm')),
@@ -190,13 +200,17 @@ def spec_detail(request, spec_id):
 # ============================================================
 @csrf_exempt
 def sample_list(request):
+    company = get_active_company(request)
     if request.method == 'GET':
         samples = Sample.objects.select_related('item', 'customer').all()
+        if company:
+            samples = samples.filter(company=company)
         return JsonResponse({'samples': [sample_to_dict(s) for s in samples]})
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
             sample = Sample.objects.create(
+                company=company,
                 sample_number=next_number('SMP', Sample, 'sample_number'),
                 item_id=data['item_id'], customer_id=data['customer_id'],
                 quantity=data['quantity'], sent_date=data.get('sent_date') or None,
@@ -229,13 +243,17 @@ def sample_update_status(request, sample_id):
 # ============================================================
 @csrf_exempt
 def tds_list(request):
+    company = get_active_company(request)
     if request.method == 'GET':
         sheets = TechnicalDataSheet.objects.select_related('item', 'spec').all()
+        if company:
+            sheets = sheets.filter(company=company)
         return JsonResponse({'sheets': [tds_to_dict(t) for t in sheets]})
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
             tds = TechnicalDataSheet.objects.create(
+                company=company,
                 tds_number=next_number('TDS', TechnicalDataSheet, 'tds_number'),
                 item_id=data['item_id'], spec_id=data.get('spec_id') or None,
                 issue_date=data['issue_date'], revision_number=data.get('revision_number', 'R0'),
@@ -263,13 +281,17 @@ def tds_issue(request, tds_id):
 # ============================================================
 @csrf_exempt
 def lab_list(request):
+    company = get_active_company(request)
     if request.method == 'GET':
         records = TestingLabRecord.objects.select_related('item').all()
+        if company:
+            records = records.filter(company=company)
         return JsonResponse({'records': [lab_to_dict(r) for r in records]})
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
             record = TestingLabRecord.objects.create(
+                company=company,
                 test_number=next_number('TST', TestingLabRecord, 'test_number'),
                 item_id=data['item_id'], test_type=data.get('test_type', 'physical'),
                 test_date=data['test_date'], tested_by=data['tested_by'],
@@ -295,13 +317,17 @@ def lab_list(request):
 # ============================================================
 @csrf_exempt
 def rd_list(request):
+    company = get_active_company(request)
     if request.method == 'GET':
         projects = RDProject.objects.select_related('category').all()
+        if company:
+            projects = projects.filter(company=company)
         return JsonResponse({'projects': [rd_to_dict(p) for p in projects]})
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
             proj = RDProject.objects.create(
+                company=company,
                 project_number=next_number('RD', RDProject, 'project_number'),
                 project_name=data['project_name'], objective=data['objective'],
                 target_product=data.get('target_product', ''),

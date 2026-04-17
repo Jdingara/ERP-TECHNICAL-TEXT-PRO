@@ -8,7 +8,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from master_data.models import Item, Warehouse
+from master_data.models import Item, Warehouse, Company
 
 
 # ============================================================
@@ -26,6 +26,7 @@ class BillOfMaterials(models.Model):
         ('inactive','Inactive'),
     ]
 
+    company             = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     # The finished product this BOM produces
     finished_product    = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='bom_as_product')
     bom_name            = models.CharField(max_length=200)
@@ -77,6 +78,7 @@ class WorkOrder(models.Model):
         ('cancelled',   'Cancelled'),
     ]
 
+    company             = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     work_order_number   = models.CharField(max_length=50, unique=True)
     bom                 = models.ForeignKey(BillOfMaterials, on_delete=models.PROTECT)
     finished_product    = models.ForeignKey(Item, on_delete=models.PROTECT, related_name='work_orders')
@@ -159,6 +161,7 @@ class Machine(models.Model):
         ('breakdown',   'Breakdown'),
     ]
 
+    company        = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     machine_code   = models.CharField(max_length=50, unique=True)
     machine_name   = models.CharField(max_length=200)
     machine_type   = models.CharField(max_length=50, choices=MACHINE_TYPES)

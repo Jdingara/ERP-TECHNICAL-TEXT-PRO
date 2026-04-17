@@ -14,6 +14,7 @@ from .models import (
 )
 from production.models import Batch
 from master_data.models import Item
+from master_data.company_utils import get_active_company
 
 
 # ── Auto-number ───────────────────────────────────────────────
@@ -111,13 +112,17 @@ def shelf_to_dict(s):
 # ============================================================
 @csrf_exempt
 def compliance_list(request):
+    company = get_active_company(request)
     if request.method == 'GET':
         records = RegulatoryCompliance.objects.select_related('item').all()
+        if company:
+            records = records.filter(company=company)
         return JsonResponse({'records': [compliance_to_dict(r) for r in records]})
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
             rec = RegulatoryCompliance.objects.create(
+                company=company,
                 item_id=data['item_id'], standard=data['standard'],
                 certificate_number=data.get('certificate_number', ''),
                 issuing_body=data['issuing_body'], issue_date=data['issue_date'],
@@ -155,13 +160,17 @@ def compliance_detail(request, rec_id):
 # ============================================================
 @csrf_exempt
 def traceability_list(request):
+    company = get_active_company(request)
     if request.method == 'GET':
         records = BatchTraceability.objects.select_related('batch', 'item').all()
+        if company:
+            records = records.filter(company=company)
         return JsonResponse({'records': [traceability_to_dict(r) for r in records]})
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
             rec = BatchTraceability.objects.create(
+                company=company,
                 batch_id=data['batch_id'], item_id=data['item_id'],
                 raw_material_lot=data.get('raw_material_lot', ''),
                 supplier_batch_ref=data.get('supplier_batch_ref', ''),
@@ -191,13 +200,17 @@ def traceability_list(request):
 # ============================================================
 @csrf_exempt
 def sterility_list(request):
+    company = get_active_company(request)
     if request.method == 'GET':
         records = SterilityRecord.objects.select_related('batch').all()
+        if company:
+            records = records.filter(company=company)
         return JsonResponse({'records': [sterility_to_dict(r) for r in records]})
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
             rec = SterilityRecord.objects.create(
+                company=company,
                 batch_id=data['batch_id'],
                 sterilization_method=data['sterilization_method'],
                 sterilization_date=data['sterilization_date'],
@@ -223,13 +236,17 @@ def sterility_list(request):
 # ============================================================
 @csrf_exempt
 def capa_list(request):
+    company = get_active_company(request)
     if request.method == 'GET':
         capas = CAPA.objects.all()
+        if company:
+            capas = capas.filter(company=company)
         return JsonResponse({'capas': [capa_to_dict(c) for c in capas]})
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
             capa = CAPA.objects.create(
+                company=company,
                 capa_number=next_number('CAPA', CAPA, 'capa_number'),
                 capa_type=data['capa_type'], source=data['source'],
                 description=data['description'],
@@ -285,8 +302,11 @@ def audit_trail_list(request):
 # ============================================================
 @csrf_exempt
 def shelf_life_list(request):
+    company = get_active_company(request)
     if request.method == 'GET':
         records = ShelfLifeRecord.objects.select_related('batch', 'item').all()
+        if company:
+            records = records.filter(company=company)
         # Auto-update status based on today's date
         today = date.today()
         for r in records:
@@ -303,6 +323,7 @@ def shelf_life_list(request):
         data = json.loads(request.body)
         try:
             rec = ShelfLifeRecord.objects.create(
+                company=company,
                 batch_id=data['batch_id'], item_id=data['item_id'],
                 manufacture_date=data['manufacture_date'],
                 expiry_date=data['expiry_date'],

@@ -7,7 +7,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from master_data.models import Item, Customer, Warehouse
+from master_data.models import Item, Customer, Warehouse, Company
 
 
 # ============================================================
@@ -36,6 +36,7 @@ class CustomerInquiry(models.Model):
         ('other',       'Other'),
     ]
 
+    company             = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     inquiry_number      = models.CharField(max_length=50, unique=True)  # INQ-YYYYMMDD-001
     customer            = models.ForeignKey(Customer, on_delete=models.PROTECT)
     received_date       = models.DateField()
@@ -86,6 +87,7 @@ class Quotation(models.Model):
         ('expired',  'Expired'),
     ]
 
+    company             = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     quotation_number    = models.CharField(max_length=50, unique=True)  # QT-YYYYMMDD-001
     inquiry             = models.ForeignKey(CustomerInquiry, on_delete=models.SET_NULL, null=True, blank=True, related_name='quotations')
     customer            = models.ForeignKey(Customer, on_delete=models.PROTECT)
@@ -133,6 +135,7 @@ class SalesOrder(models.Model):
         ('cancelled',   'Cancelled'),
     ]
 
+    company         = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     so_number       = models.CharField(max_length=50, unique=True)
     customer        = models.ForeignKey(Customer, on_delete=models.PROTECT)
     warehouse       = models.ForeignKey(Warehouse, on_delete=models.PROTECT)
@@ -183,6 +186,7 @@ class Invoice(models.Model):
         ('overdue', 'Overdue'),
     ]
 
+    company         = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     invoice_number  = models.CharField(max_length=50, unique=True)
     sales_order     = models.ForeignKey(SalesOrder, on_delete=models.PROTECT)
     customer        = models.ForeignKey(Customer, on_delete=models.PROTECT)

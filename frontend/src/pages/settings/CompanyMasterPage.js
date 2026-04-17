@@ -56,6 +56,11 @@ export default function CompanyMasterPage() {
             const r = await fetch(`${API}/`);
             const data = await r.json();
             setCompanies(Array.isArray(data) ? data : []);
+            // Auto-sync the active/default company to localStorage so printUtils picks it up
+            const defaultCo = Array.isArray(data) ? data.find(c => c.is_default) : null;
+            if (defaultCo) {
+                localStorage.setItem('meitexz_active_company', JSON.stringify(defaultCo));
+            }
         } catch { setAlert({ type:'error', msg:'Failed to load companies.' }); }
         finally  { setLoading(false); }
     }, []);

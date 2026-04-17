@@ -14,6 +14,7 @@ import json
 from .models import PurchaseOrder, PurchaseOrderLine, GoodsReceipt, GoodsReceiptLine
 from inventory.models import Stock, StockMovement
 from master_data.doc_series_utils import generate_next_number
+from master_data.company_utils import get_active_company
 from authentication.audit import log_action, field_diff
 
 
@@ -92,8 +93,12 @@ def grn_to_dict(grn, include_lines=False):
 def purchase_order_list_and_create(request):
     """ GET = list all POs | POST = create new PO with lines """
 
+    company = get_active_company(request)
+
     if request.method == 'GET':
         pos = PurchaseOrder.objects.select_related('supplier', 'warehouse').all()
+        if company:
+            pos = pos.filter(company=company)
         status_filter = request.GET.get('status', '')
         if status_filter:
             pos = pos.filter(status=status_filter)
@@ -107,6 +112,7 @@ def purchase_order_list_and_create(request):
                 if not po_number:
                     return JsonResponse({'message': 'PO number required or enable auto-numbering in Format Panel.'}, status=400)
                 po = PurchaseOrder.objects.create(
+                    company         = company,
                     po_number       = po_number,
                     supplier_id     = data['supplier_id'],
                     warehouse_id    = data['warehouse_id'],
@@ -185,8 +191,12 @@ def purchase_order_detail(request, po_id):
 def goods_receipt_list_and_create(request):
     """ GET = list all GRNs | POST = create new GRN """
 
+    company = get_active_company(request)
+
     if request.method == 'GET':
         grns = GoodsReceipt.objects.select_related('purchase_order', 'purchase_order__supplier').all()
+        if company:
+            grns = grns.filter(company=company)
         return JsonResponse({'goods_receipts': [grn_to_dict(g) for g in grns]})
 
     if request.method == 'POST':
@@ -199,6 +209,7 @@ def goods_receipt_list_and_create(request):
                 if not grn_number:
                     return JsonResponse({'message': 'GRN number required or enable auto-numbering in Format Panel.'}, status=400)
                 grn = GoodsReceipt.objects.create(
+                    company                 = company,
                     grn_number              = grn_number,
                     purchase_order          = po,
                     receipt_date            = data['receipt_date'],
@@ -241,11 +252,12 @@ def goods_receipt_confirm(request, grn_id):
     try:
         with transaction.atomic():
             warehouse = grn.purchase_order.warehouse
+            company   = grn.company
 
             for line in grn.lines.select_related('item', 'purchase_order_line').all():
                 # Add stock
                 stock, _ = Stock.objects.get_or_create(
-                    item=line.item, warehouse=warehouse,
+                    company=company, item=line.item, warehouse=warehouse,
                     defaults={'quantity': 0}
                 )
                 stock.quantity += line.received_quantity
@@ -253,6 +265,7 @@ def goods_receipt_confirm(request, grn_id):
 
                 # Record stock movement
                 StockMovement.objects.create(
+                    company     = company,
                     item        = line.item,
                     warehouse   = warehouse,
                     movement_type = 'stock_in',

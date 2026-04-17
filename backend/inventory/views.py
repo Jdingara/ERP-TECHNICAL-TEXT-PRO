@@ -11,6 +11,7 @@ import json
 
 from .models import Stock, StockMovement, StockAdjustment, StockAdjustmentLine
 from master_data.models import Item, Warehouse
+from master_data.company_utils import get_active_company
 
 
 # ============================================================
@@ -62,7 +63,10 @@ def stock_list(request):
     Returns current stock levels for all items.
     Optional filter: ?warehouse_id=1 or ?search=cotton
     """
+    company = get_active_company(request)
     stocks = Stock.objects.select_related('item', 'item__unit_of_measure', 'warehouse').all()
+    if company:
+        stocks = stocks.filter(company=company)
 
     search = request.GET.get('search', '')
     if search:
@@ -93,7 +97,11 @@ def stock_movement_list_and_create(request):
     """
 
     if request.method == 'GET':
-        movements = StockMovement.objects.select_related('item', 'warehouse', 'created_by').all()[:100]
+        company = get_active_company(request)
+        movements = StockMovement.objects.select_related('item', 'warehouse', 'created_by').all()
+        if company:
+            movements = movements.filter(company=company)
+        movements = movements[:100]
         return JsonResponse({'movements': [movement_to_dict(m) for m in movements]})
 
     if request.method == 'POST':
@@ -103,6 +111,7 @@ def stock_movement_list_and_create(request):
             warehouse_id = data['warehouse_id']
             movement_type = data['movement_type']
             quantity     = float(data['quantity'])
+            company      = get_active_company(request)
 
             if quantity <= 0:
                 return JsonResponse({'message': 'Quantity must be greater than zero.'}, status=400)
@@ -110,6 +119,7 @@ def stock_movement_list_and_create(request):
             with transaction.atomic():
                 # Create the movement record
                 movement = StockMovement.objects.create(
+                    company         = company,
                     item_id         = item_id,
                     warehouse_id    = warehouse_id,
                     movement_type   = movement_type,
@@ -121,6 +131,7 @@ def stock_movement_list_and_create(request):
 
                 # Update stock balance
                 stock, created = Stock.objects.get_or_create(
+                    company=company,
                     item_id=item_id,
                     warehouse_id=warehouse_id,
                     defaults={'quantity': 0}

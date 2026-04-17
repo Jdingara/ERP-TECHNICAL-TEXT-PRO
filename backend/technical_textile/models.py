@@ -8,7 +8,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from master_data.models import Item, Customer
+from master_data.models import Item, Customer, Company
 
 
 # ============================================================
@@ -17,6 +17,7 @@ from master_data.models import Item, Customer
 # e.g. Geotextile, Agrotextile, Medical, Protective, Automotive
 # ============================================================
 class TechnicalProductCategory(models.Model):
+    company     = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     name        = models.CharField(max_length=100, unique=True)
     code        = models.CharField(max_length=20, unique=True)
     description = models.TextField(blank=True)
@@ -44,6 +45,7 @@ class PerformanceSpec(models.Model):
         ('archived', 'Archived'),
     ]
 
+    company         = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     item            = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='performance_specs')
     category        = models.ForeignKey(TechnicalProductCategory, on_delete=models.SET_NULL, null=True, blank=True)
     spec_version    = models.CharField(max_length=20, default='v1.0')   # Version tracking
@@ -100,6 +102,7 @@ class Sample(models.Model):
         ('revision',  'Revision Required'),
     ]
 
+    company         = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     sample_number   = models.CharField(max_length=50, unique=True)
     item            = models.ForeignKey(Item, on_delete=models.CASCADE)
     customer        = models.ForeignKey(Customer, on_delete=models.CASCADE)
@@ -133,6 +136,7 @@ class TechnicalDataSheet(models.Model):
         ('revised',  'Revised'),
     ]
 
+    company         = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     tds_number      = models.CharField(max_length=50, unique=True)
     item            = models.ForeignKey(Item, on_delete=models.CASCADE)
     spec            = models.ForeignKey(PerformanceSpec, on_delete=models.SET_NULL, null=True, blank=True)
@@ -174,6 +178,7 @@ class TestingLabRecord(models.Model):
         ('other',      'Other'),
     ]
 
+    company         = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     test_number     = models.CharField(max_length=50, unique=True)
     item            = models.ForeignKey(Item, on_delete=models.CASCADE)
     test_type       = models.CharField(max_length=20, choices=TEST_TYPE_CHOICES, default='physical')
@@ -220,6 +225,7 @@ class RDProject(models.Model):
         ('cancelled',   'Cancelled'),
     ]
 
+    company         = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     project_number  = models.CharField(max_length=50, unique=True)
     project_name    = models.CharField(max_length=200)
     objective       = models.TextField()

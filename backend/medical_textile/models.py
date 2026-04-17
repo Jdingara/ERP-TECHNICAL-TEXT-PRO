@@ -8,7 +8,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from master_data.models import Item
+from master_data.models import Item, Company
 from production.models import Batch
 
 
@@ -36,6 +36,7 @@ class RegulatoryCompliance(models.Model):
         ('other',     'Other'),
     ]
 
+    company            = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     item               = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='compliance_records')
     standard           = models.CharField(max_length=30, choices=STANDARD_CHOICES)
     certificate_number = models.CharField(max_length=100, blank=True)
@@ -62,6 +63,7 @@ class RegulatoryCompliance(models.Model):
 # ============================================================
 class BatchTraceability(models.Model):
 
+    company            = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     batch              = models.OneToOneField(Batch, on_delete=models.CASCADE, related_name='traceability')
     item               = models.ForeignKey(Item, on_delete=models.CASCADE)
     raw_material_lot   = models.CharField(max_length=200, blank=True)
@@ -111,6 +113,7 @@ class SterilityRecord(models.Model):
         ('pending', 'Pending'),
     ]
 
+    company              = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     batch                = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name='sterility_records')
     sterilization_method = models.CharField(max_length=20, choices=METHOD_CHOICES)
     sterilization_date   = models.DateField()
@@ -161,6 +164,7 @@ class CAPA(models.Model):
         ('overdue',     'Overdue'),
     ]
 
+    company            = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     capa_number        = models.CharField(max_length=50, unique=True)
     capa_type          = models.CharField(max_length=20, choices=TYPE_CHOICES)
     source             = models.CharField(max_length=30, choices=SOURCE_CHOICES)
@@ -191,6 +195,7 @@ class CAPA(models.Model):
 # ============================================================
 class AuditTrail(models.Model):
 
+    company      = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     module       = models.CharField(max_length=50)
     record_id    = models.IntegerField()
     record_ref   = models.CharField(max_length=100)
@@ -219,6 +224,7 @@ class ShelfLifeRecord(models.Model):
         ('recalled',    'Recalled'),
     ]
 
+    company            = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     batch              = models.OneToOneField(Batch, on_delete=models.CASCADE, related_name='shelf_life')
     item               = models.ForeignKey(Item, on_delete=models.CASCADE)
     manufacture_date   = models.DateField()

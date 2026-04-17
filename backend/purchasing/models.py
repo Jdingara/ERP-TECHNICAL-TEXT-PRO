@@ -7,7 +7,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from master_data.models import Item, Supplier, Warehouse
+from master_data.models import Item, Supplier, Warehouse, Company
 
 
 # ============================================================
@@ -24,6 +24,7 @@ class PurchaseOrder(models.Model):
         ('cancelled',   'Cancelled'),
     ]
 
+    company         = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     po_number       = models.CharField(max_length=50, unique=True)
     supplier        = models.ForeignKey(Supplier, on_delete=models.PROTECT)
     warehouse       = models.ForeignKey(Warehouse, on_delete=models.PROTECT)
@@ -76,6 +77,7 @@ class GoodsReceipt(models.Model):
         ('confirmed',   'Confirmed'),   # Stock has been added
     ]
 
+    company         = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True, db_index=True)
     grn_number      = models.CharField(max_length=50, unique=True)
     purchase_order  = models.ForeignKey(PurchaseOrder, on_delete=models.PROTECT)
     receipt_date    = models.DateField()
