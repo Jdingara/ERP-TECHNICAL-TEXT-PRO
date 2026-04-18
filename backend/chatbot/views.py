@@ -17,10 +17,11 @@ from django.conf import settings
 from datetime import date, timedelta
 import json, os, re
 
-from sales.models      import SalesOrder, SalesOrderLine, Invoice
-from inventory.models  import Stock
-from master_data.models import Customer, Item
-from production.models import Machine, WorkOrder
+from planning.models       import SalesOrder, ProductionOrder
+from purchase.models       import Lot, PurchaseOrder
+from production_exec.models import Batch, ProcessEntry
+from masters.models        import Machine, YarnMaster, Customer
+from dispatch.models       import SalesInvoice, DispatchEntry
 
 # ── helpers ──────────────────────────────────────────────────
 

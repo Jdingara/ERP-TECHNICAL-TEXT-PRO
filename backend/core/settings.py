@@ -41,22 +41,22 @@ INSTALLED_APPS = [
     'rest_framework',        # Django REST Framework - for building APIs
     'corsheaders',           # CORS - allows React frontend to talk to Django
 
-    # SASI ERP modules - each module is a separate app
+    # Technical Textile ERP — core modules
     'authentication',        # User login, roles, permissions
-    'master_data',           # Items, suppliers, customers, employees master
-    'inventory',             # Stock management, warehouse, movements
-    'purchasing',            # Purchase orders, GRN, supplier payments
-    'sales',                 # Sales orders, invoices, customer payments
-    'finance',               # Accounts, journal entries, ledger, reports
-    'hr_payroll',            # Employee management, attendance, salary
-    'production',            # Work orders, BOM, batch tracking
-    'technical_textile',     # Technical textile specific features
-    'medical_textile',       # Medical textile specific features
-    'dashboard',             # KPIs, charts, production predictions
-    'reports',               # Report generation (PDF, Excel)
-    'analytics',             # Customer Intelligence — RFM, churn, forecast, product analytics
-    'feed',                  # Smart Business Feed — daily insights, tips, alerts
-    'chatbot',               # ERP Chatbot — natural language ERP queries
+    'master_data',           # Company Master (shared)
+    'chatbot',               # ERP Chatbot — natural language queries
+    'dashboard',             # BI Dashboard
+
+    # Technical Textile specific apps
+    'masters',               # Yarn, Product/Design, BOM, Process, Machine, Location, Vendor, Customer
+    'purchase',              # Purchase Order, GRN, Lot Creation
+    'lot_inventory',         # Lot-wise inventory and stock movements
+    'planning',              # Sales Order, Production Order, Daily Planning
+    'production_exec',       # Process Entry (core engine), Batch management
+    'quality',               # Inspection (Greige/Bare/Finished), QC Dashboard
+    'dispatch',              # Dispatch Entry, Challan, Invoice, Barcode/Labels
+    'traceability',          # Traceability Search (USP)
+    'reports',               # All reports
 ]
 
 

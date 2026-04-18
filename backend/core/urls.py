@@ -11,53 +11,23 @@ from django.conf import settings
 import os
 
 urlpatterns = [
-    # Django admin panel
     path('admin/', admin.site.urls),
 
-    # Authentication module - login, logout, current user
+    # Core — authentication, company, chatbot
     path('api/authentication/', include('authentication.urls')),
+    path('api/master-data/',    include('master_data.urls')),
+    path('api/chat/',           include('chatbot.urls')),
 
-    # Master data - items, suppliers, customers, warehouses
-    path('api/master-data/', include('master_data.urls')),
-
-    # Inventory module - stock, movements
-    path('api/inventory/', include('inventory.urls')),
-
-    # Purchasing module - purchase orders, GRN
-    path('api/purchasing/', include('purchasing.urls')),
-
-    # Sales module - sales orders, invoices
-    path('api/sales/', include('sales.urls')),
-
-    # Finance module - accounts, journal entries, reports
-    path('api/finance/', include('finance.urls')),
-
-    # HR & Payroll module
-    path('api/hr/', include('hr_payroll.urls')),
-
-    # Production module - BOM, work orders, batches, quality
-    path('api/production/', include('production.urls')),
-
-    # Technical Textile module
-    path('api/technical-textile/', include('technical_textile.urls')),
-
-    # Medical Textile module
-    path('api/medical-textile/', include('medical_textile.urls')),
-
-    # Reports module
-    path('api/reports/', include('reports.urls')),
-
-    # Dashboard API
-    path('api/dashboard/', include('dashboard.urls')),
-
-    # Customer Intelligence Analytics
-    path('api/analytics/', include('analytics.urls')),
-
-    # Smart Business Feed
-    path('api/feed/', include('feed.urls')),
-
-    # ERP Chatbot
-    path('api/chat/', include('chatbot.urls')),
+    # Technical Textile ERP modules
+    path('api/masters/',        include('masters.urls')),
+    path('api/purchase/',       include('purchase.urls')),
+    path('api/lot-inventory/',  include('lot_inventory.urls')),
+    path('api/planning/',       include('planning.urls')),
+    path('api/production/',     include('production_exec.urls')),
+    path('api/quality/',        include('quality.urls')),
+    path('api/dispatch/',       include('dispatch.urls')),
+    path('api/traceability/',   include('traceability.urls')),
+    path('api/reports/',        include('reports.urls')),
 ]
 
 # ── Serve React frontend in production ───────────────────────

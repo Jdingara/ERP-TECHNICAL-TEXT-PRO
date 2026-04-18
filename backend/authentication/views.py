@@ -18,14 +18,11 @@ import csv
 import io
 
 # Module model imports for dashboard
-from inventory.models import Stock
-from purchasing.models import PurchaseOrder
-from sales.models import SalesOrder, Invoice
-from production.models import WorkOrder
-from hr_payroll.models import Employee
-from medical_textile.models import CAPA, RegulatoryCompliance, ShelfLifeRecord
-from technical_textile.models import Sample, RDProject
-from finance.models import Account
+from purchase.models import Lot, PurchaseOrder
+from planning.models import ProductionOrder, SalesOrder
+from production_exec.models import Batch, ProcessEntry
+from quality.models import Inspection
+from dispatch.models import DispatchEntry, SalesInvoice
 from .models import Role, UserProfile, AuditLog
 from master_data.company_utils import get_active_company
 
@@ -122,61 +119,34 @@ def my_permissions_view(request):
 @require_http_methods(["GET"])
 def dashboard_summary_view(request):
     try:
-        company = get_active_company(request)
+        company   = get_active_company(request)
         co_filter = {'company': company} if company else {}
+        today     = timezone.now().date()
 
-        total_stock_items = Stock.objects.filter(quantity__gt=0, **co_filter).count()
-        low_stock_qs      = list(Stock.objects.filter(
-            quantity__gt=0, quantity__lte=10, **co_filter
-        ).select_related('item', 'warehouse').order_by('quantity')[:5])
-        low_stock_count   = len(low_stock_qs)
+        # ── Lot inventory ─────────────────────────────────────
+        available_lots   = Lot.objects.filter(status='available', **co_filter).count()
+        low_stock_lots   = Lot.objects.filter(status='available', balance_qty__lte=10, **co_filter).count()
 
-        open_pos        = PurchaseOrder.objects.filter(status__in=['draft', 'confirmed', 'partial'], **co_filter).count()
-        open_sos        = SalesOrder.objects.filter(status__in=['draft', 'confirmed'], **co_filter).count()
-        active_wos      = WorkOrder.objects.filter(status__in=['confirmed', 'in_progress'], **co_filter).count()
-        total_employees = Employee.objects.filter(status='active', **co_filter).count()
+        # ── Purchase ──────────────────────────────────────────
+        open_pos = PurchaseOrder.objects.filter(status__in=['draft', 'confirmed', 'partial'], **co_filter).count()
 
-        open_capas    = CAPA.objects.filter(status__in=['open', 'in_progress', 'overdue'], **co_filter).count()
-        today         = timezone.now().date()
-        expiry_cutoff = today + timedelta(days=90)
-        expiring_certs      = RegulatoryCompliance.objects.filter(
-            expiry_date__gte=today, expiry_date__lte=expiry_cutoff, **co_filter
-        ).count()
-        near_expiry_batches = ShelfLifeRecord.objects.filter(
-            status__in=['near_expiry', 'expired'], **co_filter
-        ).count()
-        pending_samples = Sample.objects.filter(status__in=['prepared', 'sent'], **co_filter).count()
-        active_rd       = RDProject.objects.filter(status__in=['active', 'testing'], **co_filter).count()
+        # ── Production ────────────────────────────────────────
+        open_prod_orders  = ProductionOrder.objects.filter(status__in=['planned', 'in_progress'], **co_filter).count()
+        open_sales_orders = SalesOrder.objects.filter(status__in=['draft', 'confirmed', 'in_production'], **co_filter).count()
 
-        low_stock_list = [{
-            'item_code':     s.item.item_code,
-            'item_name':     s.item.item_name,
-            'quantity':      str(s.quantity),
-            'warehouse':     s.warehouse.name,
-            'reorder_level': '10',
-        } for s in low_stock_qs]
+        # ── WIP Batches ───────────────────────────────────────
+        wip_batches  = Batch.objects.filter(status__in=['in_process', 'qc_pending'], **co_filter).count()
+        qc_pending   = Batch.objects.filter(status='qc_pending', **co_filter).count()
 
-        # ── Invoice / AR summary ──────────────────────────────
-        from django.db.models import F
-        inv_qs           = Invoice.objects.filter(**co_filter)
-        total_invoiced   = float(inv_qs.aggregate(s=Sum('total_amount'))['s'] or 0)
-        total_paid_amt   = float(inv_qs.filter(status='paid').aggregate(s=Sum('total_amount'))['s'] or 0)
-        outstanding_ar   = float(inv_qs.exclude(status__in=['paid', 'draft']).aggregate(
-                               s=Sum(F('total_amount') - F('paid_amount')))['s'] or 0)
-        overdue_invoices = inv_qs.filter(status='overdue').count()
+        # ── Quality ───────────────────────────────────────────
+        inspections_today = Inspection.objects.filter(inspection_date=today, **co_filter).count()
+        rejected_today    = Inspection.objects.filter(inspection_date=today, result='fail', **co_filter).count()
 
-        # ── AR Aging buckets ──────────────────────────────────
-        unpaid_inv = inv_qs.exclude(status__in=['paid', 'draft'])
-        def ar_sum(qs):
-            return float(qs.aggregate(s=Sum(F('total_amount') - F('paid_amount')))['s'] or 0)
-        ar_current = ar_sum(unpaid_inv.filter(due_date__gte=today))
-        ar_30      = ar_sum(unpaid_inv.filter(due_date__lt=today, due_date__gte=today - timedelta(days=30)))
-        ar_60      = ar_sum(unpaid_inv.filter(due_date__lt=today - timedelta(days=30), due_date__gte=today - timedelta(days=60)))
-        ar_90plus  = ar_sum(unpaid_inv.filter(due_date__lt=today - timedelta(days=60)))
+        # ── Dispatch ─────────────────────────────────────────
+        dispatched_today  = DispatchEntry.objects.filter(dispatch_date=today, status='confirmed', **co_filter).count()
 
-        # ── Monthly revenue trend (last 6 months) ─────────────
-        monthly_revenue = []
-        so_base = SalesOrder.objects.filter(**co_filter)
+        # ── Monthly production trend (last 6 months) ──────────
+        monthly_production = []
         for i in range(5, -1, -1):
             mo, yr = today.month - i, today.year
             while mo <= 0:
@@ -184,56 +154,36 @@ def dashboard_summary_view(request):
                 yr -= 1
             m_start = date(yr, mo, 1)
             m_end   = date(yr, mo, calendar.monthrange(yr, mo)[1])
-            rev = float(so_base.filter(
-                order_date__gte=m_start, order_date__lte=m_end,
-                status__in=['confirmed', 'partial', 'delivered']
-            ).aggregate(s=Sum('total_amount'))['s'] or 0)
-            cnt = so_base.filter(order_date__gte=m_start, order_date__lte=m_end).count()
-            monthly_revenue.append({'month': m_start.strftime('%b %y'), 'revenue': rev, 'orders': cnt})
+            prod_qty = ProcessEntry.objects.filter(
+                entry_date__gte=m_start, entry_date__lte=m_end,
+                status='confirmed', **co_filter
+            ).aggregate(s=Sum('output_quantity'))['s'] or 0
+            orders   = ProductionOrder.objects.filter(
+                created_at__date__gte=m_start, created_at__date__lte=m_end, **co_filter
+            ).count()
+            monthly_production.append({
+                'month':      m_start.strftime('%b %y'),
+                'output_qty': float(prod_qty),
+                'orders':     orders,
+            })
 
-        # ── SO status breakdown ───────────────────────────────
-        so_status = {s: so_base.filter(status=s).count()
-                     for s in ['draft', 'confirmed', 'partial', 'delivered', 'cancelled']}
-
-        # ── P&L from finance (posted journal entries) ─────────
-        try:
-            income_accounts  = list(Account.objects.filter(account_category='income', is_active=True, **co_filter))
-            expense_accounts = list(Account.objects.filter(account_category='expense', is_active=True, **co_filter))
-            pl_income  = float(sum(a.get_balance() for a in income_accounts))
-            pl_expense = float(sum(a.get_balance() for a in expense_accounts))
-        except Exception:
-            pl_income, pl_expense = 0.0, 0.0
-        pl_net = pl_income - pl_expense
+        # ── Production order status breakdown ─────────────────
+        prod_status = {s: ProductionOrder.objects.filter(status=s, **co_filter).count()
+                       for s in ['draft', 'planned', 'in_progress', 'completed', 'cancelled']}
 
         return JsonResponse({
-            'total_stock_items':    total_stock_items,
-            'low_stock_count':      low_stock_count,
+            'available_lots':     available_lots,
+            'low_stock_lots':     low_stock_lots,
             'open_purchase_orders': open_pos,
-            'open_sales_orders':    open_sos,
-            'active_work_orders':   active_wos,
-            'total_employees':      total_employees,
-            'open_capas':           open_capas,
-            'expiring_certs':       expiring_certs,
-            'near_expiry_batches':  near_expiry_batches,
-            'pending_samples':      pending_samples,
-            'active_rd_projects':   active_rd,
-            'low_stock_items':      low_stock_list,
-            # Finance / AR
-            'total_invoiced':       total_invoiced,
-            'total_paid':           total_paid_amt,
-            'outstanding_ar':       outstanding_ar,
-            'overdue_invoices':     overdue_invoices,
-            'ar_aging': {
-                'current':  ar_current,
-                'days_30':  ar_30,
-                'days_60':  ar_60,
-                'days_90p': ar_90plus,
-            },
-            'monthly_revenue':  monthly_revenue,
-            'so_status':        so_status,
-            'pl_income':        pl_income,
-            'pl_expense':       pl_expense,
-            'pl_net':           pl_net,
+            'open_production_orders': open_prod_orders,
+            'open_sales_orders':  open_sales_orders,
+            'wip_batches':        wip_batches,
+            'qc_pending':         qc_pending,
+            'inspections_today':  inspections_today,
+            'rejected_today':     rejected_today,
+            'dispatched_today':   dispatched_today,
+            'monthly_production': monthly_production,
+            'prod_status':        prod_status,
         })
     except Exception as e:
         return JsonResponse({'message': str(e)}, status=500)
