@@ -27,6 +27,7 @@ from medical_textile.models import CAPA, RegulatoryCompliance, ShelfLifeRecord
 from technical_textile.models import Sample, RDProject
 from finance.models import Account
 from .models import Role, UserProfile, AuditLog
+from master_data.company_utils import get_active_company
 
 
 # ============================================================
@@ -121,28 +122,31 @@ def my_permissions_view(request):
 @require_http_methods(["GET"])
 def dashboard_summary_view(request):
     try:
-        total_stock_items = Stock.objects.filter(quantity__gt=0).count()
+        company = get_active_company(request)
+        co_filter = {'company': company} if company else {}
+
+        total_stock_items = Stock.objects.filter(quantity__gt=0, **co_filter).count()
         low_stock_qs      = list(Stock.objects.filter(
-            quantity__gt=0, quantity__lte=10
+            quantity__gt=0, quantity__lte=10, **co_filter
         ).select_related('item', 'warehouse').order_by('quantity')[:5])
         low_stock_count   = len(low_stock_qs)
 
-        open_pos  = PurchaseOrder.objects.filter(status__in=['draft', 'confirmed', 'partial']).count()
-        open_sos  = SalesOrder.objects.filter(status__in=['draft', 'confirmed']).count()
-        active_wos = WorkOrder.objects.filter(status__in=['confirmed', 'in_progress']).count()
-        total_employees = Employee.objects.filter(status='active').count()
+        open_pos        = PurchaseOrder.objects.filter(status__in=['draft', 'confirmed', 'partial'], **co_filter).count()
+        open_sos        = SalesOrder.objects.filter(status__in=['draft', 'confirmed'], **co_filter).count()
+        active_wos      = WorkOrder.objects.filter(status__in=['confirmed', 'in_progress'], **co_filter).count()
+        total_employees = Employee.objects.filter(status='active', **co_filter).count()
 
-        open_capas    = CAPA.objects.filter(status__in=['open', 'in_progress', 'overdue']).count()
+        open_capas    = CAPA.objects.filter(status__in=['open', 'in_progress', 'overdue'], **co_filter).count()
         today         = timezone.now().date()
         expiry_cutoff = today + timedelta(days=90)
-        expiring_certs     = RegulatoryCompliance.objects.filter(
-            expiry_date__gte=today, expiry_date__lte=expiry_cutoff
+        expiring_certs      = RegulatoryCompliance.objects.filter(
+            expiry_date__gte=today, expiry_date__lte=expiry_cutoff, **co_filter
         ).count()
         near_expiry_batches = ShelfLifeRecord.objects.filter(
-            status__in=['near_expiry', 'expired']
+            status__in=['near_expiry', 'expired'], **co_filter
         ).count()
-        pending_samples = Sample.objects.filter(status__in=['prepared', 'sent']).count()
-        active_rd       = RDProject.objects.filter(status__in=['active', 'testing']).count()
+        pending_samples = Sample.objects.filter(status__in=['prepared', 'sent'], **co_filter).count()
+        active_rd       = RDProject.objects.filter(status__in=['active', 'testing'], **co_filter).count()
 
         low_stock_list = [{
             'item_code':     s.item.item_code,
@@ -153,16 +157,16 @@ def dashboard_summary_view(request):
         } for s in low_stock_qs]
 
         # ── Invoice / AR summary ──────────────────────────────
-        # balance_due is a computed property — use total_amount - paid_amount in ORM
         from django.db.models import F
-        total_invoiced   = float(Invoice.objects.aggregate(s=Sum('total_amount'))['s'] or 0)
-        total_paid_amt   = float(Invoice.objects.filter(status='paid').aggregate(s=Sum('total_amount'))['s'] or 0)
-        outstanding_ar   = float(Invoice.objects.exclude(status__in=['paid', 'draft']).aggregate(
+        inv_qs           = Invoice.objects.filter(**co_filter)
+        total_invoiced   = float(inv_qs.aggregate(s=Sum('total_amount'))['s'] or 0)
+        total_paid_amt   = float(inv_qs.filter(status='paid').aggregate(s=Sum('total_amount'))['s'] or 0)
+        outstanding_ar   = float(inv_qs.exclude(status__in=['paid', 'draft']).aggregate(
                                s=Sum(F('total_amount') - F('paid_amount')))['s'] or 0)
-        overdue_invoices = Invoice.objects.filter(status='overdue').count()
+        overdue_invoices = inv_qs.filter(status='overdue').count()
 
         # ── AR Aging buckets ──────────────────────────────────
-        unpaid_inv = Invoice.objects.exclude(status__in=['paid', 'draft'])
+        unpaid_inv = inv_qs.exclude(status__in=['paid', 'draft'])
         def ar_sum(qs):
             return float(qs.aggregate(s=Sum(F('total_amount') - F('paid_amount')))['s'] or 0)
         ar_current = ar_sum(unpaid_inv.filter(due_date__gte=today))
@@ -172,6 +176,7 @@ def dashboard_summary_view(request):
 
         # ── Monthly revenue trend (last 6 months) ─────────────
         monthly_revenue = []
+        so_base = SalesOrder.objects.filter(**co_filter)
         for i in range(5, -1, -1):
             mo, yr = today.month - i, today.year
             while mo <= 0:
@@ -179,21 +184,21 @@ def dashboard_summary_view(request):
                 yr -= 1
             m_start = date(yr, mo, 1)
             m_end   = date(yr, mo, calendar.monthrange(yr, mo)[1])
-            rev = float(SalesOrder.objects.filter(
+            rev = float(so_base.filter(
                 order_date__gte=m_start, order_date__lte=m_end,
                 status__in=['confirmed', 'partial', 'delivered']
             ).aggregate(s=Sum('total_amount'))['s'] or 0)
-            cnt = SalesOrder.objects.filter(order_date__gte=m_start, order_date__lte=m_end).count()
+            cnt = so_base.filter(order_date__gte=m_start, order_date__lte=m_end).count()
             monthly_revenue.append({'month': m_start.strftime('%b %y'), 'revenue': rev, 'orders': cnt})
 
         # ── SO status breakdown ───────────────────────────────
-        so_status = {s: SalesOrder.objects.filter(status=s).count()
+        so_status = {s: so_base.filter(status=s).count()
                      for s in ['draft', 'confirmed', 'partial', 'delivered', 'cancelled']}
 
         # ── P&L from finance (posted journal entries) ─────────
         try:
-            income_accounts  = list(Account.objects.filter(account_category='income', is_active=True))
-            expense_accounts = list(Account.objects.filter(account_category='expense', is_active=True))
+            income_accounts  = list(Account.objects.filter(account_category='income', is_active=True, **co_filter))
+            expense_accounts = list(Account.objects.filter(account_category='expense', is_active=True, **co_filter))
             pl_income  = float(sum(a.get_balance() for a in income_accounts))
             pl_expense = float(sum(a.get_balance() for a in expense_accounts))
         except Exception:
