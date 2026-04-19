@@ -1,188 +1,88 @@
-// ============================================================
-// FILE: pages/reports/SalesReportPage.js
-// PURPOSE: Sales report — monthly sales chart, top customers,
-//          order status breakdown, invoice summary.
-// ============================================================
+// PAGE: Quality Report (mapped to /reports/quality in App.js)
+import { useState, useEffect, useCallback } from 'react';
 
-import React, { useState, useEffect, useRef } from 'react';
-import {
-    Box, Typography, Grid, Paper, Table, TableBody, TableCell,
-    TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
-} from '@mui/material';
-import { ResizableChartPanel } from '../../components/common/ResizableChartPanel';
-import { ResizablePanelRowInner } from '../../components/common/ResizablePanelRow';
-import { useColumnResize } from '../../components/common/useColumnResize';
-import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-    ResponsiveContainer, LineChart, Line
-} from 'recharts';
-import ReportToolbar from '../../components/common/ReportToolbar';
+export default function SalesReportPage() {
+    const [rows,    setRows]    = useState([]);
+    const [summary, setSummary] = useState({});
+    const [fromDate,setFromDate]= useState(() => { const d = new Date(); d.setDate(1); return d.toISOString().slice(0, 10); });
+    const [toDate,  setToDate]  = useState(new Date().toISOString().slice(0, 10));
+    const [loading, setLoading] = useState(false);
 
-const API = '/api/reports/sales/';
-const STATUS_COLOR = { draft:'default', confirmed:'primary', partial:'warning', delivered:'success', cancelled:'error' };
+    const load = useCallback(async () => {
+        setLoading(true);
+        const p = new URLSearchParams({ from_date: fromDate, to_date: toDate });
+        const res = await fetch(`/api/reports/quality/?${p}`, { credentials: 'include' });
+        const d = await res.json();
+        setRows(d.inspections || []);
+        setSummary(d.summary || {});
+        setLoading(false);
+    }, [fromDate, toDate]);
 
-function KpiCard({ title, value, subtitle, color }) {
+    useEffect(() => { load(); }, [load]);
+
+    const RESULT_COLOR = { pass: '#10b981', fail: '#ef4444', rework: '#8b5cf6', conditional_pass: '#f59e0b' };
+
     return (
-        <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, textAlign: 'center' }}>
-            <Typography variant="body2" color="text.secondary">{title}</Typography>
-            <Typography variant="h4" fontWeight="bold" color={color}>{value}</Typography>
-            {subtitle && <Typography variant="caption" color="text.secondary">{subtitle}</Typography>}
-        </Paper>
+        <div style={{ padding: 24, maxWidth: 1100 }}>
+            <div style={{ marginBottom: 20 }}>
+                <h2 style={{ margin: '0 0 4px', fontSize: 22, fontWeight: 700 }}>Quality Report</h2>
+                <p style={{ margin: 0, color: '#64748b', fontSize: 13 }}>Inspection results, rejection rates, and defect analysis</p>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24, background: '#f8fafc', borderRadius: 10, padding: '12px 18px' }}>
+                <span style={{ fontWeight: 600, fontSize: 13, color: '#475569' }}>From:</span>
+                <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)}
+                    style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13 }} />
+                <span style={{ fontWeight: 600, fontSize: 13, color: '#475569' }}>To:</span>
+                <input type="date" value={toDate} onChange={e => setToDate(e.target.value)}
+                    style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13 }} />
+                <button onClick={load} disabled={loading} style={btn('#10b981')}>
+                    {loading ? 'Loading…' : '📊 Generate'}
+                </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 24 }}>
+                {[
+                    { label: 'Total Inspected', val: summary.total_inspected || 0, color: '#3b82f6' },
+                    { label: 'Passed', val: summary.passed || 0, color: '#10b981' },
+                    { label: 'Failed', val: summary.failed || 0, color: '#ef4444' },
+                    { label: 'Rework', val: summary.rework || 0, color: '#8b5cf6' },
+                    { label: 'Pass Rate', val: `${summary.pass_rate || 0}%`, color: '#f59e0b' },
+                ].map(c => (
+                    <div key={c.label} style={{ background: '#fff', border: `1px solid ${c.color}25`, borderRadius: 10, padding: '14px 18px' }}>
+                        <div style={{ fontSize: 11, color: '#64748b', marginBottom: 4 }}>{c.label}</div>
+                        <div style={{ fontSize: 24, fontWeight: 700, color: c.color }}>{c.val}</div>
+                    </div>
+                ))}
+            </div>
+
+            <div style={{ overflowX: 'auto' }}>
+                <table style={tableS}><thead><tr style={{ background: '#1e293b', color: '#fff' }}>
+                    {['Date', 'Batch', 'Product', 'Inspector', 'Result', 'Defect Type', 'Defect Count', 'Remarks'].map(h =>
+                        <th key={h} style={thS}>{h}</th>)}
+                </tr></thead><tbody>
+                    {rows.map((r, i) => (
+                        <tr key={i} style={{ background: i % 2 === 0 ? '#f8fafc' : '#fff' }}>
+                            <td style={tdS}>{r.inspection_date}</td>
+                            <td style={tdS}><b style={{ color: '#3b82f6' }}>{r.batch_number}</b></td>
+                            <td style={tdS}>{r.product_name}</td>
+                            <td style={tdS}>{r.inspector || '—'}</td>
+                            <td style={tdS}><span style={tag(RESULT_COLOR[r.result] || '#64748b')}>{r.result?.replace('_', ' ')}</span></td>
+                            <td style={tdS}>{r.defect_name || '—'}</td>
+                            <td style={tdS}>{r.defect_count || '—'}</td>
+                            <td style={tdS}>{r.remarks || '—'}</td>
+                        </tr>
+                    ))}
+                    {rows.length === 0 && !loading && <tr><td colSpan={8} style={emptyTd}>No inspections for this period</td></tr>}
+                </tbody></table>
+            </div>
+        </div>
     );
 }
 
-function SalesReportPage() {
-    const { widths, Resizer } = useColumnResize("salesreport", [100, 180, 150, 80]);
-    const [data, setData]       = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError]     = useState('');
-    const printRef = useRef();
-
-    useEffect(() => {
-        fetch(API, { credentials: 'include' })
-            .then(r => r.json())
-            .then(d => { setData(d); setLoading(false); })
-            .catch(() => { setError('Failed to load report.'); setLoading(false); });
-    }, []);
-
-    if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}><CircularProgress /></Box>;
-    if (error)   return <Alert severity="error">{error}</Alert>;
-
-    const getExcelData = () => [
-        {
-            sheetName: 'Sales Orders',
-            rows: data.recent_orders.map(o => ({
-                'SO Number':   o.so_number,
-                'Customer':    o.customer,
-                'Order Date':  o.order_date,
-                'Amount (₹)':  o.total_amount,
-                'Status':      o.status,
-            })),
-        },
-        {
-            sheetName: 'Top Customers',
-            rows: data.top_customers.map(c => ({
-                'Customer':      c.customer,
-                'Orders':        c.order_count,
-                'Total Value (₹)': c.total_value,
-            })),
-        },
-        {
-            sheetName: 'Monthly Sales',
-            rows: data.monthly_sales.map(m => ({
-                'Month':         m.month,
-                'Orders':        m.order_count,
-                'Total Value (₹)': m.total_value,
-            })),
-        },
-    ];
-
-    return (
-        <Box>
-            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Sales Report</Typography>
-            <Typography variant="body2" color="text.secondary" mb={2}>Monthly sales, top customers, and order status analysis</Typography>
-            <ReportToolbar title="Sales_Report" printRef={printRef} onExcel={getExcelData} />
-        <Box ref={printRef}>
-
-            <Grid container spacing={3} mb={4}>
-                <Grid item xs={6} md={3}><KpiCard title="Total Sales Orders" value={data.total_sales_orders} color="primary" /></Grid>
-                <Grid item xs={6} md={3}><KpiCard title="Delivered Orders" value={data.delivered_orders} color="#2e7d32" /></Grid>
-                <Grid item xs={6} md={3}><KpiCard title="Pending Invoices" value={data.pending_invoices} color="#e65100" /></Grid>
-                <Grid item xs={6} md={3}><KpiCard title="Paid Invoices" value={data.paid_invoices} color="#2e7d32" /></Grid>
-            </Grid>
-
-            {/* Monthly Sales Chart */}
-            <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, mb: 3 }}>
-                <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Monthly Sales Value — Last 6 Months (₹)</Typography>
-                {data.monthly_sales.length === 0 ? (
-                    <Typography color="text.secondary" align="center" py={4}>No sales data yet</Typography>
-                ) : (
-                    <ResponsiveContainer width="100%" height={260}>
-                        <BarChart data={data.monthly_sales}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                            <YAxis tickFormatter={v => `₹${(v/1000).toFixed(0)}k`} />
-                            <Tooltip formatter={v => [`₹${v.toLocaleString()}`, 'Sales Value']} />
-                            <Bar dataKey="total_value" name="Sales Value" fill="#e65100" radius={[4,4,0,0]} />
-                        </BarChart>
-                    </ResponsiveContainer>
-                )}
-            </Paper>
-
-            <ResizablePanelRowInner storageKey="salesreport_charts" defaultPercents={[50,50]}>
-                {/* Top Customers */}
-                <ResizableChartPanel storageKey="salesreport_top_5_customers_by_order_" title="Top 5 Customers by Order Value" defaultHeight={280}>
-                        <TableContainer>
-                            <Table size="small">
-                                <TableHead sx={{ backgroundColor: 'primary.main', '& th': { color: 'primary.contrastText', fontWeight: 700, fontSize: 12.5 } }}>
-                                    <TableRow>
-                                        <TableCell><strong>Customer</strong></TableCell>
-                                        <TableCell align="right"><strong>Orders</strong></TableCell>
-                                        <TableCell align="right"><strong>Total Value (₹)</strong></TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {data.top_customers.length === 0 ? (
-                                        <TableRow><TableCell colSpan={3} align="center" sx={{ color:'text.secondary' }}>No data yet</TableCell></TableRow>
-                                    ) : data.top_customers.map((c, i) => (
-                                        <TableRow key={i} hover>
-                                            <TableCell><strong>{c.customer}</strong></TableCell>
-                                            <TableCell align="right">{c.order_count}</TableCell>
-                                            <TableCell align="right">₹{c.total_value.toLocaleString()}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </ResizableChartPanel>
-
-                {/* Status Breakdown */}
-                <ResizableChartPanel storageKey="salesreport_orders_by_status" title="Orders by Status" defaultHeight={280}>
-                        {data.sales_by_status.map(s => (
-                            <Box key={s.status} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                                <Chip label={s.status.toUpperCase()} size="small" color={STATUS_COLOR[s.status] || 'default'} />
-                                <Box sx={{ textAlign: 'right' }}>
-                                    <Typography variant="body2" fontWeight="bold">{s.count} orders</Typography>
-                                    <Typography variant="caption" color="text.secondary">₹{(s.total || 0).toLocaleString()}</Typography>
-                                </Box>
-                            </Box>
-                        ))}
-                    </ResizableChartPanel>
-            </ResizablePanelRowInner>
-
-            {/* Recent Orders */}
-            <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Recent Sales Orders</Typography>
-                <TableContainer>
-                    <Table size="small">
-                        <TableHead sx={{ backgroundColor: 'primary.main', '& th': { color: 'primary.contrastText', fontWeight: 700, fontSize: 12.5 } }}>
-                            <TableRow>
-                                <TableCell><strong>SO Number</strong></TableCell>
-                                <TableCell><strong>Customer</strong></TableCell>
-                                <TableCell><strong>Order Date</strong></TableCell>
-                                <TableCell align="right"><strong>Amount (₹)</strong></TableCell>
-                                <TableCell><strong>Status</strong></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {data.recent_orders.map((o, i) => (
-                                <TableRow key={i} hover>
-                                    <TableCell><strong>{o.so_number}</strong></TableCell>
-                                    <TableCell>{o.customer}</TableCell>
-                                    <TableCell>{o.order_date}</TableCell>
-                                    <TableCell align="right">₹{o.total_amount.toLocaleString()}</TableCell>
-                                    <TableCell>
-                                        <Chip label={o.status.toUpperCase()} size="small" color={STATUS_COLOR[o.status] || 'default'} />
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Paper>
-        </Box> {/* end printRef Box */}
-        </Box>
-    );
-}
-
-export default SalesReportPage;
+const btn     = (bg) => ({ padding: '8px 18px', background: bg, color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 });
+const tableS  = { width: '100%', borderCollapse: 'collapse', fontSize: 13 };
+const thS     = { padding: '10px 14px', textAlign: 'left', fontWeight: 600, fontSize: 12 };
+const tdS     = { padding: '10px 14px', borderBottom: '1px solid #f1f5f9', verticalAlign: 'middle' };
+const tag     = (bg) => ({ display: 'inline-block', padding: '2px 8px', borderRadius: 12, background: `${bg}20`, color: bg, fontSize: 11, fontWeight: 600 });
+const emptyTd = { textAlign: 'center', padding: 40, color: '#94a3b8' };

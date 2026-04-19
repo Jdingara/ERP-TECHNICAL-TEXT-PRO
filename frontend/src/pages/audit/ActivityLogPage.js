@@ -1,198 +1,117 @@
-// FILE: pages/audit/ActivityLogPage.js
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-    Box, Typography, Paper, Table, TableHead, TableRow, TableCell,
-    TableBody, TableContainer, Chip, TextField, MenuItem, Select,
-    FormControl, InputLabel, Button, Collapse, IconButton, CircularProgress,
-    Tooltip,
-} from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import FilterAltIcon       from '@mui/icons-material/FilterAlt';
-import RefreshIcon         from '@mui/icons-material/Refresh';
-import ExpandMoreIcon      from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon      from '@mui/icons-material/ExpandLess';
-import FileDownloadIcon    from '@mui/icons-material/FileDownload';
+import { useState, useEffect, useCallback } from 'react';
 
-// ── Action colours ────────────────────────────────────────────
-const ACTION_COLOR = {
-    'Created':      'success',
-    'Updated':      'warning',
-    'Deleted':      'error',
-    'Status Changed': 'info',
-    'Posted':       'primary',
-    'Delivered':    'primary',
-    'Confirmed':    'success',
-    'Completed':    'success',
-    'Marked Paid':  'success',
+const ACTION_STYLE = {
+    Created:       { bg: '#d1fae5', color: '#065f46' },
+    Updated:       { bg: '#fef3c7', color: '#92400e' },
+    Deleted:       { bg: '#fee2e2', color: '#991b1b' },
+    Confirmed:     { bg: '#d1fae5', color: '#065f46' },
+    Completed:     { bg: '#d1fae5', color: '#065f46' },
+    'Status Changed': { bg: '#dbeafe', color: '#1e40af' },
+    'Posted':      { bg: '#ede9fe', color: '#5b21b6' },
+    'Delivered':   { bg: '#ede9fe', color: '#5b21b6' },
 };
 
-function ChangesRow({ changes, action }) {
+function ChangesRow({ changes }) {
     const list = changes?.changes;
-
-    // ── UPDATED: before → after table ────────────────────────
     if (Array.isArray(list)) {
-        if (list.length === 0) {
-            return (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
-                    <Typography variant="caption">
-                        ℹ️ Record was saved — no field values were modified.
-                    </Typography>
-                </Box>
-            );
-        }
+        if (list.length === 0)
+            return <span style={{ fontSize: 12, color: '#64748b' }}>ℹ️ Record saved — no field values changed.</span>;
         return (
-            <Box sx={{ overflowX: 'auto' }}>
-                <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: 13 }}>
-                    <thead>
-                        <tr>
-                            {['Field', 'Before (Old Value)', 'After (New Value)'].map(h => (
-                                <th key={h} style={{
-                                    textAlign: 'left', padding: '6px 14px',
-                                    backgroundColor: '#1e3a5f', color: '#ffffff',
-                                    fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap',
-                                }}>
-                                    {h}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {list.map((c, i) => (
-                            <tr key={i} style={{ backgroundColor: i % 2 === 0 ? 'rgba(0,0,0,0.02)' : 'transparent' }}>
-                                <td style={{ padding: '6px 14px', fontWeight: 600, whiteSpace: 'nowrap', color: '#334155' }}>
-                                    {c.field}
-                                </td>
-                                <td style={{ padding: '6px 14px' }}>
-                                    <span style={{
-                                        display: 'inline-block', padding: '2px 10px',
-                                        borderRadius: 12, fontSize: 12,
-                                        backgroundColor: '#fee2e2', color: '#991b1b',
-                                        border: '1px solid #fca5a5', maxWidth: 280,
-                                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                                    }}>
-                                        {c.before !== '' && c.before != null ? c.before : '(empty)'}
-                                    </span>
-                                </td>
-                                <td style={{ padding: '6px 14px' }}>
-                                    <span style={{
-                                        display: 'inline-block', padding: '2px 10px',
-                                        borderRadius: 12, fontSize: 12,
-                                        backgroundColor: '#dcfce7', color: '#166534',
-                                        border: '1px solid #86efac', maxWidth: 280,
-                                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                                    }}>
-                                        {c.after !== '' && c.after != null ? c.after : '(empty)'}
-                                    </span>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </Box>
-        );
-    }
-
-    // ── CREATED / DELETED: key-value snapshot ─────────────────
-    const entries = Object.entries(changes || {}).filter(([k]) => k !== 'changes');
-    if (entries.length === 0) {
-        return <Typography variant="caption" color="text.secondary">No detail recorded.</Typography>;
-    }
-    return (
-        <Box sx={{ overflowX: 'auto' }}>
-            <table style={{ borderCollapse: 'collapse', fontSize: 13 }}>
+            <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: 12 }}>
                 <thead>
                     <tr>
-                        {['Field', 'Value'].map(h => (
-                            <th key={h} style={{
-                                textAlign: 'left', padding: '6px 14px',
-                                backgroundColor: '#1e3a5f', color: '#ffffff',
-                                fontWeight: 700, fontSize: 12,
-                            }}>
-                                {h}
-                            </th>
-                        ))}
+                        {['Field', 'Before', 'After'].map(h =>
+                            <th key={h} style={{ background: '#1e293b', color: '#fff', padding: '5px 12px', textAlign: 'left', fontWeight: 600 }}>{h}</th>)}
                     </tr>
                 </thead>
                 <tbody>
-                    {entries.map(([k, v], i) => (
-                        <tr key={k} style={{ backgroundColor: i % 2 === 0 ? 'rgba(0,0,0,0.02)' : 'transparent' }}>
-                            <td style={{ padding: '6px 14px', fontWeight: 600, color: '#334155', whiteSpace: 'nowrap' }}>
-                                {k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                    {list.map((c, i) => (
+                        <tr key={i} style={{ background: i % 2 === 0 ? '#f8fafc' : '#fff' }}>
+                            <td style={{ padding: '5px 12px', fontWeight: 600, color: '#334155', whiteSpace: 'nowrap' }}>{c.field}</td>
+                            <td style={{ padding: '5px 12px' }}>
+                                <span style={{ background: '#fee2e2', color: '#991b1b', padding: '1px 8px', borderRadius: 10, fontSize: 11 }}>
+                                    {c.before != null && c.before !== '' ? String(c.before) : '(empty)'}
+                                </span>
                             </td>
-                            <td style={{ padding: '6px 14px', color: '#475569' }}>{String(v)}</td>
+                            <td style={{ padding: '5px 12px' }}>
+                                <span style={{ background: '#dcfce7', color: '#166534', padding: '1px 8px', borderRadius: 10, fontSize: 11 }}>
+                                    {c.after != null && c.after !== '' ? String(c.after) : '(empty)'}
+                                </span>
+                            </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
-        </Box>
+        );
+    }
+    const entries = Object.entries(changes || {}).filter(([k]) => k !== 'changes');
+    if (entries.length === 0) return <span style={{ fontSize: 12, color: '#94a3b8' }}>No detail recorded.</span>;
+    return (
+        <table style={{ borderCollapse: 'collapse', fontSize: 12 }}>
+            <thead>
+                <tr>
+                    {['Field', 'Value'].map(h =>
+                        <th key={h} style={{ background: '#1e293b', color: '#fff', padding: '5px 12px', textAlign: 'left', fontWeight: 600 }}>{h}</th>)}
+                </tr>
+            </thead>
+            <tbody>
+                {entries.map(([k, v], i) => (
+                    <tr key={k} style={{ background: i % 2 === 0 ? '#f8fafc' : '#fff' }}>
+                        <td style={{ padding: '5px 12px', fontWeight: 600, color: '#334155', whiteSpace: 'nowrap' }}>
+                            {k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                        </td>
+                        <td style={{ padding: '5px 12px', color: '#475569' }}>{String(v)}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
     );
 }
 
 function LogRow({ log }) {
     const [open, setOpen] = useState(false);
     const hasChanges = log.changes && Object.keys(log.changes).length > 0;
+    const ac = ACTION_STYLE[log.action] || { bg: '#f1f5f9', color: '#475569' };
 
     return (
         <>
-            <TableRow hover sx={{ '& td': { py: 0.8 } }}>
-                <TableCell sx={{ whiteSpace: 'nowrap', color: 'text.secondary', fontSize: 13 }}>
-                    {log.timestamp.replace('T', ' ').slice(0, 19)}
-                </TableCell>
-                <TableCell>
-                    <Typography variant="body2" fontWeight={600}>{log.user}</Typography>
-                </TableCell>
-                <TableCell>
-                    <Typography variant="body2">{log.module}</Typography>
-                </TableCell>
-                <TableCell>
-                    <Typography variant="body2" fontWeight={600} color="primary.main">{log.object_repr}</Typography>
-                </TableCell>
-                <TableCell>
-                    <Chip
-                        label={log.action}
-                        size="small"
-                        color={ACTION_COLOR[log.action] || 'default'}
-                        sx={{ fontWeight: 600, fontSize: 12 }}
-                    />
-                </TableCell>
-                <TableCell align="center">
-                    {hasChanges ? (
-                        <Tooltip title={open ? 'Hide details' : 'Show details'}>
-                            <IconButton size="small" onClick={() => setOpen(v => !v)}>
-                                {open ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
-                            </IconButton>
-                        </Tooltip>
-                    ) : '—'}
-                </TableCell>
-            </TableRow>
-            {hasChanges && (
-                <TableRow>
-                    <TableCell colSpan={6} sx={{ py: 0, borderBottom: open ? undefined : 'none' }}>
-                        <Collapse in={open} timeout="auto" unmountOnExit>
-                            <Box sx={{ py: 1.5, px: 2, mb: 0.5 }}>
-                                <Typography variant="caption" fontWeight={700} color="text.secondary"
-                                    sx={{ display: 'block', mb: 1, letterSpacing: 0.5, textTransform: 'uppercase' }}>
-                                    Change Details — {log.action} on {log.object_repr}
-                                </Typography>
-                                <ChangesRow changes={log.changes} action={log.action} />
-                            </Box>
-                        </Collapse>
-                    </TableCell>
-                </TableRow>
+            <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                <td style={tdS}><span style={{ color: '#64748b', fontSize: 12 }}>{log.timestamp.replace('T', ' ').slice(0, 19)}</span></td>
+                <td style={tdS}><b style={{ fontSize: 13 }}>{log.user}</b></td>
+                <td style={tdS}><span style={{ fontSize: 13 }}>{log.module}</span></td>
+                <td style={tdS}><b style={{ color: '#2563eb', fontSize: 13 }}>{log.object_repr}</b></td>
+                <td style={tdS}>
+                    <span style={{ background: ac.bg, color: ac.color, padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
+                        {log.action}
+                    </span>
+                </td>
+                <td style={{ ...tdS, textAlign: 'center' }}>
+                    {hasChanges
+                        ? <button onClick={() => setOpen(v => !v)} style={{ background: 'none', border: '1px solid #e2e8f0', borderRadius: 6, cursor: 'pointer', padding: '2px 8px', fontSize: 12, color: '#475569' }}>
+                            {open ? '▲ Hide' : '▼ Show'}
+                          </button>
+                        : <span style={{ color: '#cbd5e1' }}>—</span>}
+                </td>
+            </tr>
+            {hasChanges && open && (
+                <tr>
+                    <td colSpan={6} style={{ padding: '12px 20px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 }}>
+                            Change Details — {log.action} on {log.object_repr}
+                        </div>
+                        <ChangesRow changes={log.changes} />
+                    </td>
+                </tr>
             )}
         </>
     );
 }
 
-function ActivityLogPage() {
-    const theme = useTheme();
+export default function ActivityLogPage() {
     const [logs,    setLogs]    = useState([]);
     const [meta,    setMeta]    = useState({ modules: [], actions: [], users: [] });
     const [loading, setLoading] = useState(true);
-
-    const [filters, setFilters] = useState({
-        module: '', action: '', user_id: '', from_date: '', to_date: '', search: '',
-    });
+    const [filters, setFilters] = useState({ module: '', action: '', user_id: '', from_date: '', to_date: '', search: '' });
 
     const setF = (k, v) => setFilters(f => ({ ...f, [k]: v }));
 
@@ -204,147 +123,105 @@ function ActivityLogPage() {
             .then(r => r.json())
             .then(data => {
                 setLogs(data.logs || []);
-                setMeta({
-                    modules: data.modules || [],
-                    actions: data.actions || [],
-                    users:   data.users   || [],
-                });
+                setMeta({ modules: data.modules || [], actions: data.actions || [], users: data.users || [] });
                 setLoading(false);
             })
             .catch(() => setLoading(false));
     }, [filters]);
 
-    useEffect(() => { fetchLogs(); }, []);   // initial load only
+    useEffect(() => { fetchLogs(); }, []); // eslint-disable-line
 
-    const handleApply = () => fetchLogs();
-    const handleClear = () => {
-        setFilters({ module: '', action: '', user_id: '', from_date: '', to_date: '', search: '' });
+    const downloadSupport = async () => {
+        const res  = await fetch('/api/authentication/support-log/', { credentials: 'include' });
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = `MEI_TEXZ_Activity_Log_${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
     };
 
     return (
-        <Box>
+        <div style={{ padding: 24, maxWidth: 1200 }}>
             {/* Header */}
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2 }}>
-                <Typography variant="h5" fontWeight="bold" color="primary" flex={1}>Activity Log</Typography>
-                <Tooltip title="Download last 200 log entries as CSV — send this to your support team when reporting a problem">
-                    <Button
-                        startIcon={<FileDownloadIcon />}
-                        variant="outlined"
-                        size="small"
-                        color="success"
-                        onClick={async () => {
-                            const res  = await fetch('/api/authentication/support-log/', { credentials: 'include' });
-                            const blob = await res.blob();
-                            const url  = URL.createObjectURL(blob);
-                            const a    = document.createElement('a');
-                            a.href     = url;
-                            a.download = `MEITEXZ_ERP_Support_Log_${new Date().toISOString().slice(0,10)}.csv`;
-                            a.click();
-                            URL.revokeObjectURL(url);
-                        }}
-                        sx={{ textTransform: 'none', whiteSpace: 'nowrap' }}
-                    >
-                        Download Support Log
-                    </Button>
-                </Tooltip>
-                <Button startIcon={<RefreshIcon />} variant="outlined" size="small" onClick={fetchLogs}>
-                    Refresh
-                </Button>
-            </Box>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                <div>
+                    <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#1e293b' }}>Activity Log</h2>
+                    <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>Full audit trail — every action logged with user, module, and timestamp</p>
+                </div>
+                <div style={{ display: 'flex', gap: 10 }}>
+                    <button onClick={downloadSupport} style={outBtn('#10b981')}>⬇ Download Support Log</button>
+                    <button onClick={fetchLogs} style={outBtn('#2563eb')}>↻ Refresh</button>
+                </div>
+            </div>
 
             {/* Filters */}
-            <Paper sx={{ p: 2, borderRadius: 2, mb: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                    <FilterAltIcon fontSize="small" color="primary" />
-                    <Typography variant="subtitle2" fontWeight={700}>Filters</Typography>
-                </Box>
-                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 1.5 }}>
-                    <TextField size="small" label="Search record" value={filters.search}
-                        onChange={e => setF('search', e.target.value)} />
+            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 10, padding: '16px 20px', marginBottom: 20, boxShadow: '0 1px 3px #0001' }}>
+                <div style={{ fontWeight: 700, fontSize: 13, color: '#475569', marginBottom: 12 }}>▼ Filters</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: 12 }}>
+                    <input placeholder="Search record…" value={filters.search}
+                        onChange={e => setF('search', e.target.value)} style={inputS} />
 
-                    <FormControl size="small">
-                        <InputLabel>Module</InputLabel>
-                        <Select value={filters.module} label="Module" onChange={e => setF('module', e.target.value)}>
-                            <MenuItem value="">All Modules</MenuItem>
-                            {meta.modules.map(m => <MenuItem key={m} value={m}>{m}</MenuItem>)}
-                        </Select>
-                    </FormControl>
+                    <select value={filters.module} onChange={e => setF('module', e.target.value)} style={inputS}>
+                        <option value="">All Modules</option>
+                        {meta.modules.map(m => <option key={m} value={m}>{m}</option>)}
+                    </select>
 
-                    <FormControl size="small">
-                        <InputLabel>Action</InputLabel>
-                        <Select value={filters.action} label="Action" onChange={e => setF('action', e.target.value)}>
-                            <MenuItem value="">All Actions</MenuItem>
-                            {meta.actions.map(a => <MenuItem key={a} value={a}>{a}</MenuItem>)}
-                        </Select>
-                    </FormControl>
+                    <select value={filters.action} onChange={e => setF('action', e.target.value)} style={inputS}>
+                        <option value="">All Actions</option>
+                        {meta.actions.map(a => <option key={a} value={a}>{a}</option>)}
+                    </select>
 
-                    <FormControl size="small">
-                        <InputLabel>User</InputLabel>
-                        <Select value={filters.user_id} label="User" onChange={e => setF('user_id', e.target.value)}>
-                            <MenuItem value="">All Users</MenuItem>
-                            {meta.users.map(u => <MenuItem key={u.id} value={u.id}>{u.username}</MenuItem>)}
-                        </Select>
-                    </FormControl>
+                    <select value={filters.user_id} onChange={e => setF('user_id', e.target.value)} style={inputS}>
+                        <option value="">All Users</option>
+                        {meta.users.map(u => <option key={u.id} value={u.id}>{u.username}</option>)}
+                    </select>
 
-                    <TextField size="small" label="From Date" type="date" value={filters.from_date}
-                        onChange={e => setF('from_date', e.target.value)} InputLabelProps={{ shrink: true }} />
-                    <TextField size="small" label="To Date" type="date" value={filters.to_date}
-                        onChange={e => setF('to_date', e.target.value)} InputLabelProps={{ shrink: true }} />
-                </Box>
+                    <input type="date" value={filters.from_date}
+                        onChange={e => setF('from_date', e.target.value)} style={inputS} placeholder="From Date" />
+                    <input type="date" value={filters.to_date}
+                        onChange={e => setF('to_date', e.target.value)} style={inputS} placeholder="To Date" />
+                </div>
+                <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
+                    <button onClick={fetchLogs} style={btn('#2563eb')}>▼ Apply Filters</button>
+                    <button onClick={() => setFilters({ module: '', action: '', user_id: '', from_date: '', to_date: '', search: '' })} style={outBtn('#94a3b8')}>Clear</button>
+                </div>
+            </div>
 
-                <Box sx={{ display: 'flex', gap: 1, mt: 1.5 }}>
-                    <Button variant="contained" size="small" startIcon={<FilterAltIcon />} onClick={handleApply}
-                        sx={{ backgroundColor: 'primary.main' }}>Apply Filters</Button>
-                    <Button variant="outlined" size="small" onClick={handleClear}>Clear</Button>
-                </Box>
-            </Paper>
-
-            {/* Log count */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                <Typography variant="body2" color="text.secondary">
-                    Showing <strong>{logs.length}</strong> log entries
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                    Click the expand icon on any row to see before / after details
-                </Typography>
-            </Box>
+            {/* Count */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, fontSize: 13, color: '#64748b' }}>
+                <span>Showing <b style={{ color: '#1e293b' }}>{logs.length}</b> log entries</span>
+                <span>Click ▼ Show on any row to see before / after details</span>
+            </div>
 
             {/* Table */}
-            {loading ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}><CircularProgress /></Box>
-            ) : (
-                <Paper sx={{ borderRadius: 2 }}>
-                    <TableContainer>
-                        <Table size="small">
-                            <TableHead>
-                                <TableRow>
-                                    {['Timestamp', 'User', 'Module', 'Record', 'Action', 'Details'].map((h, i) => (
-                                        <TableCell key={h}
-                                            style={{ backgroundColor: theme.palette.primary.main }}
-                                            sx={{ color: 'white', fontWeight: 'bold', whiteSpace: 'nowrap',
-                                                  width: i === 5 ? 60 : undefined }}>
-                                            {h}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {logs.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={6} align="center" sx={{ py: 6, color: 'text.secondary' }}>
-                                            No activity log entries found.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    logs.map(log => <LogRow key={log.id} log={log} />)
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Paper>
-            )}
-        </Box>
+            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 10, overflow: 'hidden', boxShadow: '0 1px 3px #0001' }}>
+                {loading ? (
+                    <div style={{ textAlign: 'center', padding: 48, color: '#94a3b8' }}>Loading…</div>
+                ) : (
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                            <thead>
+                                <tr style={{ background: '#1e293b', color: '#fff' }}>
+                                    {['Timestamp', 'User', 'Module', 'Record', 'Action', 'Details'].map(h =>
+                                        <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 600, fontSize: 12, whiteSpace: 'nowrap' }}>{h}</th>)}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {logs.length === 0
+                                    ? <tr><td colSpan={6} style={{ textAlign: 'center', padding: 48, color: '#94a3b8' }}>No activity log entries found.</td></tr>
+                                    : logs.map(log => <LogRow key={log.id} log={log} />)}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
+        </div>
     );
 }
 
-export default ActivityLogPage;
+const tdS    = { padding: '10px 14px', verticalAlign: 'middle' };
+const inputS = { padding: '7px 10px', border: '1px solid #e2e8f0', borderRadius: 7, fontSize: 13, width: '100%', boxSizing: 'border-box', outline: 'none' };
+const btn    = (bg) => ({ padding: '7px 16px', background: bg, color: '#fff', border: 'none', borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 });
+const outBtn = (c)  => ({ padding: '7px 16px', background: 'transparent', color: c, border: `1px solid ${c}`, borderRadius: 7, cursor: 'pointer', fontWeight: 600, fontSize: 13 });

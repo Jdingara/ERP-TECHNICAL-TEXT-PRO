@@ -1,185 +1,86 @@
-// ============================================================
-// FILE: pages/reports/ProductionReportPage.js
-// PURPOSE: Production report — work orders, batches,
-//          monthly output chart, top produced items.
-// ============================================================
+// PAGE: Production Report — process entries, output, rejection analysis
+import { useState, useEffect, useCallback } from 'react';
 
-import React, { useState, useEffect, useRef } from 'react';
-import {
-    Box, Typography, Grid, Paper, Table, TableBody, TableCell,
-    TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
-} from '@mui/material';
-import { ResizableChartPanel } from '../../components/common/ResizableChartPanel';
-import { ResizablePanelRowInner } from '../../components/common/ResizablePanelRow';
-import { useColumnResize } from '../../components/common/useColumnResize';
-import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-    ResponsiveContainer, Cell
-} from 'recharts';
-import ReportToolbar from '../../components/common/ReportToolbar';
+export default function ProductionReportPage() {
+    const [rows,    setRows]    = useState([]);
+    const [summary, setSummary] = useState({});
+    const [fromDate,setFromDate]= useState(() => { const d = new Date(); d.setDate(1); return d.toISOString().slice(0, 10); });
+    const [toDate,  setToDate]  = useState(new Date().toISOString().slice(0, 10));
+    const [loading, setLoading] = useState(false);
 
-const API = '/api/reports/production/';
-const STATUS_COLOR = { draft:'default', confirmed:'primary', in_progress:'warning', completed:'success', cancelled:'error' };
+    const load = useCallback(async () => {
+        setLoading(true);
+        const p = new URLSearchParams({ from_date: fromDate, to_date: toDate });
+        const res = await fetch(`/api/reports/production/?${p}`, { credentials: 'include' });
+        const d = await res.json();
+        setRows(d.entries || []);
+        setSummary(d.summary || {});
+        setLoading(false);
+    }, [fromDate, toDate]);
 
-function KpiCard({ title, value, color }) {
+    useEffect(() => { load(); }, [load]);
+
     return (
-        <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, textAlign: 'center' }}>
-            <Typography variant="body2" color="text.secondary">{title}</Typography>
-            <Typography variant="h4" fontWeight="bold" color={color}>{value}</Typography>
-        </Paper>
+        <div style={{ padding: 24, maxWidth: 1100 }}>
+            <div style={{ marginBottom: 20 }}>
+                <h2 style={{ margin: '0 0 4px', fontSize: 22, fontWeight: 700 }}>Production Report</h2>
+                <p style={{ margin: 0, color: '#64748b', fontSize: 13 }}>Process entries, output quantities, and rejection analysis</p>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24, background: '#f8fafc', borderRadius: 10, padding: '12px 18px' }}>
+                <span style={{ fontWeight: 600, fontSize: 13, color: '#475569' }}>From:</span>
+                <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)}
+                    style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13 }} />
+                <span style={{ fontWeight: 600, fontSize: 13, color: '#475569' }}>To:</span>
+                <input type="date" value={toDate} onChange={e => setToDate(e.target.value)}
+                    style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13 }} />
+                <button onClick={load} disabled={loading} style={btn('#f97316')}>
+                    {loading ? 'Loading…' : '📊 Generate'}
+                </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
+                {[
+                    { label: 'Total Entries', val: summary.total_entries || 0, color: '#3b82f6' },
+                    { label: 'Total Output', val: summary.total_output || 0, color: '#10b981' },
+                    { label: 'Total Rejection', val: summary.total_rejection || 0, color: '#ef4444' },
+                    { label: 'Rejection %', val: `${summary.rejection_pct || 0}%`, color: '#f59e0b' },
+                ].map(c => (
+                    <div key={c.label} style={{ background: '#fff', border: `1px solid ${c.color}25`, borderRadius: 10, padding: '14px 18px' }}>
+                        <div style={{ fontSize: 11, color: '#64748b', marginBottom: 4 }}>{c.label}</div>
+                        <div style={{ fontSize: 26, fontWeight: 700, color: c.color }}>{c.val}</div>
+                    </div>
+                ))}
+            </div>
+
+            <div style={{ overflowX: 'auto' }}>
+                <table style={tableS}><thead><tr style={{ background: '#1e293b', color: '#fff' }}>
+                    {['Entry No', 'Date', 'Prod. Order', 'Process', 'Machine', 'Operator', 'Shift', 'Output Qty', 'Rejection', 'Batch'].map(h =>
+                        <th key={h} style={thS}>{h}</th>)}
+                </tr></thead><tbody>
+                    {rows.map((r, i) => (
+                        <tr key={i} style={{ background: i % 2 === 0 ? '#f8fafc' : '#fff' }}>
+                            <td style={tdS}><b style={{ color: '#f97316' }}>{r.process_entry_number}</b></td>
+                            <td style={tdS}>{r.entry_date}</td>
+                            <td style={tdS}>{r.prod_order_number || '—'}</td>
+                            <td style={tdS}>{r.process_name || '—'}</td>
+                            <td style={tdS}>{r.machine_code}</td>
+                            <td style={tdS}>{r.operator || '—'}</td>
+                            <td style={tdS}>{r.shift}</td>
+                            <td style={tdS}><b style={{ color: '#10b981' }}>{r.output_qty}</b></td>
+                            <td style={tdS}><span style={{ color: r.rejection_qty > 0 ? '#ef4444' : '#94a3b8' }}>{r.rejection_qty || 0}</span></td>
+                            <td style={tdS}>{r.batch_number || '—'}</td>
+                        </tr>
+                    ))}
+                    {rows.length === 0 && !loading && <tr><td colSpan={10} style={emptyTd}>No production entries for this period</td></tr>}
+                </tbody></table>
+            </div>
+        </div>
     );
 }
 
-function ProductionReportPage() {
-    const { widths, Resizer } = useColumnResize("productionreport", [100, 180, 150, 80]);
-    const [data, setData]     = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError]   = useState('');
-    const printRef = useRef();
-
-    useEffect(() => {
-        fetch(API, { credentials: 'include' })
-            .then(r => r.json())
-            .then(d => { setData(d); setLoading(false); })
-            .catch(() => { setError('Failed to load report.'); setLoading(false); });
-    }, []);
-
-    if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}><CircularProgress /></Box>;
-    if (error)   return <Alert severity="error">{error}</Alert>;
-
-    const getExcelData = () => [
-        {
-            sheetName: 'Work Orders by Status',
-            rows: data.wo_by_status.map(s => ({
-                'Status': s.status,
-                'Count':  s.count,
-            })),
-        },
-        {
-            sheetName: 'Top Produced Items',
-            rows: data.top_items.map(t => ({
-                'Item Code':      t.item_code,
-                'Item Name':      t.item_name,
-                'Total Produced': t.total_produced,
-            })),
-        },
-        {
-            sheetName: 'Recent Batches',
-            rows: data.recent_batches.map(b => ({
-                'Batch Number':    b.batch_number,
-                'Item Code':       b.item_code,
-                'Item Name':       b.item_name,
-                'Qty Produced':    b.quantity_produced,
-                'Production Date': b.production_date,
-            })),
-        },
-        {
-            sheetName: 'Monthly Production',
-            rows: data.monthly_production.map(m => ({
-                'Month':      m.month,
-                'Total Qty':  m.total_qty,
-                'Batch Count': m.batch_count,
-            })),
-        },
-    ];
-
-    return (
-        <Box>
-            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Production Report</Typography>
-            <Typography variant="body2" color="text.secondary" mb={2}>Work orders, batches, and monthly output summary</Typography>
-            <ReportToolbar title="Production_Report" printRef={printRef} onExcel={getExcelData} />
-        <Box ref={printRef}>
-
-            {/* KPI Cards */}
-            <Grid container spacing={3} mb={4}>
-                <Grid item xs={6} md={4}><KpiCard title="Total Work Orders" value={data.total_work_orders} color="primary" /></Grid>
-                <Grid item xs={6} md={4}><KpiCard title="Completed Work Orders" value={data.completed_work_orders} color="#2e7d32" /></Grid>
-                <Grid item xs={6} md={4}><KpiCard title="Total Batches" value={data.total_batches} color="#6a1b9a" /></Grid>
-            </Grid>
-
-            <ResizablePanelRowInner storageKey="productionreport_charts" defaultPercents={[50,50]}>
-                {/* Monthly Production Chart */}
-                <ResizableChartPanel storageKey="productionreport_monthly_production_output" title="Monthly Production Output (Last 6 Months)" defaultHeight={280}>
-                        {data.monthly_production.length === 0 ? (
-                            <Typography color="text.secondary" align="center" py={4}>No production data yet</Typography>
-                        ) : (
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={data.monthly_production}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Bar dataKey="total_qty" name="Qty Produced" fill="#1a237e" radius={[4,4,0,0]} />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        )}
-                    </ResizableChartPanel>
-
-                {/* Work Order Status */}
-                <ResizableChartPanel storageKey="productionreport_work_orders_by_status" title="Work Orders by Status" defaultHeight={280}>
-                        {data.wo_by_status.map(s => (
-                            <Box key={s.status} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
-                                <Chip label={s.status.replace('_',' ').toUpperCase()} size="small" color={STATUS_COLOR[s.status] || 'default'} />
-                                <Typography fontWeight="bold">{s.count}</Typography>
-                            </Box>
-                        ))}
-                    </ResizableChartPanel>
-            </ResizablePanelRowInner>
-
-            {/* Top Produced Items */}
-            <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, mb: 3 }}>
-                <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Top 5 Produced Items</Typography>
-                <TableContainer>
-                    <Table size="small">
-                        <TableHead sx={{ backgroundColor: 'primary.main', '& th': { color: 'primary.contrastText', fontWeight: 700, fontSize: 12.5 } }}>
-                            <TableRow>
-                                <TableCell><strong>Item Code</strong></TableCell>
-                                <TableCell><strong>Item Name</strong></TableCell>
-                                <TableCell align="right"><strong>Total Produced</strong></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {data.top_items.map((t, i) => (
-                                <TableRow key={i} hover>
-                                    <TableCell><strong>{t.item_code}</strong></TableCell>
-                                    <TableCell>{t.item_name}</TableCell>
-                                    <TableCell align="right">{t.total_produced.toFixed(2)}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Paper>
-
-            {/* Recent Batches */}
-            <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Recent Batches</Typography>
-                <TableContainer>
-                    <Table size="small">
-                        <TableHead sx={{ backgroundColor: 'primary.main', '& th': { color: 'primary.contrastText', fontWeight: 700, fontSize: 12.5 } }}>
-                            <TableRow>
-                                <TableCell><strong>Batch Number</strong></TableCell>
-                                <TableCell><strong>Item</strong></TableCell>
-                                <TableCell align="right"><strong>Qty Produced</strong></TableCell>
-                                <TableCell><strong>Production Date</strong></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {data.recent_batches.map((b, i) => (
-                                <TableRow key={i} hover>
-                                    <TableCell><strong>{b.batch_number}</strong></TableCell>
-                                    <TableCell>{b.item_code} — {b.item_name}</TableCell>
-                                    <TableCell align="right">{b.quantity_produced}</TableCell>
-                                    <TableCell>{b.production_date}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Paper>
-        </Box> {/* end printRef Box */}
-        </Box>
-    );
-}
-
-export default ProductionReportPage;
+const btn     = (bg) => ({ padding: '8px 18px', background: bg, color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 });
+const tableS  = { width: '100%', borderCollapse: 'collapse', fontSize: 13 };
+const thS     = { padding: '10px 14px', textAlign: 'left', fontWeight: 600, fontSize: 12 };
+const tdS     = { padding: '10px 14px', borderBottom: '1px solid #f1f5f9', verticalAlign: 'middle' };
+const emptyTd = { textAlign: 'center', padding: 40, color: '#94a3b8' };

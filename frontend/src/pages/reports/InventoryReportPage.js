@@ -1,187 +1,95 @@
-// ============================================================
-// FILE: pages/reports/InventoryReportPage.js
-// PURPOSE: Inventory report — stock levels, low stock,
-//          movement summary, top stock items.
-// ============================================================
+// PAGE: Inventory Report — Lot stock levels and movement summary
+import { useState, useEffect, useCallback } from 'react';
 
-import React, { useState, useEffect, useRef } from 'react';
-import {
-    Box, Typography, Grid, Paper, Table, TableBody, TableCell,
-    TableContainer, TableHead, TableRow, Chip, CircularProgress, Alert
-} from '@mui/material';
-import { ResizableChartPanel } from '../../components/common/ResizableChartPanel';
-import { ResizablePanelRowInner } from '../../components/common/ResizablePanelRow';
-import { useColumnResize } from '../../components/common/useColumnResize';
-import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-    ResponsiveContainer, PieChart, Pie, Cell, Legend
-} from 'recharts';
-import ReportToolbar from '../../components/common/ReportToolbar';
+export default function InventoryReportPage() {
+    const [rows,    setRows]    = useState([]);
+    const [summary, setSummary] = useState({});
+    const [status,  setStatus]  = useState('');
+    const [search,  setSearch]  = useState('');
+    const [loading, setLoading] = useState(false);
 
-const API = '/api/reports/inventory/';
-const PIE_COLORS = ['primary.main','#2e7d32','#e65100','#6a1b9a','#00838f','#c62828'];
+    const load = useCallback(async () => {
+        setLoading(true);
+        const p = new URLSearchParams();
+        if (status) p.set('status', status);
+        if (search) p.set('search', search);
+        const res = await fetch(`/api/reports/lot-stock/?${p}`, { credentials: 'include' });
+        const d = await res.json();
+        setRows(d.lots || []);
+        setSummary(d.summary || {});
+        setLoading(false);
+    }, [status, search]);
 
-function KpiCard({ title, value, color }) {
+    useEffect(() => { load(); }, [load]);
+
     return (
-        <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, textAlign: 'center' }}>
-            <Typography variant="body2" color="text.secondary">{title}</Typography>
-            <Typography variant="h4" fontWeight="bold" color={color}>{value}</Typography>
-        </Paper>
+        <div style={{ padding: 24, maxWidth: 1100 }}>
+            <div style={{ marginBottom: 20 }}>
+                <h2 style={{ margin: '0 0 4px', fontSize: 22, fontWeight: 700 }}>Lot Stock Report</h2>
+                <p style={{ margin: 0, color: '#64748b', fontSize: 13 }}>Current lot inventory with balance quantities</p>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, marginBottom: 24, background: '#f8fafc', borderRadius: 10, padding: '12px 18px', alignItems: 'center' }}>
+                <input placeholder="Search lot / material…" value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13, width: 240 }} />
+                <select value={status} onChange={e => setStatus(e.target.value)}
+                    style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13 }}>
+                    <option value="">All Status</option>
+                    <option value="available">Available</option>
+                    <option value="partial">Partial</option>
+                    <option value="consumed">Consumed</option>
+                </select>
+                <button onClick={load} disabled={loading} style={btn('#3b82f6')}>
+                    {loading ? 'Loading…' : '📊 Generate'}
+                </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
+                {[
+                    { label: 'Total Lots', val: summary.total_lots || 0, color: '#3b82f6' },
+                    { label: 'Available Lots', val: summary.available_lots || 0, color: '#10b981' },
+                    { label: 'Total Received Qty', val: summary.total_received || 0, color: '#f97316' },
+                    { label: 'Total Balance Qty', val: summary.total_balance || 0, color: '#8b5cf6' },
+                ].map(c => (
+                    <div key={c.label} style={{ background: '#fff', border: `1px solid ${c.color}25`, borderRadius: 10, padding: '14px 18px' }}>
+                        <div style={{ fontSize: 11, color: '#64748b', marginBottom: 4 }}>{c.label}</div>
+                        <div style={{ fontSize: 26, fontWeight: 700, color: c.color }}>{c.val}</div>
+                    </div>
+                ))}
+            </div>
+
+            <div style={{ overflowX: 'auto' }}>
+                <table style={tableS}><thead><tr style={{ background: '#1e293b', color: '#fff' }}>
+                    {['LOT Number', 'Material', 'Color', 'Vendor', 'GRN', 'Received Qty', 'Balance Qty', 'Location', 'Status'].map(h =>
+                        <th key={h} style={thS}>{h}</th>)}
+                </tr></thead><tbody>
+                    {rows.map((r, i) => {
+                        const STATUS_COLORS = { available: '#10b981', partial: '#f59e0b', consumed: '#64748b' };
+                        return (
+                            <tr key={i} style={{ background: i % 2 === 0 ? '#f8fafc' : '#fff' }}>
+                                <td style={tdS}><b style={{ color: '#ec4899' }}>{r.lot_number}</b></td>
+                                <td style={tdS}>{r.material_name}</td>
+                                <td style={tdS}>{r.color_code} {r.color_name}</td>
+                                <td style={tdS}>{r.vendor_name}</td>
+                                <td style={tdS}>{r.grn_number}</td>
+                                <td style={tdS}>{r.received_qty} {r.uom}</td>
+                                <td style={tdS}><b style={{ color: r.balance_qty > 0 ? '#10b981' : '#94a3b8' }}>{r.balance_qty}</b></td>
+                                <td style={tdS}>{r.location_name || '—'}</td>
+                                <td style={tdS}><span style={tag(STATUS_COLORS[r.status] || '#64748b')}>{r.status}</span></td>
+                            </tr>
+                        );
+                    })}
+                    {rows.length === 0 && !loading && <tr><td colSpan={9} style={emptyTd}>No lot records found</td></tr>}
+                </tbody></table>
+            </div>
+        </div>
     );
 }
 
-function InventoryReportPage() {
-    const { widths, Resizer } = useColumnResize("inventoryreport", [100, 180, 150, 80]);
-    const [data, setData]       = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError]     = useState('');
-    const printRef = useRef();
-
-    useEffect(() => {
-        fetch(API, { credentials: 'include' })
-            .then(r => r.json())
-            .then(d => { setData(d); setLoading(false); })
-            .catch(() => { setError('Failed to load report.'); setLoading(false); });
-    }, []);
-
-    if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}><CircularProgress /></Box>;
-    if (error)   return <Alert severity="error">{error}</Alert>;
-
-    const getExcelData = () => [
-        {
-            sheetName: 'Top Stock Items',
-            rows: data.top_stock_items.map(t => ({
-                'Item Code': t.item_code,
-                'Item Name': t.item_name,
-                'Type':      t.item_type,
-                'Total Qty': t.total_qty,
-            })),
-        },
-        {
-            sheetName: 'Low Stock Items',
-            rows: data.low_stock_items.map(l => ({
-                'Item Code':   l.item_code,
-                'Item Name':   l.item_name,
-                'Warehouse':   l.warehouse,
-                'Current Qty': l.quantity,
-            })),
-        },
-        {
-            sheetName: 'Movement Summary',
-            rows: data.movement_summary.map(m => ({
-                'Movement Type': m.movement_type,
-                'Count':         m.count,
-                'Total Qty':     m.total_qty,
-            })),
-        },
-    ];
-
-    return (
-        <Box>
-            <Typography variant="h5" fontWeight="bold" color="primary" mb={1}>Inventory Report</Typography>
-            <Typography variant="body2" color="text.secondary" mb={2}>Stock levels, movements, and low stock analysis</Typography>
-            <ReportToolbar title="Inventory_Report" printRef={printRef} onExcel={getExcelData} />
-        <Box ref={printRef}>
-
-            <Grid container spacing={3} mb={4}>
-                <Grid item xs={6} md={6}><KpiCard title="Total Stock Items" value={data.total_stock_items} color="primary" /></Grid>
-                <Grid item xs={6} md={6}><KpiCard title="Low Stock Items" value={data.low_stock_count} color="#e53935" /></Grid>
-            </Grid>
-
-            <ResizablePanelRowInner storageKey="inventoryreport_charts" defaultPercents={[50,50]}>
-                {/* Stock by Item Type Pie */}
-                <ResizableChartPanel storageKey="inventoryreport_stock_by_item_type" title="Stock by Item Type" defaultHeight={280}>
-                        {data.stock_by_type.length === 0 ? (
-                            <Typography color="text.secondary" align="center" py={4}>No stock data yet</Typography>
-                        ) : (
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie data={data.stock_by_type} dataKey="total_items" nameKey="item_type"
-                                        cx="50%" cy="50%" outerRadius={80} label={({ item_type, total_items }) => `${item_type}: ${total_items}`}>
-                                        {data.stock_by_type.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
-                                    </Pie>
-                                    <Tooltip />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        )}
-                    </ResizableChartPanel>
-
-                {/* Movement Summary */}
-                <ResizableChartPanel storageKey="inventoryreport_stock_movements__last_30_" title="Stock Movements (Last 30 Days)" defaultHeight={280}>
-                        {data.movement_summary.length === 0 ? (
-                            <Typography color="text.secondary" align="center" py={4}>No movements in last 30 days</Typography>
-                        ) : (
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={data.movement_summary} layout="vertical">
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis type="number" />
-                                    <YAxis dataKey="movement_type" type="category" tick={{ fontSize: 11 }} width={110} />
-                                    <Tooltip />
-                                    <Bar dataKey="count" name="Count" fill="#1a237e" radius={[0,4,4,0]} />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        )}
-                    </ResizableChartPanel>
-            </ResizablePanelRowInner>
-
-            {/* Low Stock Alert Table */}
-            {data.low_stock_items.length > 0 && (
-                <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2, mb: 3 }}>
-                    <Typography variant="subtitle1" fontWeight="bold" color="#e53935" mb={2}>Low Stock Items (Qty ≤ 10)</Typography>
-                    <TableContainer>
-                        <Table size="small">
-                            <TableHead sx={{ backgroundColor: '#ffebee' }}>
-                                <TableRow>
-                                    <TableCell><strong>Item Code</strong></TableCell>
-                                    <TableCell><strong>Item Name</strong></TableCell>
-                                    <TableCell><strong>Warehouse</strong></TableCell>
-                                    <TableCell align="right"><strong>Current Qty</strong></TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {data.low_stock_items.map((item, i) => (
-                                    <TableRow key={i} sx={{ backgroundColor: '#fff8f8' }}>
-                                        <TableCell><strong>{item.item_code}</strong></TableCell>
-                                        <TableCell>{item.item_name}</TableCell>
-                                        <TableCell>{item.warehouse}</TableCell>
-                                        <TableCell align="right" sx={{ color: '#e53935', fontWeight: 'bold' }}>{item.quantity}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Paper>
-            )}
-
-            {/* Top Stock Items */}
-            <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 2 }}>
-                <Typography variant="subtitle1" fontWeight="bold" color="primary" mb={2}>Top 10 Items by Stock Quantity</Typography>
-                <TableContainer>
-                    <Table size="small">
-                        <TableHead sx={{ backgroundColor: 'primary.main', '& th': { color: 'primary.contrastText', fontWeight: 700, fontSize: 12.5 } }}>
-                            <TableRow>
-                                <TableCell><strong>Item Code</strong></TableCell>
-                                <TableCell><strong>Item Name</strong></TableCell>
-                                <TableCell><strong>Type</strong></TableCell>
-                                <TableCell align="right"><strong>Total Qty</strong></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {data.top_stock_items.map((t, i) => (
-                                <TableRow key={i} hover>
-                                    <TableCell><strong>{t.item_code}</strong></TableCell>
-                                    <TableCell>{t.item_name}</TableCell>
-                                    <TableCell><Chip label={t.item_type} size="small" variant="outlined" /></TableCell>
-                                    <TableCell align="right">{t.total_qty.toFixed(2)}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Paper>
-        </Box> {/* end printRef Box */}
-        </Box>
-    );
-}
-
-export default InventoryReportPage;
+const btn     = (bg) => ({ padding: '8px 18px', background: bg, color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 });
+const tableS  = { width: '100%', borderCollapse: 'collapse', fontSize: 13 };
+const thS     = { padding: '10px 14px', textAlign: 'left', fontWeight: 600, fontSize: 12 };
+const tdS     = { padding: '10px 14px', borderBottom: '1px solid #f1f5f9', verticalAlign: 'middle' };
+const tag     = (bg) => ({ display: 'inline-block', padding: '2px 8px', borderRadius: 12, background: `${bg}20`, color: bg, fontSize: 11, fontWeight: 600 });
+const emptyTd = { textAlign: 'center', padding: 40, color: '#94a3b8' };

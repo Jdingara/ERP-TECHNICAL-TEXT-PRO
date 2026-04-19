@@ -16,21 +16,17 @@ import PushPinIcon       from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 
 import DashboardIcon         from '@mui/icons-material/Dashboard';
-import InventoryIcon         from '@mui/icons-material/Inventory';
+import CategoryIcon          from '@mui/icons-material/Category';
 import ShoppingCartIcon      from '@mui/icons-material/ShoppingCart';
-import PointOfSaleIcon       from '@mui/icons-material/PointOfSale';
-import AccountBalanceIcon    from '@mui/icons-material/AccountBalance';
-import PeopleIcon            from '@mui/icons-material/People';
+import WarehouseIcon         from '@mui/icons-material/Warehouse';
+import EventNoteIcon         from '@mui/icons-material/EventNote';
 import FactoryIcon           from '@mui/icons-material/Factory';
-import ScienceIcon           from '@mui/icons-material/Science';
-import LocalHospitalIcon     from '@mui/icons-material/LocalHospital';
+import TaskAltIcon           from '@mui/icons-material/TaskAlt';
+import LocalShippingIcon     from '@mui/icons-material/LocalShipping';
+import AccountTreeIcon       from '@mui/icons-material/AccountTree';
 import AssessmentIcon        from '@mui/icons-material/Assessment';
-import InsightsIcon          from '@mui/icons-material/Insights';
-import DynamicFeedIcon       from '@mui/icons-material/DynamicFeed';
 import TuneIcon              from '@mui/icons-material/Tune';
 import HistoryIcon           from '@mui/icons-material/History';
-import CategoryIcon          from '@mui/icons-material/Category';
-import BuildIcon             from '@mui/icons-material/Build';
 import ExpandLess            from '@mui/icons-material/ExpandLess';
 import ExpandMore            from '@mui/icons-material/ExpandMore';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
@@ -47,98 +43,87 @@ const makeFs = (fontSizeSetting) => (base) => Math.round(base * (FONT_SCALE[font
 
 const MENU_ITEMS = [
     { title: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard', children: [] },
-    { title: 'Master Data', icon: <CategoryIcon />, children: [
-        { title: 'Items / Products',  path: '/master-data/items' },
-        { title: 'Suppliers',         path: '/master-data/suppliers' },
-        { title: 'Customers',         path: '/master-data/customers' },
-        { title: 'Warehouses',        path: '/master-data/warehouses' },
+    { title: 'Masters', icon: <CategoryIcon />, children: [
+        { title: 'Yarn Master',      path: '/masters/yarn' },
+        { title: 'Item Master',      path: '/masters/items' },
+        { title: 'Machines',         path: '/masters/machines' },
+        { title: 'Processes',        path: '/masters/processes' },
+        { title: 'Products / Design',path: '/masters/products' },
+        { title: 'BOM',              path: '/masters/bom' },
+        { title: 'Vendors',          path: '/masters/vendors' },
+        { title: 'Customers',        path: '/masters/customers' },
+        { title: 'Locations',        path: '/masters/locations' },
+        { title: 'UOM',              path: '/masters/uom' },
     ]},
-    { title: 'Inventory', icon: <InventoryIcon />, children: [
-        { title: 'Stock List',     path: '/inventory/stock-list' },
-        { title: 'Stock Movement', path: '/inventory/stock-movement' },
+    { title: 'Purchase', icon: <ShoppingCartIcon />, children: [
+        { title: 'Purchase Orders', path: '/purchase/orders' },
+        { title: 'GRN',             path: '/purchase/grn' },
+        { title: 'Lot Stock',       path: '/purchase/lots' },
+        { title: 'Invoices (AP)',   path: '/purchase/invoices' },
     ]},
-    { title: 'Purchasing', icon: <ShoppingCartIcon />, children: [
-        { title: 'Purchase Orders', path: '/purchasing/purchase-orders' },
-        // Create Purchase Order & Goods Receipt hidden — accessed via buttons on Purchase Orders
+    { title: 'Lot Inventory', icon: <WarehouseIcon />, children: [
+        { title: 'Stock Dashboard', path: '/lot-inventory/dashboard' },
+        { title: 'Movements',       path: '/lot-inventory/movements' },
+        { title: 'Adjustments',     path: '/lot-inventory/adjustments' },
     ]},
-    { title: 'Sales', icon: <PointOfSaleIcon />, children: [
-        { title: 'Inquiries',     path: '/sales/inquiries' },
-        { title: 'Quotations',    path: '/sales/quotations' },
-        { title: 'Order Journey', path: '/sales/order-journey' },
-        { title: 'Sales Orders',  path: '/sales/sales-orders' },
-        { title: 'Invoices (AR)', path: '/sales/invoices' },
-        // Create Sales Order hidden — accessed via "New Order" button on Sales Orders
-    ]},
-    { title: 'Finance', icon: <AccountBalanceIcon />, children: [
-        { title: 'Chart of Accounts', path: '/finance/chart-of-accounts' },
-        { title: 'Journal Entries',   path: '/finance/journal-entries' },
-        { title: 'Trial Balance',     path: '/finance/trial-balance' },
-    ]},
-    { title: 'HR & Payroll', icon: <PeopleIcon />, children: [
-        { title: 'Employees',  path: '/hr-payroll/employees' },
-        { title: 'Attendance', path: '/hr-payroll/attendance' },
-        { title: 'Salary',     path: '/hr-payroll/salary' },
+    { title: 'Planning', icon: <EventNoteIcon />, children: [
+        { title: 'Customer Forecasts', path: '/planning/forecasts' },
+        { title: 'Sales Orders',       path: '/planning/sales-orders' },
+        { title: 'Production Orders',  path: '/planning/production-orders' },
+        { title: 'Daily Plan',         path: '/planning/daily-plan' },
     ]},
     { title: 'Production', icon: <FactoryIcon />, children: [
-        { title: 'Bill of Materials', path: '/production/bill-of-materials' },
-        { title: 'Work Orders',       path: '/production/work-orders' },
-        // Create Work Order hidden — accessed via "New Work Order" button on Work Orders
-        { title: 'Machines',          path: '/production/machines' },
-        { title: 'Quality Checks',    path: '/production/quality-checks' },
-        { title: 'Batch List',        path: '/production/batches' },
+        { title: 'Yarn Issue',      path: '/production/yarn-issues' },
+        { title: 'Process Entries', path: '/production/entries' },
+        { title: 'Batches',         path: '/production/batches' },
+        { title: 'Beam Outward',    path: '/production/beams' },
     ]},
-    { title: 'Technical Textile', icon: <ScienceIcon />, children: [
-        { title: 'Product Categories',   path: '/technical-textile/product-categories' },
-        { title: 'Performance Specs',    path: '/technical-textile/performance-specs' },
-        { title: 'Sample Management',    path: '/technical-textile/samples' },
-        { title: 'Technical Data Sheet', path: '/technical-textile/data-sheets' },
-        { title: 'Testing Lab',          path: '/technical-textile/testing-lab' },
-        { title: 'R&D Projects',         path: '/technical-textile/rd-projects' },
+    { title: 'Quality', icon: <TaskAltIcon />, children: [
+        { title: 'QC Dashboard',   path: '/quality/dashboard' },
+        { title: 'Inspections',    path: '/quality/inspections' },
+        { title: 'Defect Types',   path: '/quality/defect-types' },
+        { title: 'Sample Testing', path: '/quality/sample-testing' },
     ]},
-    { title: 'Medical Textile', icon: <LocalHospitalIcon />, children: [
-        { title: 'Regulatory Compliance', path: '/medical-textile/compliance' },
-        { title: 'Batch Traceability',    path: '/medical-textile/batch-traceability' },
-        { title: 'Sterility Records',     path: '/medical-textile/sterility' },
-        { title: 'CAPA Management',       path: '/medical-textile/capa' },
-        { title: 'Audit Trail',           path: '/medical-textile/audit-trail' },
-        { title: 'Shelf Life Tracking',   path: '/medical-textile/shelf-life' },
+    { title: 'Dispatch', icon: <LocalShippingIcon />, children: [
+        { title: 'Dispatch Entries', path: '/dispatch/entries' },
+        { title: 'Sales Invoices',   path: '/dispatch/invoices' },
     ]},
-    { title: 'Smart Feed',             icon: <DynamicFeedIcon />, path: '/feed', children: [] },
-    { title: 'Customer Intelligence', icon: <InsightsIcon />, path: '/analytics/customer-intelligence', children: [] },
+    { title: 'Traceability', icon: <AccountTreeIcon />, path: '/traceability', children: [] },
+    { title: 'Inventory', icon: <WarehouseIcon />, children: [
+        { title: 'Finished Goods', path: '/inventory/finished-goods' },
+    ]},
     { title: 'Reports', icon: <AssessmentIcon />, children: [
-        { title: 'My Reports',        path: '/reports/my-reports' },
-        { title: 'Production Report', path: '/reports/production' },
-        { title: 'Inventory Report',  path: '/reports/inventory' },
-        { title: 'Sales Report',      path: '/reports/sales' },
-        { title: 'Finance Report',    path: '/reports/finance' },
-        { title: 'HR Report',         path: '/reports/hr' },
+        { title: 'Production Report',  path: '/reports/production' },
+        { title: 'Lot Stock Report',   path: '/reports/lot-stock' },
+        { title: 'Quality Report',     path: '/reports/quality' },
+        { title: 'Reconciliation',     path: '/reports/reconciliation' },
     ]},
+    { title: 'Analytics', icon: <AssessmentIcon />, path: '/analytics', children: [] },
+    { title: 'Daily Feed', icon: <DashboardIcon />, path: '/feed', children: [] },
     { title: 'Settings', icon: <TuneIcon />, children: [
         { title: 'Company Master',     path: '/settings/company-master' },
         { title: 'Format Panel',       path: '/settings/format-panel' },
-        { title: 'Message Templates',  path: '/settings/message-templates' },
+        { title: 'Tally Integration',  path: '/settings/tally' },
     ]},
-    { title: 'Report Maker', icon: <BuildIcon />, path: '/reports/maker/list' },
-    { title: 'Activity Log',  icon: <HistoryIcon />, path: '/audit/activity-log' },
+    { title: 'Activity Log', icon: <HistoryIcon />, path: '/audit/activity-log', children: [] },
 ];
 
 const MODULE_COLORS = {
-    'Dashboard':         '#6366f1',
-    'Master Data':       '#06b6d4',
-    'Inventory':         '#3b82f6',
-    'Purchasing':        '#10b981',
-    'Sales':             '#f59e0b',
-    'Finance':           '#ef4444',
-    'HR & Payroll':      '#8b5cf6',
-    'Production':        '#f97316',
-    'Technical Textile': '#14b8a6',
-    'Medical Textile':   '#ec4899',
-    'Settings':          '#64748b',
-    'Smart Feed':            '#f59e0b',
-    'Customer Intelligence': '#0ea5e9',
-    'Reports':           '#a78bfa',
-    'Report Maker':      '#a78bfa',
-    'Activity Log':      '#0ea5e9',
+    'Dashboard':      '#6366f1',
+    'Masters':        '#06b6d4',
+    'Purchase':       '#10b981',
+    'Lot Inventory':  '#3b82f6',
+    'Planning':       '#f59e0b',
+    'Production':     '#f97316',
+    'Quality':        '#14b8a6',
+    'Dispatch':       '#8b5cf6',
+    'Traceability':   '#ec4899',
+    'Inventory':      '#06b6d4',
+    'Reports':        '#a78bfa',
+    'Analytics':      '#f97316',
+    'Daily Feed':     '#10b981',
+    'Settings':       '#64748b',
+    'Activity Log':   '#0ea5e9',
 };
 
 // ── Horizontal Sidebar (Top / Bottom) ────────────────────────
@@ -200,7 +185,7 @@ function HorizontalSidebar({ visibleMenu, navigate, location, accent, isBottom }
                     <span style={{ fontWeight: 700, color: 'white', fontSize: 14 }}>S</span>
                 </div>
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#f1f5f9', whiteSpace: 'nowrap' }}>
-                    MEI TEXZ ERP
+                    MEI TEXZ
                 </span>
             </div>
 
@@ -465,10 +450,10 @@ function Sidebar({ permissions, isAdmin }) {
                     {!collapsed && (
                         <Box sx={{ overflow: 'hidden' }}>
                             <Typography fontWeight={700} color={TEXT_PRI} fontSize={fs(15)} lineHeight={1.2} noWrap>
-                                MEI TEXZ ERP
+                                MEI TEXZ
                             </Typography>
                             <Typography color={TEXT_SEC} fontSize={fs(9.5)} letterSpacing={0.5} noWrap>
-                                MEDICAL · TECHNICAL TEXTILE
+                                MEI TEXZ
                             </Typography>
                         </Box>
                     )}

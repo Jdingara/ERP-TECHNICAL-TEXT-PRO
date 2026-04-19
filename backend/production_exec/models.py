@@ -104,3 +104,44 @@ class BeamOutward(models.Model):
 
     def __str__(self): return self.beam_number
     class Meta: ordering = ['-created_at']
+
+
+# ── Yarn Issue (Warp / Weft Issue to production floor) ────────
+# Issued before a process entry — warp yarn to warping machine,
+# weft yarn to weaving machine
+def yarn_issue_number():
+    import datetime
+    today = datetime.date.today().strftime('%Y%m%d')
+    last  = YarnIssue.objects.filter(issue_number__startswith=f'YI-{today}').count()
+    return f"YI-{today}-{str(last + 1).zfill(3)}"
+
+
+class YarnIssue(models.Model):
+    PURPOSE = [
+        ('warp',  'Warp Yarn Issue'),
+        ('weft',  'Weft / Filling Issue'),
+        ('other', 'Other Material Issue'),
+    ]
+    STATUS = [
+        ('draft',     'Draft'),
+        ('confirmed', 'Confirmed'),
+    ]
+    company          = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
+    issue_number     = models.CharField(max_length=50, unique=True, default=yarn_issue_number)
+    production_order = models.ForeignKey(ProductionOrder, on_delete=models.PROTECT, related_name='yarn_issues')
+    lot              = models.ForeignKey(Lot, on_delete=models.PROTECT, related_name='yarn_issues')
+    issued_qty       = models.DecimalField(max_digits=10, decimal_places=3)
+    purpose          = models.CharField(max_length=20, choices=PURPOSE, default='warp')
+    issue_date       = models.DateField()
+    shift            = models.CharField(max_length=20, choices=[
+        ('morning', 'Morning'), ('afternoon', 'Afternoon'), ('night', 'Night'),
+    ], default='morning')
+    issued_to_machine = models.ForeignKey(Machine, on_delete=models.SET_NULL, null=True, blank=True, related_name='yarn_issues')
+    issued_by        = models.CharField(max_length=100, blank=True)
+    status           = models.CharField(max_length=20, choices=STATUS, default='draft')
+    notes            = models.TextField(blank=True)
+    created_by       = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at       = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self): return self.issue_number
+    class Meta: ordering = ['-issue_date', '-created_at']

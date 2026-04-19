@@ -97,3 +97,39 @@ class DailyPlan(models.Model):
 
     def __str__(self): return f"{self.plan_date} | {self.production_order.po_number} | {self.machine.machine_code}"
     class Meta: ordering = ['plan_date', 'machine']
+
+
+# ── Customer Forecast (3-month demand planning) ───────────────
+class CustomerForecast(models.Model):
+    STATUS = [('draft', 'Draft'), ('confirmed', 'Confirmed')]
+    company      = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
+    customer     = models.ForeignKey(Customer, on_delete=models.PROTECT, related_name='forecasts')
+    title        = models.CharField(max_length=200)
+    period_from  = models.DateField()       # start of 3-month window
+    period_to    = models.DateField()       # end of 3-month window
+    month_1_label = models.CharField(max_length=20, blank=True)   # e.g. "Apr 2026"
+    month_2_label = models.CharField(max_length=20, blank=True)
+    month_3_label = models.CharField(max_length=20, blank=True)
+    status       = models.CharField(max_length=20, choices=STATUS, default='draft')
+    notes        = models.TextField(blank=True)
+    created_by   = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at   = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self): return f"{self.title} — {self.customer.customer_name}"
+    class Meta: ordering = ['-created_at']
+
+
+class ForecastLine(models.Model):
+    forecast    = models.ForeignKey(CustomerForecast, on_delete=models.CASCADE, related_name='lines')
+    product     = models.ForeignKey(ProductDesign, on_delete=models.PROTECT)
+    month_1_qty = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    month_2_qty = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    month_3_qty = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    uom         = models.CharField(max_length=20, default='kg')
+    notes       = models.CharField(max_length=200, blank=True)
+
+    @property
+    def total_qty(self): return float(self.month_1_qty) + float(self.month_2_qty) + float(self.month_3_qty)
+
+    def __str__(self): return f"{self.forecast.title} / {self.product.design_name}"
+    class Meta: ordering = ['product__design_code']

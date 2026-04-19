@@ -108,16 +108,22 @@ class Process(models.Model):
 
 
 class ProductDesign(models.Model):
-    company      = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
-    design_code  = models.CharField(max_length=50, unique=True)
-    design_name  = models.CharField(max_length=200)
-    category     = models.CharField(max_length=100, blank=True)
-    gsm          = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
-    width_cm     = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
-    composition  = models.CharField(max_length=200, blank=True)
-    customer_ref = models.CharField(max_length=100, blank=True)
-    is_active    = models.BooleanField(default=True)
-    created_at   = models.DateTimeField(auto_now_add=True)
+    PROCESS_ROUTE = [
+        ('direct',     'Direct Sale (Buy → Sell)'),
+        ('fabric_in',  'Fabric-In (Buy Fabric → Process → Sell)'),
+        ('full_cycle', 'Full Cycle (Yarn → Weave → Process → Sell)'),
+    ]
+    company       = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
+    design_code   = models.CharField(max_length=50, unique=True)
+    design_name   = models.CharField(max_length=200)
+    category      = models.CharField(max_length=100, blank=True)
+    process_route = models.CharField(max_length=20, choices=PROCESS_ROUTE, default='full_cycle')
+    gsm           = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    width_cm      = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    composition   = models.CharField(max_length=200, blank=True)
+    customer_ref  = models.CharField(max_length=100, blank=True)
+    is_active     = models.BooleanField(default=True)
+    created_at    = models.DateTimeField(auto_now_add=True)
 
     def __str__(self): return f"{self.design_code} - {self.design_name}"
     class Meta: ordering = ['design_code']

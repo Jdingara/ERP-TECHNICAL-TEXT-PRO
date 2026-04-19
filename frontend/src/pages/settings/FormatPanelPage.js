@@ -1,483 +1,257 @@
-// ============================================================
-// FILE: pages/settings/FormatPanelPage.js
-// PURPOSE: Admin settings page — configure Financial Years
-//          and Document Series auto-numbering formats.
-// ============================================================
+import { useState, useEffect } from 'react';
 
-import React, { useState, useEffect } from 'react';
-import {
-    Box, Typography, Paper, Grid, Card, CardContent, Button,
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Dialog, DialogTitle, DialogContent, DialogActions,
-    TextField, Select, MenuItem, FormControl, InputLabel,
-    Switch, FormControlLabel, Chip, Alert, CircularProgress,
-    Divider, Tooltip, IconButton,
-} from '@mui/material';
-import EditIcon        from '@mui/icons-material/Edit';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import AddIcon         from '@mui/icons-material/Add';
-import RefreshIcon     from '@mui/icons-material/Refresh';
-import RestoreIcon     from '@mui/icons-material/Restore';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import SettingsIcon    from '@mui/icons-material/Settings';
-import { useColumnResize } from '../../components/common/useColumnResize';
+const FY_API = '/api/master-data/settings/financial-years';
 
-const API = '/api/master-data/settings';
+const TT_FORMATS = [
+    { doc: 'Purchase Order',    prefix: 'PO',   module: 'Purchase',        example: 'PO-20260419-001',   color: '#3b82f6' },
+    { doc: 'Goods Receipt Note',prefix: 'GRN',  module: 'Purchase',        example: 'GRN-20260419-001',  color: '#3b82f6' },
+    { doc: 'LOT Number',        prefix: 'LOT',  module: 'Purchase',        example: 'LOT-20260419-001',  color: '#f59e0b' },
+    { doc: 'Purchase Invoice',  prefix: 'PINV', module: 'Purchase',        example: 'PINV-20260419-001', color: '#3b82f6' },
+    { doc: 'Sales Order',       prefix: 'SO',   module: 'Planning',        example: 'SO-20260419-001',   color: '#8b5cf6' },
+    { doc: 'Production Order',  prefix: 'PROD', module: 'Planning',        example: 'PROD-20260419-001', color: '#8b5cf6' },
+    { doc: 'Yarn Issue',        prefix: 'YI',   module: 'Production',      example: 'YI-20260419-001',   color: '#10b981' },
+    { doc: 'Process Entry',     prefix: 'PE',   module: 'Production',      example: 'PE-20260419-001',   color: '#10b981' },
+    { doc: 'Batch',             prefix: 'BAT',  module: 'Production',      example: 'BAT-20260419-001',  color: '#10b981' },
+    { doc: 'Beam Outward',      prefix: 'BM',   module: 'Production',      example: 'BM-20260419-001',   color: '#10b981' },
+    { doc: 'Inspection',        prefix: 'QC',   module: 'Quality',         example: 'QC-20260419-001',   color: '#ef4444' },
+    { doc: 'Sample Test',       prefix: 'ST',   module: 'Quality',         example: 'ST-20260419-001',   color: '#ef4444' },
+    { doc: 'Dispatch Entry',    prefix: 'DE',   module: 'Dispatch',        example: 'DE-20260419-001',   color: '#f97316' },
+    { doc: 'Sales Invoice',     prefix: 'SINV', module: 'Dispatch',        example: 'SINV-20260419-001', color: '#f97316' },
+];
 
-// ─── Financial Year Panel ────────────────────────────────────
-function FinancialYearPanel() {
-    const { widths, Resizer } = useColumnResize("formatpanel", [100, 180, 150, 80]);
-    const [years,    setYears]    = useState([]);
-    const [loading,  setLoading]  = useState(true);
-    const [msg,      setMsg]      = useState('');
-    const [msgType,  setMsgType]  = useState('success');
-    const [open,     setOpen]     = useState(false);
-    const [form,     setForm]     = useState({ label: '', start_date: '', end_date: '' });
+const MODULE_COLORS = {
+    Purchase:   '#3b82f6',
+    Planning:   '#8b5cf6',
+    Production: '#10b981',
+    Quality:    '#ef4444',
+    Dispatch:   '#f97316',
+};
 
-    const load = async () => {
-        setLoading(true);
+export default function FormatPanelPage() {
+    const [years,   setYears]   = useState([]);
+    const [fyLoad,  setFyLoad]  = useState(false);
+    const [msg,     setMsg]     = useState('');
+    const [msgOk,   setMsgOk]   = useState(true);
+    const [showNew, setShowNew] = useState(false);
+    const [form,    setForm]    = useState({ label: '', start_date: '', end_date: '' });
+
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+
+    const loadFY = async () => {
+        setFyLoad(true);
         try {
-            const res = await fetch(`${API}/financial-years/`, { credentials: 'include' });
-            const json = await res.json();
-            setYears(Array.isArray(json) ? json : []);
-        } catch (e) { setYears([]); }
-        finally { setLoading(false); }
+            const r = await fetch(`${FY_API}/`, { credentials: 'include' });
+            const d = await r.json();
+            setYears(Array.isArray(d) ? d : []);
+        } catch { setYears([]); }
+        setFyLoad(false);
     };
 
-    useEffect(() => { load(); }, []);
+    useEffect(() => { loadFY(); }, []);
 
-    const create = async () => {
+    const createFY = async () => {
         try {
-            const res  = await fetch(`${API}/financial-years/`, {
-                method: 'POST',
-                credentials: 'include',
+            const r = await fetch(`${FY_API}/`, {
+                method: 'POST', credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(form),
             });
-            const json = await res.json();
-            if (!res.ok) throw new Error(json.message);
-            setMsg(json.message); setMsgType('success');
-            setOpen(false);
-            setForm({ label: '', start_date: '', end_date: '' });
-            load();
-        } catch (e) { setMsg(e.message); setMsgType('error'); }
+            const d = await r.json();
+            setMsg(d.message || 'Created'); setMsgOk(r.ok);
+            if (r.ok) { setShowNew(false); setForm({ label: '', start_date: '', end_date: '' }); loadFY(); }
+        } catch (e) { setMsg(e.message); setMsgOk(false); }
     };
 
-    const activate = async (id, label) => {
-        if (!window.confirm(`Activate "${label}"? All document counters will reset to starting number.`)) return;
+    const activateFY = async (id, label) => {
+        if (!window.confirm(`Activate "${label}"?`)) return;
         try {
-            const res  = await fetch(`${API}/financial-years/${id}/activate/`, {
-                method: 'POST', credentials: 'include',
-            });
-            const json = await res.json();
-            setMsg(json.message); setMsgType(res.ok ? 'success' : 'error');
-            load();
-        } catch (e) { setMsg(e.message); setMsgType('error'); }
+            const r = await fetch(`${FY_API}/${id}/activate/`, { method: 'POST', credentials: 'include' });
+            const d = await r.json();
+            setMsg(d.message); setMsgOk(r.ok); loadFY();
+        } catch (e) { setMsg(e.message); setMsgOk(false); }
     };
 
     const deleteFY = async (id, label) => {
-        if (!window.confirm(`Delete financial year "${label}"?`)) return;
+        if (!window.confirm(`Delete "${label}"?`)) return;
         try {
-            const res  = await fetch(`${API}/financial-years/${id}/delete/`, {
-                method: 'DELETE', credentials: 'include',
-            });
-            const json = await res.json();
-            setMsg(json.message); setMsgType(res.ok ? 'success' : 'error');
-            load();
-        } catch (e) { setMsg(e.message); setMsgType('error'); }
+            const r = await fetch(`${FY_API}/${id}/delete/`, { method: 'DELETE', credentials: 'include' });
+            const d = await r.json();
+            setMsg(d.message); setMsgOk(r.ok); loadFY();
+        } catch (e) { setMsg(e.message); setMsgOk(false); }
     };
 
     return (
-        <Paper sx={{ p: 2.5, borderRadius: 2, boxShadow: 2, mb: 3 }}>
-            {/* Header */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CalendarMonthIcon sx={{ color: 'primary.main' }} />
-                    <Typography variant="h6" fontWeight="bold" color="primary">Financial Year</Typography>
-                </Box>
-                <Button variant="contained" size="small" startIcon={<AddIcon />}
-                    sx={{ backgroundColor: 'primary.main' }} onClick={() => setOpen(true)}>
-                    New Financial Year
-                </Button>
-            </Box>
+        <div style={{ padding: 24, maxWidth: 1100 }}>
 
-            {msg && <Alert severity={msgType} sx={{ mb: 2 }} onClose={() => setMsg('')}>{msg}</Alert>}
+            {/* Page Header */}
+            <div style={{ background: 'linear-gradient(135deg,#1e3a5f,#2563eb)', borderRadius: 12, padding: '20px 24px', marginBottom: 28, color: '#fff' }}>
+                <div style={{ fontSize: 22, fontWeight: 700 }}>Format Panel</div>
+                <div style={{ fontSize: 13, opacity: 0.75, marginTop: 4 }}>
+                    Configure Financial Years · Document auto-numbering reference · Admin only
+                </div>
+            </div>
 
-            {loading ? <CircularProgress size={24} /> : (
-                <TableContainer>
-                    <Table size="small">
-                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
-                            <TableRow>
-                                {['Year Label', 'Start Date', 'End Date', 'Status', 'Actions'].map(h => (
-                                    <TableCell key={h} sx={{ fontWeight: 'bold', fontSize: 12 }}>{h}</TableCell>
-                                ))}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {years.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={5} align="center" sx={{ color: 'text.secondary', py: 3 }}>
-                                        No financial years created yet. Click "New Financial Year" to add one.
-                                    </TableCell>
-                                </TableRow>
-                            ) : years.map(fy => (
-                                <TableRow key={fy.id} sx={{ backgroundColor: fy.is_active ? 'success.light' : 'inherit', opacity: 1 }}
-                                    style={fy.is_active ? { backgroundColor: 'rgba(46,125,50,0.08)' } : {}}>
-                                    <TableCell><strong>{fy.label}</strong></TableCell>
-                                    <TableCell>{fy.start_date}</TableCell>
-                                    <TableCell>{fy.end_date}</TableCell>
-                                    <TableCell>
+            {msg && (
+                <div style={{ background: msgOk ? '#d1fae5' : '#fee2e2', border: `1px solid ${msgOk ? '#6ee7b7' : '#fca5a5'}`, borderRadius: 8, padding: '10px 16px', marginBottom: 20, fontSize: 13, color: msgOk ? '#065f46' : '#991b1b', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>{msg}</span>
+                    <span style={{ cursor: 'pointer', fontWeight: 700 }} onClick={() => setMsg('')}>✕</span>
+                </div>
+            )}
+
+            {/* ── Financial Year ──────────────────────────────── */}
+            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: 24, marginBottom: 28, boxShadow: '0 1px 4px #0001' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+                    <div>
+                        <div style={{ fontSize: 16, fontWeight: 700, color: '#1e293b' }}>📅 Financial Year</div>
+                        <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>Active FY label is used in document numbers</div>
+                    </div>
+                    <button onClick={() => setShowNew(true)} style={btn('#2563eb')}>+ New Financial Year</button>
+                </div>
+
+                {fyLoad ? <div style={{ color: '#94a3b8', fontSize: 13 }}>Loading…</div> : (
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                        <thead>
+                            <tr style={{ background: '#f8fafc' }}>
+                                {['Year Label', 'Start Date', 'End Date', 'Status', 'Actions'].map(h =>
+                                    <th key={h} style={thS}>{h}</th>)}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {years.length === 0 && (
+                                <tr><td colSpan={5} style={{ textAlign: 'center', padding: 32, color: '#94a3b8' }}>
+                                    No financial years yet. Click "New Financial Year" to add one.
+                                </td></tr>
+                            )}
+                            {years.map((fy, i) => (
+                                <tr key={fy.id} style={{ background: fy.is_active ? '#f0fdf4' : i % 2 === 0 ? '#fff' : '#f8fafc' }}>
+                                    <td style={tdS}><b style={{ color: '#1e293b' }}>{fy.label}</b></td>
+                                    <td style={tdS}>{fy.start_date}</td>
+                                    <td style={tdS}>{fy.end_date}</td>
+                                    <td style={tdS}>
                                         {fy.is_active
-                                            ? <Chip label="ACTIVE" size="small" color="success" icon={<CheckCircleIcon />} />
-                                            : <Chip label="Inactive" size="small" variant="outlined" />}
-                                    </TableCell>
-                                    <TableCell>
-                                        {!fy.is_active && (
-                                            <>
-                                                <Button size="small" variant="outlined" color="success"
-                                                    sx={{ mr: 1, fontSize: 11 }}
-                                                    onClick={() => activate(fy.id, fy.label)}>
-                                                    Activate
-                                                </Button>
-                                                <Button size="small" variant="outlined" color="error"
-                                                    sx={{ fontSize: 11 }}
-                                                    onClick={() => deleteFY(fy.id, fy.label)}>
-                                                    Delete
-                                                </Button>
-                                            </>
-                                        )}
-                                    </TableCell>
-                                </TableRow>
+                                            ? <span style={tag('#10b981')}>✓ Active</span>
+                                            : <span style={tag('#94a3b8')}>Inactive</span>}
+                                    </td>
+                                    <td style={tdS}>
+                                        {!fy.is_active && (<>
+                                            <button onClick={() => activateFY(fy.id, fy.label)} style={{ ...smallBtn('#10b981'), marginRight: 8 }}>Activate</button>
+                                            <button onClick={() => deleteFY(fy.id, fy.label)} style={smallBtn('#ef4444')}>Delete</button>
+                                        </>)}
+                                    </td>
+                                </tr>
                             ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                        </tbody>
+                    </table>
+                )}
+            </div>
+
+            {/* ── Document Number Formats ─────────────────────── */}
+            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: 24, boxShadow: '0 1px 4px #0001' }}>
+                <div style={{ marginBottom: 18 }}>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#1e293b' }}>⚙️ Document Number Formats</div>
+                    <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                        MEI TEXZ uses date-based auto-numbering. Format: <b>PREFIX-YYYYMMDD-NNN</b>
+                    </div>
+                </div>
+
+                {/* Info banner */}
+                <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 8, padding: '10px 16px', marginBottom: 20, fontSize: 12, color: '#1e40af' }}>
+                    ℹ️ Numbers are generated automatically by the system on each new record. Today's example uses date <b>{today}</b>.
+                    Each module maintains its own daily counter (resets to 001 each new day).
+                </div>
+
+                {/* Module legend */}
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
+                    {Object.entries(MODULE_COLORS).map(([mod, col]) => (
+                        <span key={mod} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: col }}>
+                            <span style={{ width: 10, height: 10, borderRadius: '50%', background: col, display: 'inline-block' }} />
+                            {mod}
+                        </span>
+                    ))}
+                </div>
+
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                    <thead>
+                        <tr style={{ background: '#1e293b', color: '#fff' }}>
+                            {['Document Type', 'Module', 'Prefix', 'Pattern', 'Today\'s Example'].map(h =>
+                                <th key={h} style={thSDark}>{h}</th>)}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {TT_FORMATS.map((f, i) => (
+                            <tr key={f.doc} style={{ background: i % 2 === 0 ? '#fff' : '#f8fafc' }}>
+                                <td style={tdS}><b style={{ color: '#1e293b' }}>{f.doc}</b></td>
+                                <td style={tdS}>
+                                    <span style={{ color: MODULE_COLORS[f.module], fontWeight: 600, fontSize: 12 }}>
+                                        {f.module}
+                                    </span>
+                                </td>
+                                <td style={tdS}>
+                                    <span style={{ background: `${f.color}18`, color: f.color, padding: '2px 10px', borderRadius: 20, fontWeight: 700, fontSize: 12, fontFamily: 'monospace' }}>
+                                        {f.prefix}
+                                    </span>
+                                </td>
+                                <td style={{ ...tdS, fontFamily: 'monospace', color: '#475569' }}>
+                                    {f.prefix}-YYYYMMDD-NNN
+                                </td>
+                                <td style={tdS}>
+                                    <span style={{ background: '#f0fdf4', color: '#065f46', padding: '3px 12px', borderRadius: 20, fontSize: 12, fontFamily: 'monospace', fontWeight: 600, border: '1px solid #bbf7d0' }}>
+                                        {f.example.replace('20260419', today)}
+                                    </span>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+                <div style={{ marginTop: 16, fontSize: 12, color: '#64748b', background: '#f8fafc', borderRadius: 8, padding: '10px 16px' }}>
+                    <b>Note:</b> NNN = 3-digit counter (001, 002, …) that increments per day per document type.
+                    The counter resets automatically each new calendar day.
+                </div>
+            </div>
+
+            {/* ── New FY Modal ────────────────────────────────── */}
+            {showNew && (
+                <div style={{ position: 'fixed', inset: 0, background: '#0006', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                    <div style={{ background: '#fff', borderRadius: 12, padding: 28, width: 400, boxShadow: '0 8px 32px #0003' }}>
+                        <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, color: '#1e293b' }}>Create New Financial Year</div>
+                        <div style={{ marginBottom: 14 }}>
+                            <label style={labelS}>Year Label *</label>
+                            <input placeholder="e.g., 25-26" value={form.label}
+                                onChange={e => setForm({ ...form, label: e.target.value })}
+                                style={inputS} />
+                            <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>Used in document numbers when FY is included</div>
+                        </div>
+                        <div style={{ marginBottom: 14 }}>
+                            <label style={labelS}>Start Date *</label>
+                            <input type="date" value={form.start_date}
+                                onChange={e => setForm({ ...form, start_date: e.target.value })}
+                                style={inputS} />
+                        </div>
+                        <div style={{ marginBottom: 20 }}>
+                            <label style={labelS}>End Date *</label>
+                            <input type="date" value={form.end_date}
+                                onChange={e => setForm({ ...form, end_date: e.target.value })}
+                                style={inputS} />
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                            <button onClick={() => setShowNew(false)} style={smallBtn('#94a3b8')}>Cancel</button>
+                            <button onClick={createFY}
+                                disabled={!form.label || !form.start_date || !form.end_date}
+                                style={btn('#2563eb')}>Create</button>
+                        </div>
+                    </div>
+                </div>
             )}
-
-            {/* Create FY Dialog */}
-            <Dialog open={open} onClose={() => setOpen(false)} maxWidth="xs" fullWidth>
-                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white', fontWeight: 'bold' }}>
-                    Create New Financial Year
-                </DialogTitle>
-                <DialogContent sx={{ pt: 2.5, display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-                    <TextField label="Year Label *" placeholder="e.g., 2025-26"
-                        value={form.label} onChange={e => setForm({ ...form, label: e.target.value })}
-                        helperText="This label is used in document numbers when Include FY is ON" fullWidth size="small" />
-                    <TextField label="Start Date *" type="date" InputLabelProps={{ shrink: true }}
-                        value={form.start_date} onChange={e => setForm({ ...form, start_date: e.target.value })}
-                        fullWidth size="small" />
-                    <TextField label="End Date *" type="date" InputLabelProps={{ shrink: true }}
-                        value={form.end_date} onChange={e => setForm({ ...form, end_date: e.target.value })}
-                        fullWidth size="small" />
-                </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={create}
-                        disabled={!form.label || !form.start_date || !form.end_date}
-                        sx={{ backgroundColor: 'primary.main' }}>
-                        Create
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </Paper>
+        </div>
     );
 }
 
-
-// ─── Document Series Panel ────────────────────────────────────
-const PADDING_OPTIONS = [
-    { value: 2, label: '01  (2 digits)' },
-    { value: 3, label: '001 (3 digits)' },
-    { value: 4, label: '0001 (4 digits)' },
-    { value: 5, label: '00001 (5 digits)' },
-];
-
-const SEP_OPTIONS = [
-    { value: '-',  label: 'Hyphen  —  PO-001' },
-    { value: '/',  label: 'Slash   —  PO/001' },
-    { value: '_',  label: 'Underscore — PO_001' },
-    { value: '',   label: 'None    —  PO001' },
-];
-
-function DocumentSeriesPanel() {
-    const [series,  setSeries]  = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [msg,     setMsg]     = useState('');
-    const [msgType, setMsgType] = useState('success');
-    const [editing, setEditing] = useState(null);   // series object being edited
-    const [form,    setForm]    = useState({});
-
-    const load = async () => {
-        setLoading(true);
-        try {
-            const res = await fetch(`${API}/document-series/`, { credentials: 'include' });
-            setSeries(await res.json());
-        } catch (e) { setSeries([]); }
-        finally { setLoading(false); }
-    };
-
-    useEffect(() => { load(); }, []);
-
-    const openEdit = (s) => {
-        setEditing(s);
-        setForm({
-            prefix:          s.prefix,
-            include_fy:      s.include_fy,
-            separator:       s.separator,
-            padding:         s.padding,
-            starting_number: s.starting_number,
-            is_enabled:      s.is_enabled,
-        });
-    };
-
-    const save = async () => {
-        try {
-            const res  = await fetch(`${API}/document-series/${editing.id}/`, {
-                method: 'PUT',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form),
-            });
-            const json = await res.json();
-            if (!res.ok) throw new Error(json.message);
-            setMsg(`"${editing.label}" format updated.`); setMsgType('success');
-            setEditing(null);
-            load();
-        } catch (e) { setMsg(e.message); setMsgType('error'); }
-    };
-
-    const reset = async (s) => {
-        if (!window.confirm(`Reset counter for "${s.label}"? Next number will be ${s.starting_number}.`)) return;
-        try {
-            const res  = await fetch(`${API}/document-series/${s.id}/reset/`, {
-                method: 'POST', credentials: 'include',
-            });
-            const json = await res.json();
-            setMsg(json.message); setMsgType(res.ok ? 'success' : 'error');
-            load();
-        } catch (e) { setMsg(e.message); setMsgType('error'); }
-    };
-
-    // Preview inside edit dialog
-    const previewNumber = () => {
-        const parts = [];
-        if (form.prefix) parts.push(form.prefix);
-        if (form.include_fy) parts.push('25-26');  // example FY
-        const n = Math.max((editing?.current_number || 0) + 1, parseInt(form.starting_number) || 1);
-        parts.push(String(n).padStart(parseInt(form.padding) || 3, '0'));
-        const sep = form.separator !== undefined ? form.separator : '-';
-        return parts.join(sep) || '—';
-    };
-
-    return (
-        <Paper sx={{ p: 2.5, borderRadius: 2, boxShadow: 2 }}>
-            {/* Header */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <SettingsIcon sx={{ color: 'primary.main' }} />
-                    <Typography variant="h6" fontWeight="bold" color="primary">Document Series Format</Typography>
-                </Box>
-                <Button size="small" variant="outlined" startIcon={<RefreshIcon />} onClick={load}>
-                    Refresh
-                </Button>
-            </Box>
-
-            {msg && <Alert severity={msgType} sx={{ mb: 2 }} onClose={() => setMsg('')}>{msg}</Alert>}
-
-            <Alert severity="info" sx={{ mb: 2 }}>
-                <strong>How it works:</strong> Format = Prefix + Separator + Financial Year (optional) + Separator + Number.
-                Example: <strong>PO-25-26-001</strong> (prefix=PO, FY=25-26, pad=3, sep=-)
-            </Alert>
-
-            {loading ? <CircularProgress size={24} /> : (
-                <TableContainer>
-                    <Table size="small">
-                        <TableHead sx={{ backgroundColor: 'action.hover' }}>
-                            <TableRow>
-                                {['Document', 'Prefix', 'Sep', 'Inc. FY', 'Padding', 'Start', 'Current #', 'Preview', 'Status', 'Actions'].map(h => (
-                                    <TableCell key={h} sx={{ fontWeight: 'bold', fontSize: 11, whiteSpace: 'nowrap' }}>{h}</TableCell>
-                                ))}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {series.map(s => (
-                                <TableRow key={s.id} sx={{ opacity: s.is_enabled ? 1 : 0.6 }}>
-                                    <TableCell sx={{ fontWeight: 600, fontSize: 12 }}>{s.label}</TableCell>
-                                    <TableCell>
-                                        <Chip label={s.prefix || '—'} size="small" variant="outlined"
-                                            color="primary" sx={{ fontSize: 11 }} />
-                                    </TableCell>
-                                    <TableCell sx={{ fontSize: 12 }}>
-                                        {s.separator === '' ? '(none)' : s.separator}
-                                    </TableCell>
-                                    <TableCell>
-                                        {s.include_fy
-                                            ? <Chip label="YES" size="small" color="primary" sx={{ fontSize: 10 }} />
-                                            : <Chip label="NO"  size="small" variant="outlined" sx={{ fontSize: 10 }} />}
-                                    </TableCell>
-                                    <TableCell sx={{ fontSize: 12 }}>{`${s.padding}d`}</TableCell>
-                                    <TableCell sx={{ fontSize: 12 }}>{s.starting_number}</TableCell>
-                                    <TableCell sx={{ fontSize: 12, color: 'text.secondary' }}>{s.current_number}</TableCell>
-                                    <TableCell>
-                                        <Chip label={s.preview} size="small" color="success" variant="outlined"
-                                            sx={{ fontSize: 11, fontFamily: 'monospace' }} />
-                                    </TableCell>
-                                    <TableCell>
-                                        {s.is_enabled
-                                            ? <Chip label="Auto ON" size="small" color="success" sx={{ fontSize: 10 }} />
-                                            : <Chip label="Manual"  size="small" color="default" sx={{ fontSize: 10 }} />}
-                                    </TableCell>
-                                    <TableCell>
-                                        <Tooltip title="Edit format">
-                                            <IconButton size="small" onClick={() => openEdit(s)}>
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="Reset counter">
-                                            <IconButton size="small" color="warning" onClick={() => reset(s)}>
-                                                <RestoreIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            )}
-
-            {/* Edit Dialog */}
-            <Dialog open={!!editing} onClose={() => setEditing(null)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ backgroundColor: 'primary.main', color: 'white', fontWeight: 'bold' }}>
-                    Edit Format — {editing?.label}
-                </DialogTitle>
-                <DialogContent sx={{ pt: 2.5, mt: 1 }}>
-                    <Grid container spacing={2}>
-
-                        <Grid item xs={12}>
-                            <TextField
-                                label="Prefix"
-                                placeholder="e.g., PO, INV, IT, CUS"
-                                value={form.prefix || ''}
-                                onChange={e => setForm({ ...form, prefix: e.target.value.toUpperCase() })}
-                                fullWidth size="small"
-                                helperText="Short text that identifies the document type"
-                            />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                            <FormControl fullWidth size="small">
-                                <InputLabel>Separator</InputLabel>
-                                <Select value={form.separator ?? '-'} label="Separator"
-                                    onChange={e => setForm({ ...form, separator: e.target.value })}>
-                                    {SEP_OPTIONS.map(o => (
-                                        <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-
-                        <Grid item xs={6}>
-                            <FormControl fullWidth size="small">
-                                <InputLabel>Number Padding</InputLabel>
-                                <Select value={form.padding || 3} label="Number Padding"
-                                    onChange={e => setForm({ ...form, padding: e.target.value })}>
-                                    {PADDING_OPTIONS.map(o => (
-                                        <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-
-                        <Grid item xs={6}>
-                            <TextField
-                                label="Starting Number"
-                                type="number"
-                                value={form.starting_number || 1}
-                                onChange={e => setForm({ ...form, starting_number: parseInt(e.target.value) || 1 })}
-                                fullWidth size="small"
-                                helperText="First number to issue"
-                            />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                            <Box sx={{ border: '1px solid #e0e0e0', borderRadius: 1, p: 1.5, height: '100%' }}>
-                                <Typography fontSize={11} color="text.secondary" mb={0.5}>Include Financial Year?</Typography>
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            checked={form.include_fy || false}
-                                            onChange={e => setForm({ ...form, include_fy: e.target.checked })}
-                                            color="primary" size="small"
-                                        />
-                                    }
-                                    label={form.include_fy ? 'Yes — FY included' : 'No — FY excluded'}
-                                    sx={{ fontSize: 12 }}
-                                />
-                            </Box>
-                        </Grid>
-
-                        <Grid item xs={12}>
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={form.is_enabled || false}
-                                        onChange={e => setForm({ ...form, is_enabled: e.target.checked })}
-                                        color="success"
-                                    />
-                                }
-                                label={form.is_enabled ? 'Auto-numbering ON (code is generated automatically)' : 'Auto-numbering OFF (user types code manually)'}
-                            />
-                        </Grid>
-
-                        {/* Live Preview */}
-                        <Grid item xs={12}>
-                            <Box sx={{ backgroundColor: '#f5f7ff', border: '1px solid #c5cae9', borderRadius: 1.5, p: 2, textAlign: 'center' }}>
-                                <Typography fontSize={11} color="text.secondary" mb={0.5}>NEXT NUMBER PREVIEW</Typography>
-                                <Typography variant="h5" fontWeight="bold" color="primary" fontFamily="monospace">
-                                    {form.is_enabled ? previewNumber() : 'Manual entry'}
-                                </Typography>
-                                {form.include_fy && (
-                                    <Typography fontSize={10} color="text.secondary" mt={0.5}>
-                                        * FY shown as "25-26" — uses active Financial Year label
-                                    </Typography>
-                                )}
-                            </Box>
-                        </Grid>
-                    </Grid>
-                </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setEditing(null)}>Cancel</Button>
-                    <Button variant="contained" onClick={save}
-                        sx={{ backgroundColor: 'primary.main' }}>
-                        Save Format
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </Paper>
-    );
-}
-
-
-// ─── Main Page ───────────────────────────────────────────────
-function FormatPanelPage() {
-    return (
-        <Box sx={{ pb: 4 }}>
-            {/* Page header */}
-            <Box sx={{
-                background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.dark || theme.palette.primary.main} 0%, ${theme.palette.primary.main} 100%)`,
-                borderRadius: 2, p: 2.5, mb: 3, color: 'white',
-            }}>
-                <Typography variant="h5" fontWeight="bold">Format Panel</Typography>
-                <Typography fontSize={12} sx={{ opacity: 0.7, mt: 0.3 }}>
-                    Configure auto-numbering formats for all document types · Admin only
-                </Typography>
-            </Box>
-
-            <FinancialYearPanel />
-            <DocumentSeriesPanel />
-        </Box>
-    );
-}
-
-export default FormatPanelPage;
+const thS     = { padding: '10px 14px', textAlign: 'left', fontWeight: 600, fontSize: 12, color: '#475569', borderBottom: '2px solid #e2e8f0' };
+const thSDark = { padding: '10px 14px', textAlign: 'left', fontWeight: 600, fontSize: 12 };
+const tdS     = { padding: '10px 14px', borderBottom: '1px solid #f1f5f9', fontSize: 13 };
+const tag     = (bg) => ({ display: 'inline-block', padding: '2px 10px', borderRadius: 20, background: `${bg}18`, color: bg, fontSize: 11, fontWeight: 600 });
+const btn     = (bg) => ({ padding: '8px 18px', background: bg, color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 });
+const smallBtn= (bg) => ({ padding: '5px 12px', background: 'transparent', color: bg, border: `1px solid ${bg}`, borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: 12 });
+const labelS  = { display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 6 };
+const inputS  = { width: '100%', padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 13, boxSizing: 'border-box', outline: 'none' };
