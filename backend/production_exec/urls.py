@@ -17,4 +17,16 @@ urlpatterns = [
     # Yarn Issue (Warp / Weft)
     path('yarn-issues/',                    views.yarn_issue_list,       name='yarn_issue_list'),
     path('yarn-issues/<int:pk>/confirm/',   views.confirm_yarn_issue,    name='confirm_yarn_issue'),
+
+    # Phase B — Stage Screens
+    path('stages/warping/',     views.warping_screen,    name='warping_screen'),
+    path('stages/weaving/',     views.weaving_screen,    name='weaving_screen'),
+    path('stages/stenter/',     views.stenter_screen,    name='stenter_screen'),
+    path('stages/tumbler/',     views.tumbler_screen,    name='tumbler_screen'),
+    path('stages/embossing/',   views.embossing_screen,  name='embossing_screen'),
+    path('stages/lamination/',  views.lamination_screen, name='lamination_screen'),
+
+    # Delivery Challan
+    path('delivery-challans/',          views.delivery_challan_list,   name='delivery_challan_list'),
+    path('delivery-challans/<int:pk>/', views.delivery_challan_detail, name='delivery_challan_detail'),
 ]

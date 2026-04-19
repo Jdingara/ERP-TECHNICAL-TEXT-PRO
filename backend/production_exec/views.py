@@ -17,7 +17,11 @@ from django.db import transaction
 from django.db.models import Q
 
 from master_data.company_utils import get_active_company
-from .models import ProcessEntry, ProcessEntryLotInput, Batch, BeamOutward, batch_number, YarnIssue
+from .models import (
+    ProcessEntry, ProcessEntryLotInput, Batch, BeamOutward, batch_number, YarnIssue,
+    WarpingDetail, WeavingDetail, StenterDetail, TumblerDetail, EmbossingDetail, LaminationDetail,
+    DeliveryChallan,
+)
 from purchase.models import Lot
 from lot_inventory.models import LotMovement
 from planning.models import ProductionOrder
@@ -475,3 +479,386 @@ def confirm_yarn_issue(request, pk):
         yi.save()
 
     return JsonResponse({'success': True, 'yarn_issue': yarn_issue_dict(yi)})
+
+
+# ══════════════════════════════════════════════════════════════
+# Phase B — Stage-Specific Screen Views
+# Each view creates ProcessEntry + stage detail in one transaction
+# GET → list entries for that stage; POST → create entry + detail
+# ══════════════════════════════════════════════════════════════
+
+def _stage_entry_dict(entry):
+    """Process entry dict enriched with whatever stage detail exists."""
+    d = process_entry_dict(entry, include_lots=True)
+    for attr, key in [
+        ('warping_detail',   'warping'),
+        ('weaving_detail',   'weaving'),
+        ('stenter_detail',   'stenter'),
+        ('tumbler_detail',   'tumbler'),
+        ('embossing_detail', 'embossing'),
+        ('lamination_detail','lamination'),
+    ]:
+        try:
+            detail = getattr(entry, attr)
+            d[key] = {f.name: getattr(detail, f.name) for f in detail._meta.fields if f.name != 'process_entry'}
+            # convert Decimal to str for JSON
+            for k, v in d[key].items():
+                import decimal
+                if isinstance(v, decimal.Decimal):
+                    d[key][k] = str(v)
+        except Exception:
+            d[key] = None
+    return d
+
+
+def _get_stage_entries(company, stage_keywords):
+    """Return process entries whose process_stage name contains any keyword (case-insensitive)."""
+    from django.db.models import Q
+    q = Q()
+    for kw in stage_keywords:
+        q |= Q(process_stage__process_name__icontains=kw)
+    return ProcessEntry.objects.filter(company=company).filter(q).select_related(
+        'production_order__product', 'process_stage', 'machine'
+    )
+
+
+# ── Warping Screen ────────────────────────────────────────────
+
+@csrf_exempt
+@require_http_methods(['GET', 'POST'])
+def warping_screen(request):
+    company = get_active_company(request)
+
+    if request.method == 'GET':
+        qs = _get_stage_entries(company, ['warp'])
+        return JsonResponse({'entries': [_stage_entry_dict(e) for e in qs]})
+
+    data = json.loads(request.body)
+    with transaction.atomic():
+        entry = ProcessEntry.objects.create(
+            company=company,
+            entry_number=next_entry_number(),
+            production_order_id=data['production_order_id'],
+            daily_plan_id=data.get('daily_plan_id') or None,
+            process_stage_id=data['process_stage_id'],
+            machine_id=data['machine_id'],
+            entry_date=data.get('entry_date', str(datetime.date.today())),
+            shift=data.get('shift', 'morning'),
+            operator_name=data.get('operator_name', ''),
+            output_quantity=data.get('output_quantity', 0),
+            rejection_qty=data.get('rejection_qty', 0),
+            notes=data.get('notes', ''),
+            created_by=request.user if request.user.is_authenticated else None,
+        )
+        WarpingDetail.objects.create(
+            process_entry=entry,
+            beam_count=data.get('beam_count', 1),
+            total_ends=data.get('total_ends', 0),
+            reed_count=data.get('reed_count', ''),
+            warp_length_m=data.get('warp_length_m', 0),
+            sizing_done=data.get('sizing_done', False),
+            beam_numbers=data.get('beam_numbers', ''),
+            warp_tension_g=data.get('warp_tension_g', 0),
+        )
+        for lot_data in data.get('lot_inputs', []):
+            ProcessEntryLotInput.objects.create(
+                process_entry=entry, lot_id=lot_data['lot_id'],
+                quantity_used=lot_data['quantity_used'],
+            )
+    return JsonResponse({'success': True, 'entry': _stage_entry_dict(entry)}, status=201)
+
+
+# ── Weaving Screen ────────────────────────────────────────────
+
+@csrf_exempt
+@require_http_methods(['GET', 'POST'])
+def weaving_screen(request):
+    company = get_active_company(request)
+
+    if request.method == 'GET':
+        qs = _get_stage_entries(company, ['weav', 'loom'])
+        return JsonResponse({'entries': [_stage_entry_dict(e) for e in qs]})
+
+    data = json.loads(request.body)
+    with transaction.atomic():
+        entry = ProcessEntry.objects.create(
+            company=company,
+            entry_number=next_entry_number(),
+            production_order_id=data['production_order_id'],
+            daily_plan_id=data.get('daily_plan_id') or None,
+            process_stage_id=data['process_stage_id'],
+            machine_id=data['machine_id'],
+            entry_date=data.get('entry_date', str(datetime.date.today())),
+            shift=data.get('shift', 'morning'),
+            operator_name=data.get('operator_name', ''),
+            output_quantity=data.get('output_quantity', 0),
+            rejection_qty=data.get('rejection_qty', 0),
+            notes=data.get('notes', ''),
+            created_by=request.user if request.user.is_authenticated else None,
+        )
+        WeavingDetail.objects.create(
+            process_entry=entry,
+            beam_outward_id=data.get('beam_outward_id') or None,
+            loom_rpm=data.get('loom_rpm', 0),
+            picks_per_cm=data.get('picks_per_cm', 0),
+            weft_pattern=data.get('weft_pattern', ''),
+            fabric_width_cm=data.get('fabric_width_cm', 0),
+            efficiency_pct=data.get('efficiency_pct', 0),
+        )
+        for lot_data in data.get('lot_inputs', []):
+            ProcessEntryLotInput.objects.create(
+                process_entry=entry, lot_id=lot_data['lot_id'],
+                quantity_used=lot_data['quantity_used'],
+            )
+    return JsonResponse({'success': True, 'entry': _stage_entry_dict(entry)}, status=201)
+
+
+# ── Stenter Screen ────────────────────────────────────────────
+
+@csrf_exempt
+@require_http_methods(['GET', 'POST'])
+def stenter_screen(request):
+    company = get_active_company(request)
+
+    if request.method == 'GET':
+        qs = _get_stage_entries(company, ['stenter', 'heat'])
+        return JsonResponse({'entries': [_stage_entry_dict(e) for e in qs]})
+
+    data = json.loads(request.body)
+    with transaction.atomic():
+        entry = ProcessEntry.objects.create(
+            company=company,
+            entry_number=next_entry_number(),
+            production_order_id=data['production_order_id'],
+            daily_plan_id=data.get('daily_plan_id') or None,
+            process_stage_id=data['process_stage_id'],
+            machine_id=data['machine_id'],
+            entry_date=data.get('entry_date', str(datetime.date.today())),
+            shift=data.get('shift', 'morning'),
+            operator_name=data.get('operator_name', ''),
+            output_quantity=data.get('output_quantity', 0),
+            rejection_qty=data.get('rejection_qty', 0),
+            notes=data.get('notes', ''),
+            created_by=request.user if request.user.is_authenticated else None,
+        )
+        StenterDetail.objects.create(
+            process_entry=entry,
+            temp_zone1=data.get('temp_zone1', 0),
+            temp_zone2=data.get('temp_zone2', 0),
+            temp_zone3=data.get('temp_zone3', 0),
+            temp_zone4=data.get('temp_zone4', 0),
+            speed_mpm=data.get('speed_mpm', 0),
+            width_cm=data.get('width_cm', 0),
+            overfeed_pct=data.get('overfeed_pct', 0),
+            chemical_recipe=data.get('chemical_recipe', ''),
+        )
+        for lot_data in data.get('lot_inputs', []):
+            ProcessEntryLotInput.objects.create(
+                process_entry=entry, lot_id=lot_data['lot_id'],
+                quantity_used=lot_data['quantity_used'],
+            )
+    return JsonResponse({'success': True, 'entry': _stage_entry_dict(entry)}, status=201)
+
+
+# ── Tumbler Screen ────────────────────────────────────────────
+
+@csrf_exempt
+@require_http_methods(['GET', 'POST'])
+def tumbler_screen(request):
+    company = get_active_company(request)
+
+    if request.method == 'GET':
+        qs = _get_stage_entries(company, ['tumbler', 'drum'])
+        return JsonResponse({'entries': [_stage_entry_dict(e) for e in qs]})
+
+    data = json.loads(request.body)
+    with transaction.atomic():
+        entry = ProcessEntry.objects.create(
+            company=company,
+            entry_number=next_entry_number(),
+            production_order_id=data['production_order_id'],
+            daily_plan_id=data.get('daily_plan_id') or None,
+            process_stage_id=data['process_stage_id'],
+            machine_id=data['machine_id'],
+            entry_date=data.get('entry_date', str(datetime.date.today())),
+            shift=data.get('shift', 'morning'),
+            operator_name=data.get('operator_name', ''),
+            output_quantity=data.get('output_quantity', 0),
+            rejection_qty=data.get('rejection_qty', 0),
+            notes=data.get('notes', ''),
+            created_by=request.user if request.user.is_authenticated else None,
+        )
+        TumblerDetail.objects.create(
+            process_entry=entry,
+            temp_celsius=data.get('temp_celsius', 0),
+            duration_minutes=data.get('duration_minutes', 0),
+            softener_name=data.get('softener_name', ''),
+            softener_qty_kg=data.get('softener_qty_kg', 0),
+            anti_wrinkle=data.get('anti_wrinkle', ''),
+        )
+        for lot_data in data.get('lot_inputs', []):
+            ProcessEntryLotInput.objects.create(
+                process_entry=entry, lot_id=lot_data['lot_id'],
+                quantity_used=lot_data['quantity_used'],
+            )
+    return JsonResponse({'success': True, 'entry': _stage_entry_dict(entry)}, status=201)
+
+
+# ── Embossing Screen ──────────────────────────────────────────
+
+@csrf_exempt
+@require_http_methods(['GET', 'POST'])
+def embossing_screen(request):
+    company = get_active_company(request)
+
+    if request.method == 'GET':
+        qs = _get_stage_entries(company, ['emboss'])
+        return JsonResponse({'entries': [_stage_entry_dict(e) for e in qs]})
+
+    data = json.loads(request.body)
+    with transaction.atomic():
+        entry = ProcessEntry.objects.create(
+            company=company,
+            entry_number=next_entry_number(),
+            production_order_id=data['production_order_id'],
+            daily_plan_id=data.get('daily_plan_id') or None,
+            process_stage_id=data['process_stage_id'],
+            machine_id=data['machine_id'],
+            entry_date=data.get('entry_date', str(datetime.date.today())),
+            shift=data.get('shift', 'morning'),
+            operator_name=data.get('operator_name', ''),
+            output_quantity=data.get('output_quantity', 0),
+            rejection_qty=data.get('rejection_qty', 0),
+            notes=data.get('notes', ''),
+            created_by=request.user if request.user.is_authenticated else None,
+        )
+        EmbossingDetail.objects.create(
+            process_entry=entry,
+            pattern_code=data.get('pattern_code', ''),
+            pressure_bar=data.get('pressure_bar', 0),
+            temp_celsius=data.get('temp_celsius', 0),
+            speed_mpm=data.get('speed_mpm', 0),
+        )
+        for lot_data in data.get('lot_inputs', []):
+            ProcessEntryLotInput.objects.create(
+                process_entry=entry, lot_id=lot_data['lot_id'],
+                quantity_used=lot_data['quantity_used'],
+            )
+    return JsonResponse({'success': True, 'entry': _stage_entry_dict(entry)}, status=201)
+
+
+# ── Lamination Screen ─────────────────────────────────────────
+
+@csrf_exempt
+@require_http_methods(['GET', 'POST'])
+def lamination_screen(request):
+    company = get_active_company(request)
+
+    if request.method == 'GET':
+        qs = _get_stage_entries(company, ['laminat', 'coat'])
+        return JsonResponse({'entries': [_stage_entry_dict(e) for e in qs]})
+
+    data = json.loads(request.body)
+    with transaction.atomic():
+        entry = ProcessEntry.objects.create(
+            company=company,
+            entry_number=next_entry_number(),
+            production_order_id=data['production_order_id'],
+            daily_plan_id=data.get('daily_plan_id') or None,
+            process_stage_id=data['process_stage_id'],
+            machine_id=data['machine_id'],
+            entry_date=data.get('entry_date', str(datetime.date.today())),
+            shift=data.get('shift', 'morning'),
+            operator_name=data.get('operator_name', ''),
+            output_quantity=data.get('output_quantity', 0),
+            rejection_qty=data.get('rejection_qty', 0),
+            notes=data.get('notes', ''),
+            created_by=request.user if request.user.is_authenticated else None,
+        )
+        LaminationDetail.objects.create(
+            process_entry=entry,
+            film_type=data.get('film_type', ''),
+            film_gsm=data.get('film_gsm', 0),
+            coat_weight_gsm=data.get('coat_weight_gsm', 0),
+            adhesive_type=data.get('adhesive_type', ''),
+            line_speed_mpm=data.get('line_speed_mpm', 0),
+            curing_temp=data.get('curing_temp', 0),
+        )
+        for lot_data in data.get('lot_inputs', []):
+            ProcessEntryLotInput.objects.create(
+                process_entry=entry, lot_id=lot_data['lot_id'],
+                quantity_used=lot_data['quantity_used'],
+            )
+    return JsonResponse({'success': True, 'entry': _stage_entry_dict(entry)}, status=201)
+
+
+# ── Delivery Challan ──────────────────────────────────────────
+
+def dc_dict(dc):
+    return {
+        'id': dc.id,
+        'dc_number': dc.dc_number,
+        'dispatch_entry_id': dc.dispatch_entry_id,
+        'dispatch_number': dc.dispatch_entry.dispatch_number if dc.dispatch_entry else '',
+        'customer_name': dc.dispatch_entry.customer.customer_name if dc.dispatch_entry and dc.dispatch_entry.customer else '',
+        'dc_date': str(dc.dc_date),
+        'vehicle_number': dc.vehicle_number,
+        'driver_name': dc.driver_name,
+        'lr_number': dc.lr_number,
+        'transporter': dc.transporter,
+        'eway_bill': dc.eway_bill,
+        'delivery_address': dc.delivery_address,
+        'remarks': dc.remarks,
+        'status': dc.status,
+        'created_at': dc.created_at.strftime('%Y-%m-%d %H:%M'),
+    }
+
+
+@csrf_exempt
+@require_http_methods(['GET', 'POST'])
+def delivery_challan_list(request):
+    company = get_active_company(request)
+
+    if request.method == 'GET':
+        qs = DeliveryChallan.objects.filter(company=company).select_related(
+            'dispatch_entry__customer'
+        )
+        return JsonResponse({'challans': [dc_dict(dc) for dc in qs]})
+
+    data = json.loads(request.body)
+    dc = DeliveryChallan.objects.create(
+        company=company,
+        dispatch_entry_id=data.get('dispatch_entry_id') or None,
+        dc_date=data.get('dc_date', str(datetime.date.today())),
+        vehicle_number=data.get('vehicle_number', ''),
+        driver_name=data.get('driver_name', ''),
+        lr_number=data.get('lr_number', ''),
+        transporter=data.get('transporter', ''),
+        eway_bill=data.get('eway_bill', ''),
+        delivery_address=data.get('delivery_address', ''),
+        remarks=data.get('remarks', ''),
+        status='draft',
+        created_by=request.user if request.user.is_authenticated else None,
+    )
+    return JsonResponse({'success': True, 'challan': dc_dict(dc)}, status=201)
+
+
+@csrf_exempt
+@require_http_methods(['GET', 'PUT'])
+def delivery_challan_detail(request, pk):
+    company = get_active_company(request)
+    try:
+        dc = DeliveryChallan.objects.get(pk=pk, company=company)
+    except DeliveryChallan.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
+
+    if request.method == 'GET':
+        return JsonResponse({'challan': dc_dict(dc)})
+
+    data = json.loads(request.body)
+    for field in ['vehicle_number', 'driver_name', 'lr_number', 'transporter',
+                  'eway_bill', 'delivery_address', 'remarks', 'status']:
+        if field in data:
+            setattr(dc, field, data[field])
+    dc.save()
+    return JsonResponse({'success': True, 'challan': dc_dict(dc)})

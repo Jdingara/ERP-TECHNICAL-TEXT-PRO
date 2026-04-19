@@ -54,6 +54,11 @@ import ProcessEntriesPage   from './pages/production/ProcessEntriesPage';
 import BatchesPage          from './pages/production/BatchesPage';
 import BeamsPage            from './pages/production/BeamsPage';
 import YarnIssuePage        from './pages/production/YarnIssuePage';
+import WarpingScreen        from './pages/production/WarpingScreen';
+import WeavingScreen        from './pages/production/WeavingScreen';
+import StenterScreen        from './pages/production/StenterScreen';
+import TumblerScreen        from './pages/production/TumblerScreen';
+import LaminationScreen     from './pages/production/LaminationScreen';
 
 // ── Quality ────────────────────────────────────────────────────
 import QCDashboardPage      from './pages/quality/QCDashboardPage';
@@ -64,6 +69,7 @@ import SampleTestingPage    from './pages/quality/SampleTestingPage';
 // ── Dispatch ───────────────────────────────────────────────────
 import DispatchEntriesPage  from './pages/dispatch/DispatchEntriesPage';
 import SalesInvoicesPage    from './pages/dispatch/SalesInvoicesPage';
+import DeliveryChallanPage  from './pages/dispatch/DeliveryChallanPage';
 
 // ── Traceability ────────────────────────────────────────────────
 import TraceabilityPage     from './pages/traceability/TraceabilityPage';
@@ -190,6 +196,11 @@ function App() {
                                     <Route path="/production/entries" element={<ProcessEntriesPage />} />
                                     <Route path="/production/batches" element={<BatchesPage />} />
                                     <Route path="/production/beams"   element={<BeamsPage />} />
+                                    <Route path="/production/stages/warping"    element={<WarpingScreen />} />
+                                    <Route path="/production/stages/weaving"    element={<WeavingScreen />} />
+                                    <Route path="/production/stages/stenter"    element={<StenterScreen />} />
+                                    <Route path="/production/stages/tumbler"    element={<TumblerScreen />} />
+                                    <Route path="/production/stages/lamination" element={<LaminationScreen />} />
 
                                     {/* Quality */}
                                     <Route path="/quality/dashboard"      element={<QCDashboardPage />} />
@@ -198,8 +209,9 @@ function App() {
                                     <Route path="/quality/sample-testing" element={<SampleTestingPage />} />
 
                                     {/* Dispatch */}
-                                    <Route path="/dispatch/entries"  element={<DispatchEntriesPage />} />
-                                    <Route path="/dispatch/invoices" element={<SalesInvoicesPage />} />
+                                    <Route path="/dispatch/entries"          element={<DispatchEntriesPage />} />
+                                    <Route path="/dispatch/invoices"         element={<SalesInvoicesPage />} />
+                                    <Route path="/dispatch/delivery-challans" element={<DeliveryChallanPage />} />
 
                                     {/* Traceability */}
                                     <Route path="/traceability" element={<TraceabilityPage />} />

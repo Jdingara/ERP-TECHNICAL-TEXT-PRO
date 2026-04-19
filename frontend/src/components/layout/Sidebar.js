@@ -77,6 +77,12 @@ const MENU_ITEMS = [
         { title: 'Process Entries', path: '/production/entries' },
         { title: 'Batches',         path: '/production/batches' },
         { title: 'Beam Outward',    path: '/production/beams' },
+        { title: '— Stage Screens —', path: '' },
+        { title: 'Warping',         path: '/production/stages/warping' },
+        { title: 'Weaving',         path: '/production/stages/weaving' },
+        { title: 'Stenter',         path: '/production/stages/stenter' },
+        { title: 'Tumbler',         path: '/production/stages/tumbler' },
+        { title: 'Lamination',      path: '/production/stages/lamination' },
     ]},
     { title: 'Quality', icon: <TaskAltIcon />, children: [
         { title: 'QC Dashboard',   path: '/quality/dashboard' },
@@ -85,8 +91,9 @@ const MENU_ITEMS = [
         { title: 'Sample Testing', path: '/quality/sample-testing' },
     ]},
     { title: 'Dispatch', icon: <LocalShippingIcon />, children: [
-        { title: 'Dispatch Entries', path: '/dispatch/entries' },
-        { title: 'Sales Invoices',   path: '/dispatch/invoices' },
+        { title: 'Dispatch Entries',    path: '/dispatch/entries' },
+        { title: 'Delivery Challans',   path: '/dispatch/delivery-challans' },
+        { title: 'Sales Invoices',      path: '/dispatch/invoices' },
     ]},
     { title: 'Traceability', icon: <AccountTreeIcon />, path: '/traceability', children: [] },
     { title: 'Inventory', icon: <WarehouseIcon />, children: [
@@ -392,7 +399,7 @@ function Sidebar({ permissions, isAdmin }) {
         // Top-level leaf items (no children, e.g. Activity Log)
         if (!item.children) return canSee(item.path) ? item : null;
         if (item.children.length === 0) return item;
-        const visibleChildren = item.children.filter(c => canSee(c.path));
+        const visibleChildren = item.children.filter(c => !c.path || canSee(c.path));
         return visibleChildren.length > 0 ? { ...item, children: visibleChildren } : null;
     }).filter(Boolean);
 
@@ -581,6 +588,19 @@ function Sidebar({ permissions, isAdmin }) {
                                 <Collapse in={groupOpen} timeout="auto">
                                     <List disablePadding sx={{ pl: 1, mt: 0.3 }}>
                                         {item.children.map((child) => {
+                                            // Section separator (empty path)
+                                            if (!child.path) {
+                                                return (
+                                                    <ListItem key={child.title} disablePadding sx={{ mb: 0.2 }}>
+                                                        <Box sx={{ px: 2.5, py: 0.4 }}>
+                                                            <Typography fontSize={fs(10)} color={TEXT_SEC} letterSpacing={0.6}
+                                                                sx={{ textTransform: 'uppercase', opacity: 0.6 }}>
+                                                                {child.title.replace(/—/g, '').trim()}
+                                                            </Typography>
+                                                        </Box>
+                                                    </ListItem>
+                                                );
+                                            }
                                             const active = isActive(child.path);
                                             return (
                                                 <ListItem key={child.path} disablePadding sx={{ mb: 0.2 }}>
