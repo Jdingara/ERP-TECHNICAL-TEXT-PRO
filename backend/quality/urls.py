@@ -11,6 +11,7 @@ urlpatterns = [
 
     # Defect Types
     path('defect-types/',           views.defect_type_list,   name='defect_type_list'),
+    path('defect-types/<int:pk>/',  views.defect_type_detail, name='defect_type_detail'),
 
     # Sample Testing (physical lab tests on finished batches)
     path('sample-tests/',           views.sample_test_list,   name='sample_test_list'),

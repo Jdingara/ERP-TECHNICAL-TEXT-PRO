@@ -5,6 +5,8 @@ urlpatterns = [
     # Purchase Orders
     path('po/',                    views.po_list,           name='po_list'),
     path('po/<int:pk>/',           views.po_detail,         name='po_detail'),
+    path('orders/',                views.po_list,           name='po_list_alias'),
+    path('orders/<int:pk>/',       views.po_detail,         name='po_detail_alias'),
 
     # GRN
     path('grn/',                   views.grn_list,          name='grn_list'),

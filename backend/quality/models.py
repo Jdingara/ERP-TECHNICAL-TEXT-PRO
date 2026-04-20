@@ -56,11 +56,13 @@ class Inspection(models.Model):
 
 
 class DefectType(models.Model):
-    company      = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
-    name         = models.CharField(max_length=100)
-    stage        = models.CharField(max_length=20, blank=True)  # which inspection stage
-    description  = models.TextField(blank=True)
-    is_active    = models.BooleanField(default=True)
+    company         = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
+    defect_code     = models.CharField(max_length=50, blank=True)
+    name            = models.CharField(max_length=100)   # = defect_name
+    stage           = models.CharField(max_length=20, blank=True)   # = defect_category
+    severity        = models.CharField(max_length=20, blank=True, default='minor')  # minor/major/critical
+    description     = models.TextField(blank=True)
+    is_active       = models.BooleanField(default=True)
 
     def __str__(self): return self.name
     class Meta: ordering = ['name']

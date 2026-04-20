@@ -46,7 +46,7 @@ export default function ProcessEntriesPage() {
     useEffect(() => { load(); }, [load]);
 
     useEffect(() => {
-        fetch('/api/planning/production-orders/?status=released', { credentials: 'include' }).then(r => r.json()).then(d => setOrders(d.orders || []));
+        fetch('/api/planning/production-orders/?status=released', { credentials: 'include' }).then(r => r.json()).then(d => setOrders(d.production_orders || []));
         fetch('/api/masters/machines/', { credentials: 'include' }).then(r => r.json()).then(d => setMachines(d.machines || []));
         fetch('/api/masters/processes/', { credentials: 'include' }).then(r => r.json()).then(d => setProc(d.processes || []));
         fetch('/api/purchase/lots/?status=available', { credentials: 'include' }).then(r => r.json()).then(d => setAvailLots(d.lots || []));

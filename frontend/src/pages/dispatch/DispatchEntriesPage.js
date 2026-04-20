@@ -37,7 +37,7 @@ export default function DispatchEntriesPage() {
         if (status) p.set('status', status);
         const res = await fetch(`/api/dispatch/entries/?${p}`, { credentials: 'include' });
         const d = await res.json();
-        setRows(d.dispatches || []);
+        setRows(d.dispatch_entries || []);
     }, [search, status]);
 
     useEffect(() => { load(); }, [load]);

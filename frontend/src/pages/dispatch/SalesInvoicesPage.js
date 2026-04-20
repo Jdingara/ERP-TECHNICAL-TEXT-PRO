@@ -36,7 +36,7 @@ export default function SalesInvoicesPage() {
     useEffect(() => { load(); }, [load]);
     useEffect(() => {
         fetch('/api/masters/customers/', {credentials:'include'}).then(r=>r.json()).then(d=>setCustomers(d.customers||[]));
-        fetch('/api/dispatch/entries/?status=confirmed', {credentials:'include'}).then(r=>r.json()).then(d=>setDispatches(d.dispatches||[]));
+        fetch('/api/dispatch/entries/?status=confirmed', {credentials:'include'}).then(r=>r.json()).then(d=>setDispatches(d.dispatch_entries||[]));
     }, []);
 
     const openAdd  = () => { setForm(empty); setEditId(null); setMsg(''); setModal(true); };

@@ -205,7 +205,7 @@ def reconciliation_report(request):
         rows.append({
             'prod_order_number': po.po_number,
             'product_name':      po.product.design_name if po.product else '',
-            'planned_qty':       str(po.planned_quantity),
+            'planned_qty':       str(po.planned_qty),
             'produced_qty':      str(po.produced_qty),
             'issued_qty':        str(issued),
             'output_qty':        str(output),

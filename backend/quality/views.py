@@ -61,8 +61,10 @@ def inspection_dict(insp, include_defects=False):
 def defect_type_dict(dt):
     return {
         'id': dt.id,
-        'name': dt.name,
-        'stage': dt.stage,
+        'defect_code': dt.defect_code,
+        'defect_name': dt.name,
+        'defect_category': dt.stage,
+        'severity': dt.severity,
         'description': dt.description,
         'is_active': dt.is_active,
     }
@@ -273,11 +275,40 @@ def defect_type_list(request):
     data = json.loads(request.body)
     dt = DefectType.objects.create(
         company=company,
-        name=data['name'],
-        stage=data.get('stage', ''),
+        defect_code=data.get('defect_code', ''),
+        name=data.get('defect_name') or data.get('name', ''),
+        stage=data.get('defect_category') or data.get('stage', ''),
+        severity=data.get('severity', 'minor'),
         description=data.get('description', ''),
     )
     return JsonResponse({'success': True, 'defect_type': defect_type_dict(dt)}, status=201)
+
+
+@csrf_exempt
+@require_http_methods(['GET', 'PUT', 'DELETE'])
+def defect_type_detail(request, pk):
+    company = get_active_company(request)
+    try:
+        dt = DefectType.objects.get(id=pk, company=company)
+    except DefectType.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
+
+    if request.method == 'GET':
+        return JsonResponse({'defect_type': defect_type_dict(dt)})
+
+    if request.method == 'DELETE':
+        dt.is_active = False
+        dt.save()
+        return JsonResponse({'success': True})
+
+    data = json.loads(request.body)
+    dt.defect_code = data.get('defect_code', dt.defect_code)
+    dt.name        = data.get('defect_name') or data.get('name', dt.name)
+    dt.stage       = data.get('defect_category') or data.get('stage', dt.stage)
+    dt.severity    = data.get('severity', dt.severity)
+    dt.description = data.get('description', dt.description)
+    dt.save()
+    return JsonResponse({'success': True, 'defect_type': defect_type_dict(dt)})
 
 
 # ── Sample Testing ────────────────────────────────────────────
