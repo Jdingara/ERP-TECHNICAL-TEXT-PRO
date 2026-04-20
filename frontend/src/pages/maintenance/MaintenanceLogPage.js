@@ -94,15 +94,23 @@ export default function MaintenanceLogPage() {
 
                     {/* Alert Banner */}
                     {alerts.length > 0 && (
-                        <div style={{ backgroundColor: '#450a0a', borderRadius: 10, padding: '14px 18px', marginBottom: 20, border: '1px solid #ef444440' }}>
-                            <p style={{ margin: '0 0 10px', color: '#fca5a5', fontWeight: 700, fontSize: 13 }}>
+                        <div style={{
+                            backgroundColor: pt.dark ? '#450a0a' : '#fff1f2',
+                            borderRadius: 10, padding: '14px 18px', marginBottom: 20,
+                            border: `1px solid ${pt.dark ? '#ef444440' : '#fca5a5'}`
+                        }}>
+                            <p style={{ margin: '0 0 10px', color: pt.dark ? '#fca5a5' : '#b91c1c', fontWeight: 700, fontSize: 13 }}>
                                 ⚠ {alerts.filter(a => a.is_overdue).length} Overdue · {alerts.filter(a => !a.is_overdue).length} Due Soon
                             </p>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                                 {alerts.map(a => (
                                     <span key={a.id} style={{
-                                        backgroundColor: a.is_overdue ? '#7f1d1d' : '#78350f',
-                                        color: a.is_overdue ? '#fca5a5' : '#fde68a',
+                                        backgroundColor: a.is_overdue
+                                            ? (pt.dark ? '#7f1d1d' : '#fee2e2')
+                                            : (pt.dark ? '#78350f' : '#fef3c7'),
+                                        color: a.is_overdue
+                                            ? (pt.dark ? '#fca5a5' : '#991b1b')
+                                            : (pt.dark ? '#fde68a' : '#92400e'),
                                         padding: '4px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600
                                     }}>
                                         {a.machine_code}: {a.task_name} — {a.is_overdue ? `${a.days_overdue}d overdue` : `due ${a.due_date}`}
@@ -112,12 +120,25 @@ export default function MaintenanceLogPage() {
                         </div>
                     )}
                     {alerts.length === 0 && (
-                        <div style={{ backgroundColor: '#14532d', borderRadius: 10, padding: '12px 18px', marginBottom: 20, fontSize: 13, color: '#86efac' }}>
+                        <div style={{
+                            backgroundColor: pt.dark ? '#14532d' : '#f0fdf4',
+                            borderRadius: 10, padding: '12px 18px', marginBottom: 20,
+                            fontSize: 13, color: pt.dark ? '#86efac' : '#166534',
+                            border: `1px solid ${pt.dark ? '#166534' : '#bbf7d0'}`
+                        }}>
                             ✓ All maintenance tasks are up to date.
                         </div>
                     )}
 
-                    {msg && <div style={{ padding: '10px 16px', borderRadius: 8, backgroundColor: msg.includes('Error') || msg.includes('required') ? '#7f1d1d' : '#14532d', color: '#fff', marginBottom: 16, fontSize: 13 }}>{msg}</div>}
+                    {msg && <div style={{
+                        padding: '10px 16px', borderRadius: 8, marginBottom: 16, fontSize: 13,
+                        backgroundColor: msg.includes('Error') || msg.includes('required')
+                            ? (pt.dark ? '#7f1d1d' : '#fee2e2')
+                            : (pt.dark ? '#14532d' : '#f0fdf4'),
+                        color: msg.includes('Error') || msg.includes('required')
+                            ? (pt.dark ? '#fff' : '#991b1b')
+                            : (pt.dark ? '#fff' : '#166534'),
+                    }}>{msg}</div>}
 
                     {/* Filters */}
                     <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
