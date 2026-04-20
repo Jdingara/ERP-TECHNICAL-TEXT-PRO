@@ -28,6 +28,7 @@ urlpatterns = [
     path('api/dispatch/',       include('dispatch.urls')),
     path('api/traceability/',   include('traceability.urls')),
     path('api/reports/',        include('reports.urls')),
+    path('api/maintenance/',    include('maintenance.urls')),
 ]
 
 # ── Serve React frontend in production ───────────────────────

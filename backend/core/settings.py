@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'dispatch',              # Dispatch Entry, Challan, Invoice, Barcode/Labels
     'traceability',          # Traceability Search (USP)
     'reports',               # All reports
+    'maintenance',           # Machine Maintenance Schedules + Escalation
 ]
 
 

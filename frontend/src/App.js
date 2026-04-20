@@ -59,6 +59,7 @@ import WeavingScreen        from './pages/production/WeavingScreen';
 import StenterScreen        from './pages/production/StenterScreen';
 import TumblerScreen        from './pages/production/TumblerScreen';
 import LaminationScreen     from './pages/production/LaminationScreen';
+import EmbossingScreen     from './pages/production/EmbossingScreen';
 
 // ── Quality ────────────────────────────────────────────────────
 import QCDashboardPage      from './pages/quality/QCDashboardPage';
@@ -87,6 +88,11 @@ import TallyIntegrationPage    from './pages/settings/TallyIntegrationPage';
 import AnalyticsPage           from './pages/analytics/AnalyticsPage';
 import FeedPage                from './pages/feed/FeedPage';
 import FinishedGoodsPage       from './pages/inventory/FinishedGoodsPage';
+
+// ── Maintenance ────────────────────────────────────────────────
+import MaintenanceSchedulePage from './pages/maintenance/MaintenanceSchedulePage';
+import MaintenanceLogPage      from './pages/maintenance/MaintenanceLogPage';
+import EscalationPage          from './pages/maintenance/EscalationPage';
 
 
 function App() {
@@ -201,12 +207,18 @@ function App() {
                                     <Route path="/production/stages/stenter"    element={<StenterScreen />} />
                                     <Route path="/production/stages/tumbler"    element={<TumblerScreen />} />
                                     <Route path="/production/stages/lamination" element={<LaminationScreen />} />
+                                    <Route path="/production/stages/embossing"  element={<EmbossingScreen />} />
 
                                     {/* Quality */}
                                     <Route path="/quality/dashboard"      element={<QCDashboardPage />} />
                                     <Route path="/quality/inspections"    element={<InspectionsPage />} />
                                     <Route path="/quality/defect-types"   element={<DefectTypesPage />} />
                                     <Route path="/quality/sample-testing" element={<SampleTestingPage />} />
+
+                                    {/* Maintenance */}
+                                    <Route path="/maintenance/schedule"   element={<MaintenanceSchedulePage />} />
+                                    <Route path="/maintenance/log"        element={<MaintenanceLogPage />} />
+                                    <Route path="/maintenance/escalation" element={<EscalationPage />} />
 
                                     {/* Dispatch */}
                                     <Route path="/dispatch/entries"          element={<DispatchEntriesPage />} />

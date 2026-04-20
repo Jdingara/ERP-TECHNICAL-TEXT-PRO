@@ -27,6 +27,7 @@ import AccountTreeIcon       from '@mui/icons-material/AccountTree';
 import AssessmentIcon        from '@mui/icons-material/Assessment';
 import TuneIcon              from '@mui/icons-material/Tune';
 import HistoryIcon           from '@mui/icons-material/History';
+import BuildIcon             from '@mui/icons-material/Build';
 import ExpandLess            from '@mui/icons-material/ExpandLess';
 import ExpandMore            from '@mui/icons-material/ExpandMore';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
@@ -83,6 +84,7 @@ const MENU_ITEMS = [
         { title: 'Stenter',         path: '/production/stages/stenter' },
         { title: 'Tumbler',         path: '/production/stages/tumbler' },
         { title: 'Lamination',      path: '/production/stages/lamination' },
+        { title: 'Embossing',       path: '/production/stages/embossing' },
     ]},
     { title: 'Quality', icon: <TaskAltIcon />, children: [
         { title: 'QC Dashboard',   path: '/quality/dashboard' },
@@ -94,6 +96,11 @@ const MENU_ITEMS = [
         { title: 'Dispatch Entries',    path: '/dispatch/entries' },
         { title: 'Delivery Challans',   path: '/dispatch/delivery-challans' },
         { title: 'Sales Invoices',      path: '/dispatch/invoices' },
+    ]},
+    { title: 'Maintenance', icon: <BuildIcon />, children: [
+        { title: 'Schedule Master',    path: '/maintenance/schedule' },
+        { title: 'Maintenance Log',    path: '/maintenance/log' },
+        { title: 'Escalation Config',  path: '/maintenance/escalation' },
     ]},
     { title: 'Traceability', icon: <AccountTreeIcon />, path: '/traceability', children: [] },
     { title: 'Inventory', icon: <WarehouseIcon />, children: [
