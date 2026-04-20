@@ -3,8 +3,9 @@ from . import views
 
 urlpatterns = [
     # Tasks (schedule master)
-    path('tasks/',            views.task_list,         name='maintenance_task_list'),
-    path('tasks/<int:pk>/',   views.task_detail,       name='maintenance_task_detail'),
+    path('tasks/',                          views.task_list,          name='maintenance_task_list'),
+    path('tasks/<int:pk>/',                views.task_detail,        name='maintenance_task_detail'),
+    path('tasks/<int:pk>/upload-image/',   views.task_upload_image,  name='maintenance_task_upload_image'),
 
     # Logs (execution records)
     path('logs/',                          views.log_list,     name='maintenance_log_list'),

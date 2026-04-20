@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.generic import TemplateView
 from django.conf import settings
+from django.views.static import serve as media_serve
 import os
 
 urlpatterns = [
@@ -29,6 +30,9 @@ urlpatterns = [
     path('api/traceability/',   include('traceability.urls')),
     path('api/reports/',        include('reports.urls')),
     path('api/maintenance/',    include('maintenance.urls')),
+
+    # Media files (uploaded images, documents)
+    re_path(r'^media/(?P<path>.*)$', media_serve, {'document_root': settings.MEDIA_ROOT}),
 ]
 
 # ── Serve React frontend in production ───────────────────────

@@ -42,6 +42,7 @@ class MaintenanceTask(models.Model):
     measurement_labels = models.JSONField(default=list, blank=True)
     # e.g. [{"label": "Before (Hz)", "key": "before"}, {"label": "After (Hz)", "key": "after"}]
     instructions     = models.TextField(blank=True)
+    task_image       = models.FileField(upload_to='maintenance/tasks/', blank=True, null=True)
     is_active        = models.BooleanField(default=True)
     created_at       = models.DateTimeField(auto_now_add=True)
 

@@ -96,7 +96,7 @@ def lot_stock_report(request):
     lots = []
     total_received = total_balance = 0
     for l in qs.select_related('grn__purchase_order__vendor', 'location'):
-        total_received += float(l.received_qty)
+        total_received += float(l.quantity)
         total_balance  += float(l.balance_qty)
         lots.append({
             'lot_number':    l.lot_number,
@@ -106,10 +106,10 @@ def lot_stock_report(request):
             'vendor_name':   (l.grn.purchase_order.vendor.vendor_name
                               if l.grn and l.grn.purchase_order and l.grn.purchase_order.vendor else ''),
             'grn_number':    l.grn.grn_number if l.grn else '',
-            'received_qty':  str(l.received_qty),
+            'received_qty':  str(l.quantity),
             'balance_qty':   str(l.balance_qty),
-            'uom':           l.uom or '',
-            'location_name': l.location.location_name if l.location else '',
+            'uom':           l.uom.short_name if l.uom else '',
+            'location_name': l.location.name if l.location else '',
             'status':        l.status,
         })
 
@@ -366,7 +366,7 @@ def analytics_lot_utilization(request):
     by_material = {}
 
     for l in lots:
-        received = float(l.received_qty)
+        received = float(l.quantity)
         balance  = float(l.balance_qty)
         consumed = received - balance
         util_pct = round(consumed / received * 100, 1) if received > 0 else 0
@@ -499,7 +499,7 @@ def analytics_vendor_performance(request):
         vendor_id = grn.purchase_order.vendor_id if grn.purchase_order else None
 
         lots = Lot.objects.filter(company=company, grn=grn)
-        total_recv  = float(lots.aggregate(t=Sum('received_qty'))['t'] or 0)
+        total_recv  = float(lots.aggregate(t=Sum('quantity'))['t'] or 0)
         total_bal   = float(lots.aggregate(t=Sum('balance_qty'))['t'] or 0)
         rejected    = lots.filter(status='rejected').count()
         lot_count   = lots.count()
@@ -598,11 +598,11 @@ def feed(request):
 
     # Low stock lots (balance < 20% of received)
     for lot in Lot.objects.filter(company=company, status='available'):
-        if lot.received_qty > 0 and lot.balance_qty / lot.received_qty < 0.2:
+        if lot.quantity > 0 and lot.balance_qty / lot.quantity < 0.2:
             alerts.append({
                 'type':     'warning',
                 'category': 'Low Stock',
-                'message':  f"LOT {lot.lot_number} ({lot.material_name}) — only {round(float(lot.balance_qty), 2)} {lot.uom or 'units'} remaining ({round(float(lot.balance_qty)/float(lot.received_qty)*100,1)}%)",
+                'message':  f"LOT {lot.lot_number} ({lot.material_name}) — only {round(float(lot.balance_qty), 2)} {lot.uom.short_name if lot.uom else 'units'} remaining ({round(float(lot.balance_qty)/float(lot.quantity)*100,1)}%)",
                 'link':     '/lot-inventory/dashboard',
             })
 

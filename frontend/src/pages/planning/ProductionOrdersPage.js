@@ -31,12 +31,12 @@ export default function ProductionOrdersPage() {
         if (status) p.set('status', status);
         const res = await fetch(`/api/planning/production-orders/?${p}`, { credentials:'include' });
         const d = await res.json();
-        setRows(d.orders||[]);
+        setRows(d.production_orders||[]);
     }, [status]);
 
     useEffect(() => { load(); }, [load]);
     useEffect(() => {
-        fetch('/api/planning/sales-orders/?status=confirmed', {credentials:'include'}).then(r=>r.json()).then(d=>setSOs(d.orders||[]));
+        fetch('/api/planning/sales-orders/?status=confirmed', {credentials:'include'}).then(r=>r.json()).then(d=>setSOs(d.sales_orders||[]));
         fetch('/api/masters/products/', {credentials:'include'}).then(r=>r.json()).then(d=>setProducts(d.products||[]));
         fetch('/api/masters/uom/', {credentials:'include'}).then(r=>r.json()).then(d=>setUoms(d.uoms||[]));
     }, []);

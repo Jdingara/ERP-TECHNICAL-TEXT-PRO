@@ -45,7 +45,10 @@ export default function MaintenanceSchedulePage() {
     const [msg,      setMsg]      = useState('');
     const [filterMachine, setFilterMachine] = useState('');
     const [filterFreq,    setFilterFreq]    = useState('');
-    const [newLabel, setNewLabel] = useState({ label: '', key: '' });
+    const [newLabel,  setNewLabel]  = useState({ label: '', key: '' });
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [existingImage, setExistingImage] = useState(null);
 
     const flash = (m) => { setMsg(m); setTimeout(() => setMsg(''), 3500); };
 
@@ -63,7 +66,11 @@ export default function MaintenanceSchedulePage() {
             .then(r => r.json()).then(d => setMachines(d.machines || []));
     }, []);
 
-    const openAdd = () => { setForm(blankForm); setEditId(null); setShowForm(true); };
+    const openAdd = () => {
+        setForm(blankForm); setEditId(null);
+        setImageFile(null); setImagePreview(null); setExistingImage(null);
+        setShowForm(true);
+    };
     const openEdit = (t) => {
         setForm({
             machine_id: t.machine_id,
@@ -74,7 +81,16 @@ export default function MaintenanceSchedulePage() {
             measurement_labels: t.measurement_labels || [],
         });
         setEditId(t.id);
+        setImageFile(null); setImagePreview(null);
+        setExistingImage(t.image_url || null);
         setShowForm(true);
+    };
+
+    const onImageChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setImageFile(file);
+        setImagePreview(URL.createObjectURL(file));
     };
 
     const submit = async () => {
@@ -88,8 +104,18 @@ export default function MaintenanceSchedulePage() {
                 body: JSON.stringify(form),
             });
             const d = await r.json();
-            if (d.success || d.task) { flash(editId ? 'Task updated.' : 'Task created.'); setShowForm(false); load(); }
-            else flash(d.error || 'Error saving.');
+            if (d.success || d.task) {
+                const savedId = editId || d.task?.id;
+                if (imageFile && savedId) {
+                    const fd = new FormData();
+                    fd.append('image', imageFile);
+                    await fetch(`/api/maintenance/tasks/${savedId}/upload-image/`, {
+                        method: 'POST', credentials: 'include', body: fd,
+                    });
+                }
+                flash(editId ? 'Task updated.' : 'Task created.');
+                setShowForm(false); load();
+            } else flash(d.error || 'Error saving.');
         } finally { setLoading(false); }
     };
 
@@ -165,7 +191,7 @@ export default function MaintenanceSchedulePage() {
                             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead>
                                     <tr>
-                                        {['Task Name', 'Frequency', 'Type', 'Measurement Fields', 'Instructions', ''].map(h => (
+                                        {['Pic', 'Task Name', 'Frequency', 'Type', 'Measurement Fields', 'Instructions', ''].map(h => (
                                             <th key={h} style={th}>{h}</th>
                                         ))}
                                     </tr>
@@ -173,6 +199,13 @@ export default function MaintenanceSchedulePage() {
                                 <tbody>
                                     {mTasks.map(t => (
                                         <tr key={t.id}>
+                                            <td style={{ ...cell, padding: '6px 10px', width: 56 }}>
+                                                {t.image_url
+                                                    ? <img src={t.image_url} alt="" style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 6, border: `1px solid ${pt.colors.border}`, cursor: 'pointer' }}
+                                                        onClick={() => window.open(t.image_url, '_blank')} />
+                                                    : <div style={{ width: 44, height: 44, borderRadius: 6, border: `1px dashed ${pt.colors.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: pt.colors.muted, fontSize: 18 }}>📷</div>
+                                                }
+                                            </td>
                                             <td style={{ ...cell, fontWeight: 600 }}>{t.task_name}</td>
                                             <td style={cell}>
                                                 <span style={{ backgroundColor: (FREQ_COLOR[t.frequency] || '#64748b') + '22', color: FREQ_COLOR[t.frequency] || '#64748b', padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700 }}>
@@ -269,6 +302,29 @@ export default function MaintenanceSchedulePage() {
                         <textarea value={form.instructions} onChange={e => setForm(f => ({ ...f, instructions: e.target.value }))}
                             style={{ ...inp, height: 65, resize: 'vertical' }}
                             placeholder="e.g. Use only SAE 40 grade oil. Check oil level indicator before changing." />
+                    </div>
+
+                    <div style={{ marginBottom: 14 }}>
+                        <label style={{ fontSize: 12, color: pt.colors.muted, display: 'block', marginBottom: 8 }}>Reference Picture</label>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+                            <label style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 8, border: `1px dashed ${pt.colors.border}`, backgroundColor: pt.colors.inner, color: pt.colors.muted, fontSize: 13 }}>
+                                📷 {imageFile ? imageFile.name : 'Choose image…'}
+                                <input type="file" accept="image/*" onChange={onImageChange} style={{ display: 'none' }} />
+                            </label>
+                            {(imagePreview || existingImage) && (
+                                <div style={{ position: 'relative' }}>
+                                    <img src={imagePreview || existingImage} alt="preview"
+                                        style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 8, border: `1px solid ${pt.colors.border}` }} />
+                                    {imagePreview && (
+                                        <button onClick={() => { setImageFile(null); setImagePreview(null); }}
+                                            style={{ position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: '50%', border: 'none', backgroundColor: '#ef4444', color: '#fff', fontSize: 11, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                        {existingImage && !imagePreview && (
+                            <p style={{ margin: '6px 0 0', fontSize: 11, color: pt.colors.dimText }}>Existing image shown — upload a new one to replace it.</p>
+                        )}
                     </div>
 
                     {msg && <div style={{ padding: '8px 14px', borderRadius: 6, backgroundColor: '#7f1d1d', color: '#fff', marginBottom: 14, fontSize: 13 }}>{msg}</div>}

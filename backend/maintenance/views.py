@@ -27,6 +27,7 @@ def _task_dict(t):
         'measurement_labels': t.measurement_labels or [],
         'instructions': t.instructions,
         'is_active': t.is_active,
+        'image_url': t.task_image.url if t.task_image else None,
     }
 
 
@@ -47,6 +48,7 @@ def _log_dict(log):
         'measurements': log.measurements or {},
         'remarks': log.remarks,
         'escalation_level': log.escalation_level,
+        'image_url': log.task.task_image.url if log.task.task_image else None,
     }
 
 
@@ -233,11 +235,37 @@ def due_alerts(request):
             'id': log.id,
             'task_name': log.task.task_name,
             'machine_code': log.task.machine.machine_code,
+            'frequency': log.task.frequency,
             'due_date': str(log.due_date),
             'is_overdue': is_overdue,
             'days_overdue': (today - log.due_date).days if is_overdue else 0,
+            'image_url': log.task.task_image.url if log.task.task_image else None,
         })
     return JsonResponse({'alerts': alerts, 'count': len(alerts)})
+
+
+# ── Image Upload ──────────────────────────────────────────────
+
+@csrf_exempt
+def task_upload_image(request, pk):
+    """Upload or replace the reference image for a maintenance task."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    company = get_active_company(request)
+    try:
+        t = MaintenanceTask.objects.get(id=pk, company=company)
+    except MaintenanceTask.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
+
+    img = request.FILES.get('image')
+    if not img:
+        return JsonResponse({'error': 'No image file provided'}, status=400)
+
+    if t.task_image:
+        t.task_image.delete(save=False)
+    t.task_image = img
+    t.save(update_fields=['task_image'])
+    return JsonResponse({'success': True, 'image_url': t.task_image.url})
 
 
 # ── Escalation Config ─────────────────────────────────────────

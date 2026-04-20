@@ -35,7 +35,7 @@ export default function SalesOrdersPage() {
         if (status) p.set('status', status);
         const res = await fetch(`/api/planning/sales-orders/?${p}`, { credentials:'include' });
         const d = await res.json();
-        setRows(d.orders||[]);
+        setRows(d.sales_orders||[]);
     }, [search, status]);
 
     useEffect(() => { load(); }, [load]);

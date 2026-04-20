@@ -29,8 +29,10 @@ export default function MaintenanceLogPage() {
     const [form,     setForm]     = useState({ completed_by: '', remarks: '', measurements: {} });
     const [loading,  setLoading]  = useState(false);
     const [msg,      setMsg]      = useState('');
-    const [filterStatus,  setFilterStatus]  = useState('');
-    const [filterMachine, setFilterMachine] = useState('');
+    const [filterStatus,       setFilterStatus]       = useState('');
+    const [filterMachine,      setFilterMachine]      = useState('');
+    const [alertFilterMachine, setAlertFilterMachine] = useState('');
+    const [alertFilterType,    setAlertFilterType]    = useState('');
 
     const flash = (m) => { setMsg(m); setTimeout(() => setMsg(''), 3500); };
 
@@ -92,33 +94,97 @@ export default function MaintenanceLogPage() {
                         <p style={{ margin: 0, color: pt.colors.dimText, fontSize: 13 }}>Record task completions · view overdue alerts</p>
                     </div>
 
-                    {/* Alert Banner */}
-                    {alerts.length > 0 && (
-                        <div style={{
-                            backgroundColor: pt.dark ? '#450a0a' : '#fff1f2',
-                            borderRadius: 10, padding: '14px 18px', marginBottom: 20,
-                            border: `1px solid ${pt.dark ? '#ef444440' : '#fca5a5'}`
-                        }}>
-                            <p style={{ margin: '0 0 10px', color: pt.dark ? '#fca5a5' : '#b91c1c', fontWeight: 700, fontSize: 13 }}>
-                                ⚠ {alerts.filter(a => a.is_overdue).length} Overdue · {alerts.filter(a => !a.is_overdue).length} Due Soon
-                            </p>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                                {alerts.map(a => (
-                                    <span key={a.id} style={{
-                                        backgroundColor: a.is_overdue
-                                            ? (pt.dark ? '#7f1d1d' : '#fee2e2')
-                                            : (pt.dark ? '#78350f' : '#fef3c7'),
-                                        color: a.is_overdue
-                                            ? (pt.dark ? '#fca5a5' : '#991b1b')
-                                            : (pt.dark ? '#fde68a' : '#92400e'),
-                                        padding: '4px 12px', borderRadius: 6, fontSize: 12, fontWeight: 600
-                                    }}>
-                                        {a.machine_code}: {a.task_name} — {a.is_overdue ? `${a.days_overdue}d overdue` : `due ${a.due_date}`}
-                                    </span>
-                                ))}
+                    {/* Alert Table */}
+                    {alerts.length > 0 && (() => {
+                        const filteredAlerts = alerts.filter(a => {
+                            if (alertFilterMachine && a.machine_code !== alertFilterMachine) return false;
+                            if (alertFilterType === 'overdue' && !a.is_overdue) return false;
+                            if (alertFilterType === 'due_soon' && a.is_overdue) return false;
+                            return true;
+                        });
+                        const alertMachines = [...new Set(alerts.map(a => a.machine_code))].sort();
+                        return (
+                            <div style={{
+                                backgroundColor: pt.colors.card, borderRadius: 10, marginBottom: 20,
+                                border: `1px solid ${pt.dark ? '#ef444440' : '#fca5a5'}`, overflow: 'hidden'
+                            }}>
+                                <div style={{
+                                    padding: '12px 18px', backgroundColor: pt.dark ? '#450a0a' : '#fff1f2',
+                                    borderBottom: `1px solid ${pt.dark ? '#ef444440' : '#fca5a5'}`,
+                                    display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap'
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
+                                        <span style={{ color: pt.dark ? '#fca5a5' : '#b91c1c', fontWeight: 700, fontSize: 13 }}>
+                                            ⚠ {alerts.filter(a => a.is_overdue).length} Overdue
+                                        </span>
+                                        <span style={{ color: pt.colors.muted, fontSize: 13 }}>·</span>
+                                        <span style={{ color: pt.dark ? '#fde68a' : '#92400e', fontWeight: 700, fontSize: 13 }}>
+                                            {alerts.filter(a => !a.is_overdue).length} Due Soon
+                                        </span>
+                                        {(alertFilterMachine || alertFilterType) && (
+                                            <span style={{ color: pt.colors.muted, fontSize: 12 }}>
+                                                — showing {filteredAlerts.length} of {alerts.length}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div style={{ display: 'flex', gap: 8 }}>
+                                        <select value={alertFilterMachine} onChange={e => setAlertFilterMachine(e.target.value)}
+                                            style={{ ...inp, width: 180, fontSize: 12, padding: '5px 8px' }}>
+                                            <option value="">All Machines</option>
+                                            {alertMachines.map(mc => <option key={mc} value={mc}>{mc}</option>)}
+                                        </select>
+                                        <select value={alertFilterType} onChange={e => setAlertFilterType(e.target.value)}
+                                            style={{ ...inp, width: 130, fontSize: 12, padding: '5px 8px' }}>
+                                            <option value="">All Types</option>
+                                            <option value="overdue">Overdue Only</option>
+                                            <option value="due_soon">Due Soon Only</option>
+                                        </select>
+                                        {(alertFilterMachine || alertFilterType) && (
+                                            <button onClick={() => { setAlertFilterMachine(''); setAlertFilterType(''); }}
+                                                style={{ padding: '5px 10px', borderRadius: 6, border: `1px solid ${pt.colors.border}`, backgroundColor: 'transparent', color: pt.colors.muted, cursor: 'pointer', fontSize: 12 }}>
+                                                Clear
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                                    <thead>
+                                        <tr>
+                                            {['Pic', 'Machine', 'Task', 'Frequency', 'Due Date', 'Status'].map(h => (
+                                                <th key={h} style={{ ...th, fontSize: 11, textTransform: 'uppercase' }}>{h}</th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {filteredAlerts.length === 0 && (
+                                            <tr><td colSpan={6} style={{ ...cell, textAlign: 'center', color: pt.colors.muted, padding: 24 }}>No alerts match the filter.</td></tr>
+                                        )}
+                                        {filteredAlerts.map(a => (
+                                            <tr key={a.id}>
+                                                <td style={{ ...cell, padding: '6px 10px', width: 52 }}>
+                                                    {a.image_url
+                                                        ? <img src={a.image_url} alt="" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 6, border: `1px solid ${pt.colors.border}`, cursor: 'pointer' }}
+                                                            onClick={() => window.open(a.image_url, '_blank')} />
+                                                        : <div style={{ width: 40, height: 40, borderRadius: 6, border: `1px dashed ${pt.colors.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: pt.colors.muted, fontSize: 16 }}>📷</div>
+                                                    }
+                                                </td>
+                                                <td style={{ ...cell, fontWeight: 600 }}>{a.machine_code}</td>
+                                                <td style={cell}>{a.task_name}</td>
+                                                <td style={{ ...cell, color: pt.colors.muted, fontSize: 12 }}>{FREQ_LABEL[a.frequency] || a.frequency}</td>
+                                                <td style={{ ...cell, color: a.is_overdue ? '#ef4444' : (pt.dark ? '#fde68a' : '#92400e') }}>{a.due_date}</td>
+                                                <td style={cell}>
+                                                    {a.is_overdue
+                                                        ? <span style={{ backgroundColor: '#ef444422', color: '#ef4444', padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700 }}>Overdue {a.days_overdue}d</span>
+                                                        : <span style={{ backgroundColor: '#f59e0b22', color: '#f59e0b', padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700 }}>Due Soon</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
-                        </div>
-                    )}
+                        );
+                    })()}
                     {alerts.length === 0 && (
                         <div style={{
                             backgroundColor: pt.dark ? '#14532d' : '#f0fdf4',
@@ -160,17 +226,24 @@ export default function MaintenanceLogPage() {
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
                                 <tr>
-                                    {['Machine', 'Task', 'Frequency', 'Due Date', 'Status', 'Completed By', 'Completed On', ''].map(h => (
+                                    {['Pic', 'Machine', 'Task', 'Frequency', 'Due Date', 'Status', 'Completed By', 'Completed On', ''].map(h => (
                                         <th key={h} style={th}>{h}</th>
                                     ))}
                                 </tr>
                             </thead>
                             <tbody>
                                 {logs.length === 0 && (
-                                    <tr><td colSpan={8} style={{ ...cell, textAlign: 'center', color: pt.colors.muted, padding: 40 }}>No maintenance logs.</td></tr>
+                                    <tr><td colSpan={9} style={{ ...cell, textAlign: 'center', color: pt.colors.muted, padding: 40 }}>No maintenance logs.</td></tr>
                                 )}
                                 {logs.map(log => (
                                     <tr key={log.id}>
+                                        <td style={{ ...cell, padding: '6px 10px', width: 52 }}>
+                                            {log.image_url
+                                                ? <img src={log.image_url} alt="" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 6, border: `1px solid ${pt.colors.border}`, cursor: 'pointer' }}
+                                                    onClick={() => window.open(log.image_url, '_blank')} />
+                                                : <div style={{ width: 40, height: 40, borderRadius: 6, border: `1px dashed ${pt.colors.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: pt.colors.muted, fontSize: 16 }}>📷</div>
+                                            }
+                                        </td>
                                         <td style={{ ...cell, fontWeight: 600 }}>{log.machine_code}</td>
                                         <td style={cell}>{log.task_name}</td>
                                         <td style={cell}>
