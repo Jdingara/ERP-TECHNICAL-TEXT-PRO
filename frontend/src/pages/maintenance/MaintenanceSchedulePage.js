@@ -4,6 +4,7 @@
 // ============================================================
 
 import { useState, useEffect, useCallback } from 'react';
+import { usePageTheme } from '../../hooks/usePageTheme';
 
 const FREQUENCIES = [
     { value: 'daily',       label: 'Daily' },
@@ -28,6 +29,13 @@ const blankForm = {
 };
 
 export default function MaintenanceSchedulePage() {
+    const pt = usePageTheme();
+    const thS      = { ...pt.th, textAlign: 'left' };
+    const tdS      = { ...pt.cell, verticalAlign: 'middle' };
+    const inpS     = { ...pt.inp };
+    const formPage = { ...pt.formPage, maxWidth: 900 };
+    const formHeader = pt.formHeader;
+    const backBtnS = pt.backBtn;
     const [tasks,    setTasks]    = useState([]);
     const [machines, setMachines] = useState([]);
     const [showForm, setShowForm] = useState(false);
@@ -107,18 +115,18 @@ export default function MaintenanceSchedulePage() {
         return acc;
     }, {});
 
-    const cell = { padding: '10px 14px', borderBottom: '1px solid #1e293b', fontSize: 13, color: '#f1f5f9' };
-    const th   = { ...cell, backgroundColor: '#0f172a', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', fontSize: 11 };
-    const inp  = { padding: '8px 10px', borderRadius: 6, border: '1px solid #334155', backgroundColor: '#0f172a', color: '#f1f5f9', fontSize: 13, width: '100%', boxSizing: 'border-box' };
+    const cell = { padding: '10px 14px', borderBottom: `1px solid ${pt.colors.border}`, fontSize: 13, color: pt.colors.text };
+    const th   = { ...cell, backgroundColor: pt.colors.inner, color: pt.colors.muted, fontWeight: 600, textTransform: 'uppercase', fontSize: 11 };
+    const inp  = { padding: '8px 10px', borderRadius: 6, border: `1px solid ${pt.colors.border}`, backgroundColor: pt.colors.inner, color: pt.colors.text, fontSize: 13, width: '100%', boxSizing: 'border-box' };
 
     return (
-        <div style={{ padding: '24px 28px', fontFamily: 'Inter, sans-serif', color: '#f1f5f9', minHeight: '100vh', backgroundColor: '#0b1120' }}>
+        <div style={{ padding: '24px 28px', fontFamily: 'Inter, sans-serif', color: pt.colors.text, minHeight: '100vh', backgroundColor: pt.colors.outer }}>
             {!showForm ? (
                 <>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                         <div>
                             <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Maintenance Schedule</h2>
-                            <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: 13 }}>Define recurring maintenance tasks per machine</p>
+                            <p style={{ margin: '4px 0 0', color: pt.colors.dimText, fontSize: 13 }}>Define recurring maintenance tasks per machine</p>
                         </div>
                         <button onClick={openAdd}
                             style={{ padding: '9px 20px', borderRadius: 8, border: 'none', backgroundColor: '#10b981', color: '#fff', fontWeight: 600, cursor: 'pointer', fontSize: 13 }}>
@@ -142,17 +150,17 @@ export default function MaintenanceSchedulePage() {
                     </div>
 
                     {Object.keys(grouped).length === 0 && (
-                        <div style={{ backgroundColor: '#1e293b', borderRadius: 12, padding: 48, textAlign: 'center', color: '#475569' }}>
+                        <div style={{ backgroundColor: pt.colors.card, borderRadius: 12, padding: 48, textAlign: 'center', color: pt.colors.muted }}>
                             No maintenance tasks yet. Click "+ New Task" to create one.
                         </div>
                     )}
 
                     {Object.entries(grouped).map(([machineCode, { machine_name, tasks: mTasks }]) => (
-                        <div key={machineCode} style={{ backgroundColor: '#1e293b', borderRadius: 12, overflow: 'hidden', marginBottom: 20 }}>
-                            <div style={{ padding: '12px 18px', backgroundColor: '#0f172a', borderBottom: '1px solid #334155', display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div key={machineCode} style={{ backgroundColor: pt.colors.card, borderRadius: 12, overflow: 'hidden', marginBottom: 20 }}>
+                            <div style={{ padding: '12px 18px', backgroundColor: pt.colors.inner, borderBottom: `1px solid ${pt.colors.border}`, display: 'flex', alignItems: 'center', gap: 10 }}>
                                 <span style={{ backgroundColor: '#10b98120', color: '#10b981', padding: '2px 10px', borderRadius: 6, fontSize: 12, fontWeight: 700 }}>{machineCode}</span>
                                 <span style={{ fontSize: 14, fontWeight: 600 }}>{machine_name}</span>
-                                <span style={{ color: '#64748b', fontSize: 12 }}>· {mTasks.length} task{mTasks.length !== 1 ? 's' : ''}</span>
+                                <span style={{ color: pt.colors.dimText, fontSize: 12 }}>· {mTasks.length} task{mTasks.length !== 1 ? 's' : ''}</span>
                             </div>
                             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead>
@@ -181,10 +189,10 @@ export default function MaintenanceSchedulePage() {
                                                     ? t.measurement_labels.map((l, i) => (
                                                         <span key={i} style={{ backgroundColor: '#1e3a5f', color: '#93c5fd', padding: '2px 7px', borderRadius: 4, fontSize: 11, marginRight: 4 }}>{l.label}</span>
                                                     ))
-                                                    : <span style={{ color: '#475569', fontSize: 12 }}>—</span>
+                                                    : <span style={{ color: pt.colors.muted, fontSize: 12 }}>—</span>
                                                 }
                                             </td>
-                                            <td style={{ ...cell, color: '#94a3b8', fontSize: 12, maxWidth: 200 }}>{t.instructions || '—'}</td>
+                                            <td style={{ ...cell, color: pt.colors.muted, fontSize: 12, maxWidth: 200 }}>{t.instructions || '—'}</td>
                                             <td style={cell}>
                                                 <button onClick={() => openEdit(t)} style={{ padding: '4px 10px', borderRadius: 5, border: 'none', backgroundColor: '#3b82f6', color: '#fff', cursor: 'pointer', fontSize: 12, marginRight: 4 }}>Edit</button>
                                                 <button onClick={() => del(t.id)} style={{ padding: '4px 10px', borderRadius: 5, border: 'none', backgroundColor: '#ef4444', color: '#fff', cursor: 'pointer', fontSize: 12 }}>Del</button>
@@ -197,10 +205,10 @@ export default function MaintenanceSchedulePage() {
                     ))}
                 </>
             ) : (
-                <div style={{ backgroundColor: '#1e293b', borderRadius: 12, padding: 28, maxWidth: 780 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24, paddingBottom: 16, borderBottom: '1px solid #334155' }}>
+                <div style={{ backgroundColor: pt.colors.card, borderRadius: 12, padding: 28, maxWidth: 780 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24, paddingBottom: 16, borderBottom: `1px solid ${pt.colors.border}` }}>
                         <button onClick={() => setShowForm(false)}
-                            style={{ padding: '7px 16px', background: '#0f172a', color: '#94a3b8', border: '1px solid #334155', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+                            style={{ padding: '7px 16px', background: '#0f172a', color: pt.colors.muted, border: `1px solid ${pt.colors.border}`, borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
                             ← Back
                         </button>
                         <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>{editId ? 'Edit Maintenance Task' : 'New Maintenance Task'}</h3>
@@ -208,25 +216,25 @@ export default function MaintenanceSchedulePage() {
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
                         <div style={{ gridColumn: '1/-1' }}>
-                            <label style={{ fontSize: 12, color: '#94a3b8', display: 'block', marginBottom: 5 }}>Machine *</label>
+                            <label style={{ fontSize: 12, color: pt.colors.muted, display: 'block', marginBottom: 5 }}>Machine *</label>
                             <select value={form.machine_id} onChange={e => setForm(f => ({ ...f, machine_id: e.target.value }))} style={inp}>
                                 <option value="">— select machine —</option>
                                 {machines.map(m => <option key={m.id} value={m.id}>{m.machine_code} — {m.machine_name}</option>)}
                             </select>
                         </div>
                         <div style={{ gridColumn: '1/-1' }}>
-                            <label style={{ fontSize: 12, color: '#94a3b8', display: 'block', marginBottom: 5 }}>Task Name *</label>
+                            <label style={{ fontSize: 12, color: pt.colors.muted, display: 'block', marginBottom: 5 }}>Task Name *</label>
                             <input value={form.task_name} onChange={e => setForm(f => ({ ...f, task_name: e.target.value }))}
                                 style={inp} placeholder="e.g. Complete Oil Change in All Gearing Boxes" />
                         </div>
                         <div>
-                            <label style={{ fontSize: 12, color: '#94a3b8', display: 'block', marginBottom: 5 }}>Frequency</label>
+                            <label style={{ fontSize: 12, color: pt.colors.muted, display: 'block', marginBottom: 5 }}>Frequency</label>
                             <select value={form.frequency} onChange={e => setForm(f => ({ ...f, frequency: e.target.value }))} style={inp}>
                                 {FREQUENCIES.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
                             </select>
                         </div>
                         <div>
-                            <label style={{ fontSize: 12, color: '#94a3b8', display: 'block', marginBottom: 5 }}>Task Type</label>
+                            <label style={{ fontSize: 12, color: pt.colors.muted, display: 'block', marginBottom: 5 }}>Task Type</label>
                             <select value={form.task_type} onChange={e => setForm(f => ({ ...f, task_type: e.target.value }))} style={inp}>
                                 <option value="checklist">Checklist (just tick done)</option>
                                 <option value="measurement">Measurement (capture values)</option>
@@ -235,9 +243,9 @@ export default function MaintenanceSchedulePage() {
                     </div>
 
                     {form.task_type === 'measurement' && (
-                        <div style={{ margin: '0 0 14px', padding: '16px', backgroundColor: '#0f172a', borderRadius: 8, border: '1px solid #1e3a5f' }}>
+                        <div style={{ margin: '0 0 14px', padding: '16px', backgroundColor: pt.colors.inner, borderRadius: 8, border: '1px solid #1e3a5f' }}>
                             <p style={{ margin: '0 0 12px', color: '#93c5fd', fontWeight: 600, fontSize: 13 }}>Measurement Fields</p>
-                            <p style={{ margin: '0 0 10px', color: '#64748b', fontSize: 12 }}>Define what values to capture (e.g. "Before Hz", "After Hz", "LHS", "RHS")</p>
+                            <p style={{ margin: '0 0 10px', color: pt.colors.dimText, fontSize: 12 }}>Define what values to capture (e.g. "Before Hz", "After Hz", "LHS", "RHS")</p>
                             <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
                                 <input value={newLabel.label} onChange={e => setNewLabel(l => ({ ...l, label: e.target.value }))}
                                     style={{ ...inp, flex: 2 }} placeholder="Field label (e.g. Before Hz)" />
@@ -251,13 +259,13 @@ export default function MaintenanceSchedulePage() {
                                         <button onClick={() => removeLabel(i)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 14, lineHeight: 1 }}>✕</button>
                                     </span>
                                 ))}
-                                {form.measurement_labels.length === 0 && <span style={{ color: '#475569', fontSize: 12 }}>No fields added yet.</span>}
+                                {form.measurement_labels.length === 0 && <span style={{ color: pt.colors.muted, fontSize: 12 }}>No fields added yet.</span>}
                             </div>
                         </div>
                     )}
 
                     <div style={{ marginBottom: 14 }}>
-                        <label style={{ fontSize: 12, color: '#94a3b8', display: 'block', marginBottom: 5 }}>Instructions / Notes</label>
+                        <label style={{ fontSize: 12, color: pt.colors.muted, display: 'block', marginBottom: 5 }}>Instructions / Notes</label>
                         <textarea value={form.instructions} onChange={e => setForm(f => ({ ...f, instructions: e.target.value }))}
                             style={{ ...inp, height: 65, resize: 'vertical' }}
                             placeholder="e.g. Use only SAE 40 grade oil. Check oil level indicator before changing." />
@@ -266,7 +274,7 @@ export default function MaintenanceSchedulePage() {
                     {msg && <div style={{ padding: '8px 14px', borderRadius: 6, backgroundColor: '#7f1d1d', color: '#fff', marginBottom: 14, fontSize: 13 }}>{msg}</div>}
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-                        <button onClick={() => setShowForm(false)} style={{ padding: '9px 20px', borderRadius: 8, border: '1px solid #334155', backgroundColor: 'transparent', color: '#94a3b8', cursor: 'pointer', fontSize: 13 }}>Cancel</button>
+                        <button onClick={() => setShowForm(false)} style={{ padding: '9px 20px', borderRadius: 8, border: `1px solid ${pt.colors.border}`, backgroundColor: 'transparent', color: pt.colors.muted, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
                         <button onClick={submit} disabled={loading}
                             style={{ padding: '9px 24px', borderRadius: 8, border: 'none', backgroundColor: '#10b981', color: '#fff', fontWeight: 600, cursor: 'pointer', fontSize: 13 }}>
                             {loading ? 'Saving…' : (editId ? 'Update Task' : 'Create Task')}

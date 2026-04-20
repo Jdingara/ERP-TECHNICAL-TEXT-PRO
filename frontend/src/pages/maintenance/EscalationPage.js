@@ -4,8 +4,17 @@
 // ============================================================
 
 import { useState, useEffect, useCallback } from 'react';
+import { usePageTheme } from '../../hooks/usePageTheme';
+import { useSettings } from '../../context/SettingsContext';
 
 export default function EscalationPage() {
+    const pt = usePageTheme();
+    const thS      = { ...pt.th, textAlign: 'left' };
+    const tdS      = { ...pt.cell, verticalAlign: 'middle' };
+    const inpS     = { ...pt.inp };
+    const formPage = { ...pt.formPage, maxWidth: 900 };
+    const formHeader = pt.formHeader;
+    const backBtnS = pt.backBtn;
     const [escalations, setEscalations] = useState([]);
     const [machines,    setMachines]    = useState([]);
     const [showForm,    setShowForm]    = useState(false);
@@ -78,18 +87,17 @@ export default function EscalationPage() {
         load();
     };
 
-    const F = ({ label, children }) => (
-        <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#94a3b8', marginBottom: 4 }}>{label}</label>
-            {children}
-        </div>
-    );
-    const inp = { padding: '8px 10px', borderRadius: 6, border: '1px solid #334155', backgroundColor: '#0f172a', color: '#f1f5f9', fontSize: 13, width: '100%', boxSizing: 'border-box' };
-    const cell = { padding: '10px 14px', borderBottom: '1px solid #1e293b', fontSize: 13, color: '#f1f5f9' };
-    const th   = { ...cell, backgroundColor: '#0f172a', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', fontSize: 11 };
+    function F({ label, children }) {
+    const { settings } = useSettings();
+    const muted = settings.themeMode === 'dark' ? '#94a3b8' : '#475569';
+    return <div><label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: muted, marginBottom: 4 }}>{label}</label>{children}</div>;
+}
+    const inp = { padding: '8px 10px', borderRadius: 6, border: `1px solid ${pt.colors.border}`, backgroundColor: pt.colors.inner, color: pt.colors.text, fontSize: 13, width: '100%', boxSizing: 'border-box' };
+    const cell = { padding: '10px 14px', borderBottom: `1px solid ${pt.colors.border}`, fontSize: 13, color: pt.colors.text };
+    const th   = { ...cell, backgroundColor: pt.colors.inner, color: pt.colors.muted, fontWeight: 600, textTransform: 'uppercase', fontSize: 11 };
 
     const levelCard = (level, color, label) => (
-        <div style={{ padding: 16, backgroundColor: '#0f172a', borderRadius: 8, border: `1px solid ${color}30`, marginBottom: 12 }}>
+        <div style={{ padding: 16, backgroundColor: pt.colors.inner, borderRadius: 8, border: `1px solid ${color}30`, marginBottom: 12 }}>
             <p style={{ margin: '0 0 12px', color, fontWeight: 700, fontSize: 13 }}>{label}</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
                 <F label="Name">
@@ -113,13 +121,13 @@ export default function EscalationPage() {
     );
 
     return (
-        <div style={{ padding: '24px 28px', fontFamily: 'Inter, sans-serif', color: '#f1f5f9', minHeight: '100vh', backgroundColor: '#0b1120' }}>
+        <div style={{ padding: '24px 28px', fontFamily: 'Inter, sans-serif', color: pt.colors.text, minHeight: '100vh', backgroundColor: pt.colors.outer }}>
             {!showForm ? (
                 <>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                         <div>
                             <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Escalation Settings</h2>
-                            <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: 13 }}>Configure email / WhatsApp alerts per machine</p>
+                            <p style={{ margin: '4px 0 0', color: pt.colors.dimText, fontSize: 13 }}>Configure email / WhatsApp alerts per machine</p>
                         </div>
                         <button onClick={openAdd}
                             style={{ padding: '9px 20px', borderRadius: 8, border: 'none', backgroundColor: '#8b5cf6', color: '#fff', fontWeight: 600, cursor: 'pointer', fontSize: 13 }}>
@@ -129,7 +137,7 @@ export default function EscalationPage() {
 
                     {msg && <div style={{ padding: '10px 16px', borderRadius: 8, backgroundColor: msg.includes('Error') ? '#7f1d1d' : '#14532d', color: '#fff', marginBottom: 16, fontSize: 13 }}>{msg}</div>}
 
-                    <div style={{ backgroundColor: '#1e293b', borderRadius: 12, overflow: 'hidden' }}>
+                    <div style={{ backgroundColor: pt.colors.card, borderRadius: 12, overflow: 'hidden' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
                                 <tr>
@@ -140,11 +148,11 @@ export default function EscalationPage() {
                             </thead>
                             <tbody>
                                 {escalations.length === 0 && (
-                                    <tr><td colSpan={8} style={{ ...cell, textAlign: 'center', color: '#475569', padding: 40 }}>No escalation configs yet.</td></tr>
+                                    <tr><td colSpan={8} style={{ ...cell, textAlign: 'center', color: pt.colors.muted, padding: 40 }}>No escalation configs yet.</td></tr>
                                 )}
                                 {escalations.map(e => (
                                     <tr key={e.id}>
-                                        <td style={{ ...cell, fontWeight: 600 }}>{e.machine_code} <span style={{ color: '#64748b', fontWeight: 400 }}>{e.machine_name}</span></td>
+                                        <td style={{ ...cell, fontWeight: 600 }}>{e.machine_code} <span style={{ color: pt.colors.dimText, fontWeight: 400 }}>{e.machine_name}</span></td>
                                         <td style={cell}>{e.reminder_days}d before</td>
                                         <td style={cell}>
                                             <span style={{ color: e.enable_email ? '#10b981' : '#475569', fontSize: 12 }}>{e.enable_email ? '● On' : '○ Off'}</span>
@@ -152,9 +160,9 @@ export default function EscalationPage() {
                                         <td style={cell}>
                                             <span style={{ color: e.enable_whatsapp ? '#10b981' : '#475569', fontSize: 12 }}>{e.enable_whatsapp ? '● On' : '○ Off'}</span>
                                         </td>
-                                        <td style={cell}>{e.level1_name || '—'} {e.level1_email && <span style={{ color: '#64748b', fontSize: 11 }}><br />{e.level1_email}</span>}</td>
-                                        <td style={cell}>{e.level2_name || '—'} {e.level2_email && <span style={{ color: '#64748b', fontSize: 11 }}><br />{e.level2_email}</span>}</td>
-                                        <td style={cell}>{e.level3_name || '—'} {e.level3_email && <span style={{ color: '#64748b', fontSize: 11 }}><br />{e.level3_email}</span>}</td>
+                                        <td style={cell}>{e.level1_name || '—'} {e.level1_email && <span style={{ color: pt.colors.dimText, fontSize: 11 }}><br />{e.level1_email}</span>}</td>
+                                        <td style={cell}>{e.level2_name || '—'} {e.level2_email && <span style={{ color: pt.colors.dimText, fontSize: 11 }}><br />{e.level2_email}</span>}</td>
+                                        <td style={cell}>{e.level3_name || '—'} {e.level3_email && <span style={{ color: pt.colors.dimText, fontSize: 11 }}><br />{e.level3_email}</span>}</td>
                                         <td style={cell}>
                                             <button onClick={() => openEdit(e)} style={{ padding: '4px 10px', borderRadius: 5, border: 'none', backgroundColor: '#3b82f6', color: '#fff', cursor: 'pointer', fontSize: 12, marginRight: 4 }}>Edit</button>
                                             <button onClick={() => del(e.id)} style={{ padding: '4px 10px', borderRadius: 5, border: 'none', backgroundColor: '#ef4444', color: '#fff', cursor: 'pointer', fontSize: 12 }}>Del</button>
@@ -166,10 +174,10 @@ export default function EscalationPage() {
                     </div>
                 </>
             ) : (
-                <div style={{ backgroundColor: '#1e293b', borderRadius: 12, padding: 28, maxWidth: 860 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24, paddingBottom: 16, borderBottom: '1px solid #334155' }}>
+                <div style={{ backgroundColor: pt.colors.card, borderRadius: 12, padding: 28, maxWidth: 860 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24, paddingBottom: 16, borderBottom: `1px solid ${pt.colors.border}` }}>
                         <button onClick={() => setShowForm(false)}
-                            style={{ padding: '7px 16px', background: '#0f172a', color: '#94a3b8', border: '1px solid #334155', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+                            style={{ padding: '7px 16px', background: '#0f172a', color: pt.colors.muted, border: `1px solid ${pt.colors.border}`, borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
                             ← Back
                         </button>
                         <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>{editId ? 'Edit Escalation Config' : 'New Escalation Config'}</h3>
@@ -206,7 +214,7 @@ export default function EscalationPage() {
                     {msg && <div style={{ padding: '8px 14px', borderRadius: 6, backgroundColor: '#7f1d1d', color: '#fff', marginBottom: 14, fontSize: 13 }}>{msg}</div>}
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 8 }}>
-                        <button onClick={() => setShowForm(false)} style={{ padding: '9px 20px', borderRadius: 8, border: '1px solid #334155', backgroundColor: 'transparent', color: '#94a3b8', cursor: 'pointer', fontSize: 13 }}>Cancel</button>
+                        <button onClick={() => setShowForm(false)} style={{ padding: '9px 20px', borderRadius: 8, border: `1px solid ${pt.colors.border}`, backgroundColor: 'transparent', color: pt.colors.muted, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
                         <button onClick={submit} disabled={loading}
                             style={{ padding: '9px 24px', borderRadius: 8, border: 'none', backgroundColor: '#8b5cf6', color: '#fff', fontWeight: 600, cursor: 'pointer', fontSize: 13 }}>
                             {loading ? 'Saving…' : 'Save Config'}

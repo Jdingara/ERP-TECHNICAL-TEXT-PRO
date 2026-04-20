@@ -1,9 +1,10 @@
 // ============================================================
 // PAGE: Process Entries — The production core screen
 // Worker picks lots → enters output qty → system creates batch
-// and writes traceability record automatically
 // ============================================================
 import { useState, useEffect, useCallback } from 'react';
+import { usePageTheme } from '../../hooks/usePageTheme';
+import { useSettings } from '../../context/SettingsContext';
 
 const emptyForm = {
     prod_order_id: '', process_id: '', machine_id: '', operator: '',
@@ -12,6 +13,15 @@ const emptyForm = {
 };
 
 export default function ProcessEntriesPage() {
+    const pt = usePageTheme();
+    const emptyTd  = { textAlign: 'center', padding: 40, color: pt.colors.muted };
+    const thS      = { ...pt.th, textAlign: 'left' };
+    const tdS      = { ...pt.cell, verticalAlign: 'middle' };
+    const inpS     = { ...pt.inp };
+    const selectS  = { ...pt.inp, width: 'auto' };
+    const formPage = { ...pt.formPage, maxWidth: 1100 };
+    const formHeader = pt.formHeader;
+    const backBtnS = pt.backBtn;
     const [rows,     setRows]     = useState([]);
     const [orders,   setOrders]   = useState([]);
     const [machines, setMachines] = useState([]);
@@ -20,7 +30,7 @@ export default function ProcessEntriesPage() {
     const [status,   setStatus]   = useState('');
     const [modal,    setModal]    = useState(false);
     const [form,     setForm]     = useState(emptyForm);
-    const [lotPicks, setLotPicks] = useState([]);   // [{lot_id, lot_number, material_name, balance_qty, uom, qty_to_use}]
+    const [lotPicks, setLotPicks] = useState([]);
     const [saving,   setSaving]   = useState(false);
     const [msg,      setMsg]      = useState('');
     const [detail,   setDetail]   = useState(null);
@@ -43,10 +53,9 @@ export default function ProcessEntriesPage() {
     }, []);
 
     const openAdd = () => {
-        setForm(emptyForm); setLotPicks([]); setMsg(''); setModal(true);
+        setForm(emptyForm); setLotPicks([]); setMsg(''); setDetail(null); setModal(true);
     };
 
-    // Add lot to the picker table
     const addLot = (lot) => {
         if (lotPicks.find(p => p.lot_id === lot.id)) return;
         setLotPicks(prev => [...prev, {
@@ -90,7 +99,6 @@ export default function ProcessEntriesPage() {
             const d = await res.json();
             setModal(false);
             load();
-            // refresh available lots
             fetch('/api/purchase/lots/?status=available', { credentials: 'include' }).then(r => r.json()).then(d => setAvailLots(d.lots || []));
             if (d.batch_number) alert(`✅ Entry saved!\nBatch created: ${d.batch_number}`);
         } else {
@@ -111,200 +119,193 @@ export default function ProcessEntriesPage() {
     const STATUS_COLOR = { draft: '#64748b', confirmed: '#10b981', cancelled: '#ef4444' };
     const SHIFT_COLOR  = { day: '#3b82f6', evening: '#f59e0b', night: '#8b5cf6' };
 
-    // Available lots not yet in picker
     const unselectedLots = availLots.filter(l => !lotPicks.find(p => p.lot_id === l.id));
 
     return (
         <div style={{ padding: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                <div>
-                    <h2 style={{ margin: '0 0 4px', fontSize: 22, fontWeight: 700 }}>Process Entries</h2>
-                    <p style={{ margin: 0, color: '#64748b', fontSize: 13 }}>Record production — pick input lots, enter output quantity, create batch</p>
-                </div>
-                <button onClick={openAdd} style={btn('#f97316')}>+ New Process Entry</button>
-            </div>
-
-            <div style={{ marginBottom: 16 }}>
-                <select value={status} onChange={e => setStatus(e.target.value)} style={selectS}>
-                    <option value="">All Entries</option>
-                    <option value="draft">Draft</option>
-                    <option value="confirmed">Confirmed</option>
-                </select>
-            </div>
-
-            <div style={{ overflowX: 'auto' }}>
-                <table style={tableS}><thead><tr style={{ background: '#1e293b', color: '#fff' }}>
-                    {['Entry No', 'Date', 'Prod. Order', 'Process', 'Machine', 'Operator', 'Shift', 'Output Qty', 'Rejection', 'Batch Created', 'Status', 'Actions'].map(h =>
-                        <th key={h} style={thS}>{h}</th>)}
-                </tr></thead><tbody>
-                    {rows.map((r, i) => (
-                        <tr key={r.id} style={{ background: i % 2 === 0 ? '#f8fafc' : '#fff' }}>
-                            <td style={tdS}><b style={{ color: '#f97316', cursor: 'pointer' }} onClick={() => setDetail(r)}>{r.process_entry_number}</b></td>
-                            <td style={tdS}>{r.entry_date}</td>
-                            <td style={tdS}>{r.prod_order_number || '—'}</td>
-                            <td style={tdS}>{r.process_name || '—'}</td>
-                            <td style={tdS}>{r.machine_code}</td>
-                            <td style={tdS}>{r.operator || '—'}</td>
-                            <td style={tdS}><span style={tag(SHIFT_COLOR[r.shift] || '#64748b')}>{r.shift}</span></td>
-                            <td style={tdS}><b style={{ color: '#10b981' }}>{r.output_qty}</b></td>
-                            <td style={tdS}><span style={{ color: r.rejection_qty > 0 ? '#ef4444' : '#94a3b8' }}>{r.rejection_qty || 0}</span></td>
-                            <td style={tdS}>{r.batch_number ? <b style={{ color: '#3b82f6' }}>{r.batch_number}</b> : '—'}</td>
-                            <td style={tdS}><span style={tag(STATUS_COLOR[r.status] || '#64748b')}>{r.status}</span></td>
-                            <td style={tdS}>
-                                {r.status === 'draft' && (
-                                    <button onClick={() => confirmEntry(r.id)} style={smallBtn('#10b981')}>Confirm</button>
-                                )}
-                            </td>
-                        </tr>
-                    ))}
-                    {rows.length === 0 && <tr><td colSpan={12} style={emptyTd}>No process entries yet</td></tr>}
-                </tbody></table>
-            </div>
-
-            {/* Add Modal */}
-            {modal && (
-                <div style={overlay}>
-                    <div style={{ ...modalBox, width: 900 }}>
-                        <h3 style={{ margin: '0 0 20px', color: '#f97316' }}>New Process Entry</h3>
-
-                        {/* Header Fields */}
-                        <div style={grid3}>
-                            <F label="Production Order *">
-                                <select style={inpS} {...inp('prod_order_id')}>
-                                    <option value="">Select production order…</option>
-                                    {orders.map(o => <option key={o.id} value={o.id}>{o.prod_order_number} — {o.product_name}</option>)}
-                                </select>
-                            </F>
-                            <F label="Process Stage">
-                                <select style={inpS} {...inp('process_id')}>
-                                    <option value="">Select process…</option>
-                                    {processes.map(p => <option key={p.id} value={p.id}>{p.process_name}</option>)}
-                                </select>
-                            </F>
-                            <F label="Machine *">
-                                <select style={inpS} {...inp('machine_id')}>
-                                    <option value="">Select machine…</option>
-                                    {machines.map(m => <option key={m.id} value={m.id}>{m.machine_code} — {m.machine_name}</option>)}
-                                </select>
-                            </F>
-                            <F label="Operator"><input style={inpS} {...inp('operator')} /></F>
-                            <F label="Shift">
-                                <select style={inpS} {...inp('shift')}>
-                                    <option value="day">Day</option>
-                                    <option value="evening">Evening</option>
-                                    <option value="night">Night</option>
-                                </select>
-                            </F>
-                            <F label="Entry Date *"><input type="date" style={inpS} {...inp('entry_date')} /></F>
+            {!modal ? (
+                <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                        <div>
+                            <h2 style={{ margin: '0 0 4px', fontSize: 22, fontWeight: 700 }}>Process Entries</h2>
+                            <p style={{ margin: 0, color: pt.colors.dimText, fontSize: 13 }}>Record production — pick input lots, enter output quantity, create batch</p>
                         </div>
-
-                        {/* LOT PICKER */}
-                        <div style={{ border: '2px solid #f97316', borderRadius: 10, padding: 16, marginBottom: 16 }}>
-                            <div style={{ fontWeight: 700, fontSize: 14, color: '#f97316', marginBottom: 12 }}>
-                                📦 Input Lots — Select lots consumed in this process
-                            </div>
-
-                            {/* Available lots dropdown */}
-                            <div style={{ marginBottom: 12 }}>
-                                <select style={{ ...inpS, maxWidth: 480 }}
-                                    onChange={e => {
-                                        const lot = availLots.find(l => String(l.id) === e.target.value);
-                                        if (lot) { addLot(lot); e.target.value = ''; }
-                                    }}>
-                                    <option value="">+ Add lot to this entry…</option>
-                                    {unselectedLots.map(l => (
-                                        <option key={l.id} value={l.id}>
-                                            {l.lot_number} — {l.material_name} {l.color_code ? `[${l.color_code}]` : ''} (Balance: {l.balance_qty} {l.uom})
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {lotPicks.length === 0 ? (
-                                <div style={{ color: '#94a3b8', fontSize: 13, padding: '12px 0' }}>No lots selected yet. Use the dropdown above to add lots.</div>
-                            ) : (
-                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                                    <thead><tr style={{ background: '#fff7ed' }}>
-                                        <th style={{ ...thS, fontSize: 11, color: '#9a3412' }}>LOT Number</th>
-                                        <th style={{ ...thS, fontSize: 11, color: '#9a3412' }}>Material</th>
-                                        <th style={{ ...thS, fontSize: 11, color: '#9a3412' }}>Color</th>
-                                        <th style={{ ...thS, fontSize: 11, color: '#9a3412' }}>Available</th>
-                                        <th style={{ ...thS, fontSize: 11, color: '#9a3412' }}>Qty to Use *</th>
-                                        <th style={{ ...thS, fontSize: 11, color: '#9a3412' }}></th>
-                                    </tr></thead>
-                                    <tbody>
-                                        {lotPicks.map(p => (
-                                            <tr key={p.lot_id} style={{ borderBottom: '1px solid #fed7aa' }}>
-                                                <td style={tdS}><b style={{ color: '#ec4899' }}>{p.lot_number}</b></td>
-                                                <td style={tdS}>{p.material_name}</td>
-                                                <td style={tdS}>{p.color_code || '—'}</td>
-                                                <td style={tdS}>{p.balance_qty} {p.uom}</td>
-                                                <td style={tdS}>
-                                                    <input type="number" min="0.01" max={p.balance_qty}
-                                                        value={p.qty_to_use}
-                                                        onChange={e => updateLotQty(p.lot_id, e.target.value)}
-                                                        style={{ width: 100, padding: '5px 8px', borderRadius: 6,
-                                                            border: `1px solid ${Number(p.qty_to_use) > Number(p.balance_qty) ? '#ef4444' : '#e2e8f0'}`,
-                                                            fontSize: 13 }}
-                                                    />
-                                                </td>
-                                                <td style={tdS}>
-                                                    <button onClick={() => removeLot(p.lot_id)}
-                                                        style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 16 }}>✕</button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            )}
-                        </div>
-
-                        {/* Output */}
-                        <div style={grid3}>
-                            <F label="Output Qty *"><input type="number" style={inpS} {...inp('output_qty')} /></F>
-                            <F label="Rejection Qty"><input type="number" style={inpS} {...inp('rejection_qty')} /></F>
-                            <F label="Notes"><input style={inpS} {...inp('notes')} /></F>
-                        </div>
-
-                        {msg && <div style={{ color: '#ef4444', marginTop: 8, fontWeight: 600 }}>{msg}</div>}
-                        <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: 8, padding: '10px 14px', marginTop: 12, fontSize: 13, color: '#9a3412' }}>
-                            ⚡ Saving will create a new batch and deduct quantities from selected lots. Make sure lot quantities are correct before saving.
-                        </div>
-                        <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'flex-end' }}>
-                            <button onClick={() => setModal(false)} style={smallBtn('#64748b')}>Cancel</button>
-                            <button onClick={save} disabled={saving} style={btn('#f97316')}>
-                                {saving ? 'Saving…' : '✅ Save & Create Batch'}
-                            </button>
-                        </div>
+                        <button onClick={openAdd} style={btn('#f97316')}>+ New Process Entry</button>
                     </div>
-                </div>
-            )}
 
-            {/* Detail Modal */}
-            {detail && (
-                <div style={overlay}>
-                    <div style={{ ...modalBox, width: 600 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                            <h3 style={{ margin: 0, color: '#f97316' }}>{detail.process_entry_number}</h3>
-                            <button onClick={() => setDetail(null)} style={smallBtn('#64748b')}>✕ Close</button>
-                        </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                            {[['Date', detail.entry_date], ['Production Order', detail.prod_order_number || '—'],
-                              ['Process', detail.process_name || '—'], ['Machine', detail.machine_code],
-                              ['Operator', detail.operator || '—'], ['Shift', detail.shift],
-                              ['Output Qty', detail.output_qty], ['Rejection', detail.rejection_qty || 0],
-                              ['Batch Created', detail.batch_number || '—'], ['Status', detail.status]
-                            ].map(([l, v]) => (
-                                <div key={l} style={{ background: '#f8fafc', borderRadius: 8, padding: '10px 14px' }}>
-                                    <div style={{ fontSize: 11, color: '#64748b', marginBottom: 3 }}>{l}</div>
-                                    <div style={{ fontWeight: 600, fontSize: 13 }}>{v}</div>
-                                </div>
+                    <div style={{ marginBottom: 16 }}>
+                        <select value={status} onChange={e => setStatus(e.target.value)} style={selectS}>
+                            <option value="">All Entries</option>
+                            <option value="draft">Draft</option>
+                            <option value="confirmed">Confirmed</option>
+                        </select>
+                    </div>
+
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={tableS}><thead><tr style={{ background: pt.colors.inner, color: '#fff' }}>
+                            {['Entry No', 'Date', 'Prod. Order', 'Process', 'Machine', 'Operator', 'Shift', 'Output Qty', 'Rejection', 'Batch Created', 'Status', 'Actions'].map(h =>
+                                <th key={h} style={thS}>{h}</th>)}
+                        </tr></thead><tbody>
+                            {rows.map((r, i) => (
+                                <tr key={r.id} style={{ background: i % 2 === 0 ? pt.colors.inner : pt.colors.card }}>
+                                    <td style={tdS}><b style={{ color: '#f97316', cursor: 'pointer' }} onClick={() => setDetail(detail?.id === r.id ? null : r)}>{r.process_entry_number}</b></td>
+                                    <td style={tdS}>{r.entry_date}</td>
+                                    <td style={tdS}>{r.prod_order_number || '—'}</td>
+                                    <td style={tdS}>{r.process_name || '—'}</td>
+                                    <td style={tdS}>{r.machine_code}</td>
+                                    <td style={tdS}>{r.operator || '—'}</td>
+                                    <td style={tdS}><span style={tag(SHIFT_COLOR[r.shift] || '#64748b')}>{r.shift}</span></td>
+                                    <td style={tdS}><b style={{ color: '#10b981' }}>{r.output_qty}</b></td>
+                                    <td style={tdS}><span style={{ color: r.rejection_qty > 0 ? '#ef4444' : '#94a3b8' }}>{r.rejection_qty || 0}</span></td>
+                                    <td style={tdS}>{r.batch_number ? <b style={{ color: '#3b82f6' }}>{r.batch_number}</b> : '—'}</td>
+                                    <td style={tdS}><span style={tag(STATUS_COLOR[r.status] || '#64748b')}>{r.status}</span></td>
+                                    <td style={tdS}>
+                                        {r.status === 'draft' && (
+                                            <button onClick={() => confirmEntry(r.id)} style={smallBtn('#10b981')}>Confirm</button>
+                                        )}
+                                    </td>
+                                </tr>
                             ))}
+                            {rows.length === 0 && <tr><td colSpan={12} style={emptyTd}>No process entries yet</td></tr>}
+                        </tbody></table>
+                    </div>
+
+                    {detail && (
+                        <div style={{ marginTop: 24, background: pt.colors.inner, border: `1px solid ${pt.colors.border}`, borderRadius: 12, padding: 24, maxWidth: 700 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                                <h3 style={{ margin: 0, color: '#f97316', fontSize: 16 }}>{detail.process_entry_number}</h3>
+                                <button onClick={() => setDetail(null)} style={smallBtn('#64748b')}>✕ Close</button>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                {[['Date', detail.entry_date], ['Production Order', detail.prod_order_number || '—'],
+                                  ['Process', detail.process_name || '—'], ['Machine', detail.machine_code],
+                                  ['Operator', detail.operator || '—'], ['Shift', detail.shift],
+                                  ['Output Qty', detail.output_qty], ['Rejection', detail.rejection_qty || 0],
+                                  ['Batch Created', detail.batch_number || '—'], ['Status', detail.status]
+                                ].map(([l, v]) => (
+                                    <div key={l} style={{ background: pt.colors.card, borderRadius: 8, padding: '10px 14px', border: '1px solid #f1f5f9' }}>
+                                        <div style={{ fontSize: 11, color: pt.colors.dimText, marginBottom: 3 }}>{l}</div>
+                                        <div style={{ fontWeight: 600, fontSize: 13 }}>{v}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            {detail.notes && <div style={{ marginTop: 12, background: pt.colors.card, borderRadius: 8, padding: '10px 14px', border: '1px solid #f1f5f9' }}>
+                                <div style={{ fontSize: 11, color: pt.colors.dimText, marginBottom: 3 }}>Notes</div>
+                                <div style={{ fontSize: 13 }}>{detail.notes}</div>
+                            </div>}
                         </div>
-                        {detail.notes && <div style={{ marginTop: 14, background: '#f8fafc', borderRadius: 8, padding: '10px 14px' }}>
-                            <div style={{ fontSize: 11, color: '#64748b', marginBottom: 3 }}>Notes</div>
-                            <div style={{ fontSize: 13 }}>{detail.notes}</div>
-                        </div>}
+                    )}
+                </>
+            ) : (
+                <div style={formPage}>
+                    <div style={formHeader}>
+                        <button onClick={() => setModal(false)} style={backBtnS}>← Back to Process Entries</button>
+                        <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#f97316' }}>New Process Entry</h3>
+                    </div>
+
+                    <div style={grid3}>
+                        <F label="Production Order *">
+                            <select style={inpS} {...inp('prod_order_id')}>
+                                <option value="">Select production order…</option>
+                                {orders.map(o => <option key={o.id} value={o.id}>{o.prod_order_number} — {o.product_name}</option>)}
+                            </select>
+                        </F>
+                        <F label="Process Stage">
+                            <select style={inpS} {...inp('process_id')}>
+                                <option value="">Select process…</option>
+                                {processes.map(p => <option key={p.id} value={p.id}>{p.process_name}</option>)}
+                            </select>
+                        </F>
+                        <F label="Machine *">
+                            <select style={inpS} {...inp('machine_id')}>
+                                <option value="">Select machine…</option>
+                                {machines.map(m => <option key={m.id} value={m.id}>{m.machine_code} — {m.machine_name}</option>)}
+                            </select>
+                        </F>
+                        <F label="Operator"><input style={inpS} {...inp('operator')} /></F>
+                        <F label="Shift">
+                            <select style={inpS} {...inp('shift')}>
+                                <option value="day">Day</option>
+                                <option value="evening">Evening</option>
+                                <option value="night">Night</option>
+                            </select>
+                        </F>
+                        <F label="Entry Date *"><input type="date" style={inpS} {...inp('entry_date')} /></F>
+                    </div>
+
+                    <div style={{ border: '2px solid #f97316', borderRadius: 10, padding: 16, marginBottom: 16 }}>
+                        <div style={{ fontWeight: 700, fontSize: 14, color: '#f97316', marginBottom: 12 }}>
+                            📦 Input Lots — Select lots consumed in this process
+                        </div>
+                        <div style={{ marginBottom: 12 }}>
+                            <select style={{ ...inpS, maxWidth: 480 }}
+                                onChange={e => {
+                                    const lot = availLots.find(l => String(l.id) === e.target.value);
+                                    if (lot) { addLot(lot); e.target.value = ''; }
+                                }}>
+                                <option value="">+ Add lot to this entry…</option>
+                                {unselectedLots.map(l => (
+                                    <option key={l.id} value={l.id}>
+                                        {l.lot_number} — {l.material_name} {l.color_code ? `[${l.color_code}]` : ''} (Balance: {l.balance_qty} {l.uom})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {lotPicks.length === 0 ? (
+                            <div style={{ color: pt.colors.muted, fontSize: 13, padding: '12px 0' }}>No lots selected yet. Use the dropdown above to add lots.</div>
+                        ) : (
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                                <thead><tr style={{ background: '#fff7ed' }}>
+                                    <th style={{ ...thS, fontSize: 11, color: '#9a3412' }}>LOT Number</th>
+                                    <th style={{ ...thS, fontSize: 11, color: '#9a3412' }}>Material</th>
+                                    <th style={{ ...thS, fontSize: 11, color: '#9a3412' }}>Color</th>
+                                    <th style={{ ...thS, fontSize: 11, color: '#9a3412' }}>Available</th>
+                                    <th style={{ ...thS, fontSize: 11, color: '#9a3412' }}>Qty to Use *</th>
+                                    <th style={{ ...thS, fontSize: 11, color: '#9a3412' }}></th>
+                                </tr></thead>
+                                <tbody>
+                                    {lotPicks.map(p => (
+                                        <tr key={p.lot_id} style={{ borderBottom: '1px solid #fed7aa' }}>
+                                            <td style={tdS}><b style={{ color: '#ec4899' }}>{p.lot_number}</b></td>
+                                            <td style={tdS}>{p.material_name}</td>
+                                            <td style={tdS}>{p.color_code || '—'}</td>
+                                            <td style={tdS}>{p.balance_qty} {p.uom}</td>
+                                            <td style={tdS}>
+                                                <input type="number" min="0.01" max={p.balance_qty}
+                                                    value={p.qty_to_use}
+                                                    onChange={e => updateLotQty(p.lot_id, e.target.value)}
+                                                    style={{ width: 100, padding: '5px 8px', borderRadius: 6,
+                                                        border: `1px solid ${Number(p.qty_to_use) > Number(p.balance_qty) ? '#ef4444' : '#e2e8f0'}`,
+                                                        fontSize: 13 }}
+                                                />
+                                            </td>
+                                            <td style={tdS}>
+                                                <button onClick={() => removeLot(p.lot_id)}
+                                                    style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 16 }}>✕</button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+
+                    <div style={grid3}>
+                        <F label="Output Qty *"><input type="number" style={inpS} {...inp('output_qty')} /></F>
+                        <F label="Rejection Qty"><input type="number" style={inpS} {...inp('rejection_qty')} /></F>
+                        <F label="Notes"><input style={inpS} {...inp('notes')} /></F>
+                    </div>
+
+                    {msg && <div style={{ color: '#ef4444', marginTop: 8, fontWeight: 600 }}>{msg}</div>}
+                    <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: 8, padding: '10px 14px', marginTop: 12, fontSize: 13, color: '#9a3412' }}>
+                        ⚡ Saving will create a new batch and deduct quantities from selected lots. Make sure lot quantities are correct before saving.
+                    </div>
+                    <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'flex-end' }}>
+                        <button onClick={() => setModal(false)} style={smallBtn('#64748b')}>Cancel</button>
+                        <button onClick={save} disabled={saving} style={btn('#f97316')}>
+                            {saving ? 'Saving…' : '✅ Save & Create Batch'}
+                        </button>
                     </div>
                 </div>
             )}
@@ -312,16 +313,13 @@ export default function ProcessEntriesPage() {
     );
 }
 
-const F        = ({ label, children }) => (<div><label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 4 }}>{label}</label>{children}</div>);
+function F({ label, children }) {
+    const { settings } = useSettings();
+    const muted = settings.themeMode === 'dark' ? '#94a3b8' : '#475569';
+    return <div><label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: muted, marginBottom: 4 }}>{label}</label>{children}</div>;
+}
 const btn      = (bg) => ({ padding: '8px 18px', background: bg, color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 });
 const smallBtn = (bg) => ({ padding: '4px 10px', background: bg, color: '#fff', border: 'none', borderRadius: 5, cursor: 'pointer', fontSize: 12, marginRight: 4 });
 const tableS   = { width: '100%', borderCollapse: 'collapse', fontSize: 13 };
-const thS      = { padding: '10px 14px', textAlign: 'left', fontWeight: 600, fontSize: 12 };
-const tdS      = { padding: '10px 14px', borderBottom: '1px solid #f1f5f9', verticalAlign: 'middle' };
-const overlay  = { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1300 };
-const modalBox = { background: '#fff', borderRadius: 12, padding: 28, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' };
 const grid3    = { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, marginBottom: 16 };
-const inpS     = { width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13, boxSizing: 'border-box' };
-const selectS  = { padding: '8px 14px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13, outline: 'none' };
 const tag      = (bg) => ({ display: 'inline-block', padding: '2px 8px', borderRadius: 12, background: `${bg}20`, color: bg, fontSize: 11, fontWeight: 600 });
-const emptyTd  = { textAlign: 'center', padding: 40, color: '#94a3b8' };
