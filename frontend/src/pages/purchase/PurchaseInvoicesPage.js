@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePageTheme } from '../../hooks/usePageTheme';
 import { useSettings } from '../../context/SettingsContext';
+import { printPurchaseInvoice } from '../../utils/printUtils';
 
 /* eslint-disable no-undef */
 
@@ -38,7 +39,7 @@ export default function PurchaseInvoicesPage() {
     useEffect(() => { load(); }, [load]);
     useEffect(() => {
         fetch('/api/masters/vendors/', {credentials:'include'}).then(r=>r.json()).then(d=>setVendors(d.vendors||[]));
-        fetch('/api/purchase/orders/?status=confirmed', {credentials:'include'}).then(r=>r.json()).then(d=>setPOs(d.orders||[]));
+        fetch('/api/purchase/po/?status=confirmed', {credentials:'include'}).then(r=>r.json()).then(d=>setPOs(d.purchase_orders||[]));
     }, []);
 
     const openAdd  = () => { setForm(empty); setEditId(null); setMsg(''); setModal(true); };
@@ -87,7 +88,10 @@ export default function PurchaseInvoicesPage() {
                                     <td style={tdS}>{r.due_date||'—'}</td>
                                     <td style={tdS}><b>₹{Number(r.total_amount||0).toLocaleString('en-IN')}</b></td>
                                     <td style={tdS}><span style={tag(STATUS_COLOR[r.status]||'#64748b')}>{r.status||'draft'}</span></td>
-                                    <td style={tdS}><button onClick={()=>openEdit(r)} style={smallBtn('#3b82f6')}>Edit</button></td>
+                                    <td style={tdS}>
+                                        <button onClick={()=>openEdit(r)} style={smallBtn('#3b82f6')}>Edit</button>
+                                        <button onClick={()=>printPurchaseInvoice(r)} style={smallBtn('#1a237e')}>🖨 Print</button>
+                                    </td>
                                 </tr>
                             ))}
                             {rows.length===0 && <tr><td colSpan={8} style={emptyTd}>No invoices found</td></tr>}

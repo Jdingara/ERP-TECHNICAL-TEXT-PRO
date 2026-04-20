@@ -37,12 +37,20 @@ def so_line_dict(line):
 
 
 def so_dict(so, include_lines=False):
+    c = so.customer
     d = {
         'id': so.id,
         'so_number': so.so_number,
         'customer_id': so.customer_id,
-        'customer_name': so.customer.customer_name if so.customer else '',
-        'customer_code': so.customer.customer_code if so.customer else '',
+        'customer_name': c.customer_name if c else '',
+        'customer_code': c.customer_code if c else '',
+        'customer_phone': c.phone if c else '',
+        'customer_email': c.email if c else '',
+        'customer_address': c.address if c else '',
+        'customer_city': c.city if c else '',
+        'customer_state': c.state if c else '',
+        'customer_gstin': c.gstin if c else '',
+        'customer_contact': c.contact_person if c else '',
         'order_date': str(so.order_date),
         'delivery_date': str(so.delivery_date) if so.delivery_date else '',
         'status': so.status,

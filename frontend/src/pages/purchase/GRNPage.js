@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePageTheme } from '../../hooks/usePageTheme';
 import { useSettings } from '../../context/SettingsContext';
+import { printGRN } from '../../utils/printUtils';
 
 export default function GRNPage() {
     const pt = usePageTheme();
@@ -74,6 +75,12 @@ export default function GRNPage() {
             setPoLines([]); setGrnLines([]);
             load();
         } else { const d = await res.json(); setMsg(d.error || 'Error'); }
+    };
+
+    const printGrnRecord = async (grn) => {
+        const res = await fetch(`/api/purchase/grn/${grn.id}/`, { credentials: 'include' });
+        const d = await res.json();
+        if (d.grn) printGRN(d.grn);
     };
 
     const openLotScreen = async (grn) => {
@@ -194,6 +201,7 @@ export default function GRNPage() {
                                         </button>
                                     )}
                                     {r.status === 'confirmed' && <span style={{ color: '#10b981', fontSize: 12 }}>✓ Lots Created</span>}
+                                    <button onClick={() => printGrnRecord(r)} style={{ ...smallBtn('#1a237e'), marginLeft: 6 }}>🖨 Print</button>
                                 </td>
                             </tr>
                         ))}

@@ -45,12 +45,20 @@ def po_line_dict(line):
 
 
 def po_dict(po, include_lines=False):
+    v = po.vendor
     d = {
         'id': po.id,
         'po_number': po.po_number,
         'vendor_id': po.vendor_id,
-        'vendor_name': po.vendor.vendor_name if po.vendor else '',
-        'vendor_code': po.vendor.vendor_code if po.vendor else '',
+        'vendor_name': v.vendor_name if v else '',
+        'vendor_code': v.vendor_code if v else '',
+        'vendor_phone': v.phone if v else '',
+        'vendor_email': v.email if v else '',
+        'vendor_address': v.address if v else '',
+        'vendor_city': v.city if v else '',
+        'vendor_state': v.state if v else '',
+        'vendor_gstin': v.gstin if v else '',
+        'vendor_contact': v.contact_person if v else '',
         'order_date': str(po.order_date),
         'expected_date': str(po.expected_date) if po.expected_date else '',
         'status': po.status,
@@ -121,13 +129,21 @@ def lot_dict(lot):
 
 
 def invoice_dict(inv):
+    v = inv.vendor
     return {
         'id': inv.id,
         'invoice_number': inv.invoice_number,
         'grn_id': inv.grn_id,
         'grn_number': inv.grn.grn_number if inv.grn else '',
         'vendor_id': inv.vendor_id,
-        'vendor_name': inv.vendor.vendor_name if inv.vendor else '',
+        'vendor_name': v.vendor_name if v else '',
+        'vendor_phone': v.phone if v else '',
+        'vendor_email': v.email if v else '',
+        'vendor_address': v.address if v else '',
+        'vendor_city': v.city if v else '',
+        'vendor_state': v.state if v else '',
+        'vendor_gstin': v.gstin if v else '',
+        'vendor_contact': v.contact_person if v else '',
         'invoice_date': str(inv.invoice_date),
         'due_date': str(inv.due_date) if inv.due_date else '',
         'total_amount': str(inv.total_amount),

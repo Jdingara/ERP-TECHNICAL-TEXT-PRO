@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePageTheme } from '../../hooks/usePageTheme';
 import { useSettings } from '../../context/SettingsContext';
+import { printDeliveryChallan } from '../../utils/printUtils';
 
 const emptyForm = {
     customer_id: '', dispatch_date: new Date().toISOString().slice(0, 10),
@@ -87,6 +88,12 @@ export default function DispatchEntriesPage() {
         if (res.ok) { load(); } else { const d = await res.json(); alert(d.error || 'Error'); }
     };
 
+    const printDispatch = async (id) => {
+        const res = await fetch(`/api/dispatch/entries/${id}/`, { credentials: 'include' });
+        const d = await res.json();
+        if (d.dispatch) printDeliveryChallan(d.dispatch);
+    };
+
     const inp = (f) => ({ value: form[f], onChange: e => setForm(p => ({ ...p, [f]: e.target.value })) });
     const STATUS_COLOR = { draft: '#64748b', confirmed: '#10b981', cancelled: '#ef4444' };
     const unselectedBatches = batches.filter(b => !pickedBatches.find(p => p.batch_id === b.id));
@@ -133,6 +140,7 @@ export default function DispatchEntriesPage() {
                                         {r.status === 'draft' && (
                                             <button onClick={() => confirmDispatch(r.id)} style={smallBtn('#10b981')}>Confirm</button>
                                         )}
+                                        <button onClick={() => printDispatch(r.id)} style={smallBtn('#1a237e')}>🖨</button>
                                     </td>
                                 </tr>
                             ))}
@@ -144,7 +152,10 @@ export default function DispatchEntriesPage() {
                         <div style={{ marginTop: 24, background: pt.colors.inner, border: `1px solid ${pt.colors.border}`, borderRadius: 12, padding: 24, maxWidth: 700 }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                                 <h3 style={{ margin: 0, color: '#8b5cf6', fontSize: 16 }}>{detail.dispatch_number}</h3>
-                                <button onClick={() => setDetail(null)} style={smallBtn('#64748b')}>✕ Close</button>
+                                <div style={{ display: 'flex', gap: 8 }}>
+                                    <button onClick={() => printDispatch(detail.id)} style={smallBtn('#1a237e')}>🖨 Print Challan</button>
+                                    <button onClick={() => setDetail(null)} style={smallBtn('#64748b')}>✕ Close</button>
+                                </div>
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                                 {[['Customer', detail.customer_name], ['Dispatch Date', detail.dispatch_date],

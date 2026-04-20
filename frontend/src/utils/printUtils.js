@@ -45,24 +45,58 @@ const LOGO_SVG = `
 </svg>`;
 
 // ────────────────────────────────────────────────────────────
-// Core print function — opens new window and triggers print
+// Core print function — opens new window with Print & Download buttons
 // ────────────────────────────────────────────────────────────
 export function printDoc(title, bodyHTML) {
-    const win = window.open('', '_blank', 'width=900,height=750');
+    const win = window.open('', '_blank', 'width=960,height=820');
     win.document.write(`<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8"/>
   <title>${title}</title>
-  <style>${getPrintCSS()}</style>
+  <style>
+    ${getPrintCSS()}
+    .toolbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      background: #1a237e; color: white;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      font-family: Arial, sans-serif;
+    }
+    .toolbar .doc-title { font-size: 14px; font-weight: bold; letter-spacing: 0.5px; }
+    .toolbar .btn-group { display: flex; gap: 10px; }
+    .toolbar button {
+      padding: 8px 20px; border: none; border-radius: 6px;
+      font-size: 13px; font-weight: bold; cursor: pointer;
+    }
+    .btn-print { background: #fff; color: #1a237e; }
+    .btn-pdf   { background: #43a047; color: #fff; }
+    .btn-close { background: transparent; color: rgba(255,255,255,0.7); font-size: 18px; padding: 4px 10px; }
+    .toolbar .hint { font-size: 11px; color: rgba(255,255,255,0.7); }
+    .print-body { margin-top: 60px; }
+    @media print {
+      .toolbar { display: none !important; }
+      .print-body { margin-top: 0; }
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      thead { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
 </head>
 <body>
-  ${bodyHTML}
-  <script>
-    window.onload = function() {
-      setTimeout(function() { window.print(); }, 400);
-    };
-  </script>
+  <div class="toolbar">
+    <div>
+      <div class="doc-title">📄 ${title}</div>
+      <div class="hint">To download PDF: click Save as PDF → select "Save as PDF" as printer</div>
+    </div>
+    <div class="btn-group">
+      <button class="btn-print" onclick="window.print()">🖨 Print</button>
+      <button class="btn-pdf"   onclick="window.print()">⬇ Save as PDF</button>
+      <button class="btn-close" onclick="window.close()">✕</button>
+    </div>
+  </div>
+  <div class="print-body">
+    ${bodyHTML}
+  </div>
 </body>
 </html>`);
     win.document.close();
@@ -314,136 +348,120 @@ export function printQuotation(qt) {
 }
 
 // ============================================================
-// 2. SALES ORDER CONFIRMATION
+// 2. SALES ORDER CONFIRMATION  (matches our planning/SO API)
 // ============================================================
 export function printSalesOrder(so) {
     const lines = so.lines || [];
     const linesHTML = lines.length > 0 ? lines.map((l, i) => `
         <tr>
           <td>${i + 1}</td>
-          <td>${l.item_code}</td>
-          <td>${l.item_name}</td>
-          <td class="num">${fmtNum(l.ordered_quantity, 3)}</td>
-          <td>${l.unit}</td>
-          <td class="num">${fmtNum(l.unit_price)}</td>
-          <td class="num"><strong>${fmtNum(l.total_price)}</strong></td>
+          <td>${l.product_name || l.item_name || '—'}</td>
+          <td class="num">${fmtNum(l.quantity || l.ordered_quantity, 3)}</td>
+          <td>${l.uom || l.unit || '—'}</td>
+          <td class="num">${fmtNum(l.unit_price || 0)}</td>
+          <td class="num"><strong>₹${fmtNum((l.quantity || l.ordered_quantity || 0) * (l.unit_price || 0))}</strong></td>
+          <td>${fmtDate(l.delivery_date)}</td>
           <td>${l.notes || ''}</td>
-        </tr>`).join('') : `<tr><td colspan="8" style="text-align:center;color:#888">No line items</td></tr>`;
+        </tr>`).join('') : `<tr><td colspan="8" style="text-align:center;color:#888;padding:14px">No line items on record</td></tr>`;
 
     const body = `
     <div class="page">
-      ${companyHeader('Order Confirmation', so.so_number, fmtDate(so.order_date), `Delivery: ${fmtDate(so.delivery_date)}`)}
-
+      ${companyHeader('Sales Order', so.so_number, fmtDate(so.order_date), `Delivery Due: ${fmtDate(so.delivery_date)}`)}
       <div class="info-row">
         <div class="info-box">
-          <h3>Bill To / Ship To</h3>
+          <h3>Bill To / Customer</h3>
           <p class="big">${so.customer_name}</p>
-          <p>${so.customer_address || ''}</p>
-          ${so.customer_gstin ? `<p>GSTIN: ${so.customer_gstin}</p>` : ''}
+          ${so.customer_contact ? `<p>Attn: ${so.customer_contact}</p>` : ''}
+          ${so.customer_address ? `<p>${so.customer_address}${so.customer_city ? ', ' + so.customer_city : ''}${so.customer_state ? ', ' + so.customer_state : ''}</p>` : ''}
+          ${so.customer_gstin ? `<p>GSTIN: <strong>${so.customer_gstin}</strong></p>` : ''}
           ${so.customer_phone ? `<p>Tel: ${so.customer_phone}</p>` : ''}
+          ${so.customer_email ? `<p>Email: ${so.customer_email}</p>` : ''}
         </div>
         <div class="info-box highlight">
-          <h3>Order Details</h3>
-          <p>Warehouse: <strong>${so.warehouse_name}</strong></p>
+          <h3>Order Summary</h3>
+          <p>SO Number: <strong>${so.so_number}</strong></p>
           <p>Order Date: <strong>${fmtDate(so.order_date)}</strong></p>
-          <p>Delivery Date: <strong>${fmtDate(so.delivery_date)}</strong></p>
-          <p>Status: <span class="badge ${so.status}">${so.status.toUpperCase()}</span></p>
+          <p>Delivery Date: <strong>${fmtDate(so.delivery_date) || '—'}</strong></p>
+          <p>Status: <span class="badge ${so.status || 'draft'}">${(so.status || 'draft').toUpperCase()}</span></p>
         </div>
       </div>
-
-      <div class="section-title">Order Items</div>
+      <div class="section-title">Order Line Items</div>
       <table>
-        <thead>
-          <tr>
-            <th style="width:4%">#</th>
-            <th style="width:10%">Item Code</th>
-            <th>Item Description</th>
-            <th class="num">Qty</th>
-            <th>Unit</th>
-            <th class="num">Rate (Rs)</th>
-            <th class="num">Amount (Rs)</th>
-            <th>Notes</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th style="width:4%">#</th>
+          <th>Product Description</th>
+          <th class="num">Qty</th><th>UOM</th>
+          <th class="num">Rate (₹)</th><th class="num">Amount (₹)</th>
+          <th>Delivery Date</th><th>Notes</th>
+        </tr></thead>
         <tbody>${linesHTML}</tbody>
       </table>
-
       <div class="totals-wrap">
         <table class="totals-table">
-          <tr>
-            <td class="label">Total (Excl. GST)</td>
-            <td class="value">Rs ${fmtNum(so.total_amount)}</td>
-          </tr>
-          <tr>
-            <td class="label">GST (18%)</td>
-            <td class="value">Rs ${fmtNum(parseFloat(so.total_amount || 0) * 0.18)}</td>
-          </tr>
-          <tr class="grand">
-            <td>Grand Total (Incl. GST)</td>
-            <td class="value">Rs ${fmtNum(parseFloat(so.total_amount || 0) * 1.18)}</td>
-          </tr>
+          <tr><td class="label">Order Value (Excl. GST)</td><td class="value">₹${fmtNum(so.total_amount)}</td></tr>
+          <tr><td class="label">Estimated GST (18%)</td><td class="value">₹${fmtNum(parseFloat(so.total_amount || 0) * 0.18)}</td></tr>
+          <tr class="grand"><td>Grand Total (Incl. GST)</td><td class="value">₹${fmtNum(parseFloat(so.total_amount || 0) * 1.18)}</td></tr>
         </table>
       </div>
-
       ${so.notes ? `<div class="notes-section"><h4>Notes / Special Instructions</h4><p>${so.notes}</p></div>` : ''}
-
       <div class="sig-row">
-        <div class="sig-box">
-          <div class="sig-space"></div>
-          <div class="title">Customer Acknowledgement</div>
-          <div class="sub">Authorised Signatory with Stamp</div>
-        </div>
-        <div class="sig-box">
-          <div class="sig-space"></div>
-          <div class="title">For ${(getActiveCompany() || COMPANY_FALLBACK).name}</div>
-          <div class="sub">Sales Manager / Authorised Signatory</div>
-        </div>
+        <div class="sig-box"><div class="sig-space"></div><div class="title">Customer Acknowledgement</div><div class="sub">Authorised Signatory with Stamp</div></div>
+        <div class="sig-box"><div class="sig-space"></div><div class="title">For ${(getActiveCompany() || COMPANY_FALLBACK).name}</div><div class="sub">Sales Manager</div></div>
       </div>
       ${pageFooter()}
     </div>`;
-    printDoc(`Sales Order ${so.so_number}`, body);
+    printDoc(`Sales Order — ${so.so_number}`, body);
 }
 
 // ============================================================
-// 3. DELIVERY CHALLAN (from delivered SO)
+// 3. DELIVERY CHALLAN (from DispatchEntry)
 // ============================================================
-export function printDeliveryChallan(so) {
-    const lines = so.lines || [];
-    const linesHTML = lines.map((l, i) => `
+export function printDeliveryChallan(dispatch) {
+    const lines = dispatch.lines || [];
+    const linesHTML = lines.length > 0 ? lines.map((l, i) => `
         <tr>
           <td>${i + 1}</td>
-          <td>${l.item_code}</td>
-          <td>${l.item_name}</td>
-          <td class="num">${fmtNum(l.delivered_quantity || l.ordered_quantity, 3)}</td>
-          <td>${l.unit}</td>
+          <td>${l.batch_number || '—'}</td>
+          <td>${l.product_name || '—'}</td>
+          <td class="num">${fmtNum(l.quantity, 3)}</td>
+          <td class="num">${l.rolls || 1}</td>
           <td>${l.notes || ''}</td>
-        </tr>`).join('');
+        </tr>`).join('') : `<tr><td colspan="6" style="text-align:center;color:#888;padding:14px">No items</td></tr>`;
 
     const body = `
     <div class="page">
-      ${companyHeader('Delivery Challan', `DC-${so.so_number}`, fmtDate(new Date()), `SO Ref: ${so.so_number}`)}
+      ${companyHeader('Delivery Challan', dispatch.dispatch_number, fmtDate(dispatch.dispatch_date), dispatch.so_number ? `SO Ref: ${dispatch.so_number}` : '')}
 
       <div class="info-row">
         <div class="info-box">
           <h3>Deliver To</h3>
-          <p class="big">${so.customer_name}</p>
-          <p>${so.customer_address || ''}</p>
-          ${so.customer_phone ? `<p>Tel: ${so.customer_phone}</p>` : ''}
+          <p class="big">${dispatch.customer_name}</p>
+          ${dispatch.customer_contact ? `<p>Attn: ${dispatch.customer_contact}</p>` : ''}
+          ${dispatch.customer_address ? `<p>${dispatch.customer_address}${dispatch.customer_city ? ', ' + dispatch.customer_city : ''}${dispatch.customer_state ? ', ' + dispatch.customer_state : ''}</p>` : ''}
+          ${dispatch.customer_gstin ? `<p>GSTIN: ${dispatch.customer_gstin}</p>` : ''}
+          ${dispatch.customer_phone ? `<p>Tel: ${dispatch.customer_phone}</p>` : ''}
         </div>
         <div class="info-box highlight">
-          <h3>Dispatch Details</h3>
-          <p>Dispatch From: <strong>${so.warehouse_name}</strong></p>
-          <p>Dispatch Date: <strong>${fmtDate(new Date())}</strong></p>
-          <p>Vehicle No.: _______________________</p>
-          <p>LR / AWB No.: _______________________</p>
+          <h3>Transport Details</h3>
+          <p>Dispatch Date: <strong>${fmtDate(dispatch.dispatch_date)}</strong></p>
+          ${dispatch.vehicle_number ? `<p>Vehicle No.: <strong>${dispatch.vehicle_number}</strong></p>` : '<p>Vehicle No.: _______________________</p>'}
+          ${dispatch.driver_name ? `<p>Driver: <strong>${dispatch.driver_name}</strong></p>` : ''}
+          ${dispatch.lr_number ? `<p>LR / AWB No.: <strong>${dispatch.lr_number}</strong></p>` : '<p>LR / AWB No.: _______________________</p>'}
+          ${dispatch.transporter ? `<p>Transporter: <strong>${dispatch.transporter}</strong></p>` : ''}
+          <p>Status: <span class="badge ${dispatch.status}">${(dispatch.status || 'draft').toUpperCase()}</span></p>
         </div>
       </div>
 
+      <div class="section-title">Items Dispatched</div>
       <table>
         <thead>
           <tr>
-            <th>#</th><th>Item Code</th><th>Item Description</th>
-            <th class="num">Qty Delivered</th><th>Unit</th><th>Remarks</th>
+            <th style="width:4%">#</th>
+            <th>Batch No.</th>
+            <th>Product Description</th>
+            <th class="num">Quantity</th>
+            <th class="num">Rolls</th>
+            <th>Remarks</th>
           </tr>
         </thead>
         <tbody>${linesHTML}</tbody>
@@ -451,8 +469,10 @@ export function printDeliveryChallan(so) {
 
       <div class="notes-section">
         <h4>Receiver's Acknowledgement</h4>
-        <p>Goods received in good condition. Date of Receipt: _______________ &nbsp;&nbsp;&nbsp; Seal &amp; Signature: _______________</p>
+        <p>Goods received in good condition.&nbsp;&nbsp; Date of Receipt: _______________ &nbsp;&nbsp;&nbsp; Seal &amp; Signature: _______________</p>
       </div>
+
+      ${dispatch.notes ? `<div class="notes-section"><h4>Notes</h4><p>${dispatch.notes}</p></div>` : ''}
 
       <div class="sig-row">
         <div class="sig-box">
@@ -468,38 +488,15 @@ export function printDeliveryChallan(so) {
       </div>
       ${pageFooter()}
     </div>`;
-    printDoc(`Delivery Challan ${so.so_number}`, body);
+    printDoc(`Delivery Challan — ${dispatch.dispatch_number}`, body);
 }
 
 // ============================================================
-// 4. TAX INVOICE
+// 4a. SALES INVOICE (Tax Invoice to customer)
 // ============================================================
-export function printInvoice(inv, soLines = []) {
-    const taxRate = 0.18;
+export function printSalesInvoice(inv) {
     const cgst = parseFloat(inv.tax_amount || 0) / 2;
     const sgst = parseFloat(inv.tax_amount || 0) / 2;
-
-    const linesHTML = soLines.length > 0 ? soLines.map((l, i) => `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${l.item_code}</td>
-          <td>${l.item_name}</td>
-          <td>${l.hsn_code || '—'}</td>
-          <td class="num">${fmtNum(l.ordered_quantity, 3)}</td>
-          <td>${l.unit}</td>
-          <td class="num">${fmtNum(l.unit_price)}</td>
-          <td class="num">${fmtNum(l.total_price)}</td>
-          <td class="num">${fmtNum(parseFloat(l.total_price || 0) * taxRate / 2)}</td>
-          <td class="num">${fmtNum(parseFloat(l.total_price || 0) * taxRate / 2)}</td>
-          <td class="num"><strong>${fmtNum(parseFloat(l.total_price || 0) * (1 + taxRate))}</strong></td>
-        </tr>`).join('') : `<tr>
-        <td colspan="4">As per SO ${inv.so_number}</td>
-        <td colspan="3"></td>
-        <td class="num">${fmtNum(inv.subtotal)}</td>
-        <td class="num">${fmtNum(cgst)}</td>
-        <td class="num">${fmtNum(sgst)}</td>
-        <td class="num"><strong>${fmtNum(inv.total_amount)}</strong></td>
-      </tr>`;
 
     const body = `
     <div class="page">
@@ -509,61 +506,60 @@ export function printInvoice(inv, soLines = []) {
         <div class="info-box">
           <h3>Bill To</h3>
           <p class="big">${inv.customer_name}</p>
-          <p>${inv.customer_address || ''}</p>
-          ${inv.customer_gstin ? `<p>GSTIN: ${inv.customer_gstin}</p>` : ''}
+          ${inv.customer_contact ? `<p>Attn: ${inv.customer_contact}</p>` : ''}
+          ${inv.customer_address ? `<p>${inv.customer_address}${inv.customer_city ? ', ' + inv.customer_city : ''}${inv.customer_state ? ', ' + inv.customer_state : ''}</p>` : ''}
+          ${inv.customer_gstin ? `<p>GSTIN: <strong>${inv.customer_gstin}</strong></p>` : ''}
           ${inv.customer_phone ? `<p>Tel: ${inv.customer_phone}</p>` : ''}
+          ${inv.customer_email ? `<p>Email: ${inv.customer_email}</p>` : ''}
         </div>
         <div class="info-box highlight">
           <h3>Invoice Details</h3>
           <p>Invoice #: <strong>${inv.invoice_number}</strong></p>
-          <p>Against SO: <strong>${inv.so_number}</strong></p>
+          ${inv.dispatch_number ? `<p>Dispatch Ref: <strong>${inv.dispatch_number}</strong></p>` : ''}
           <p>Invoice Date: <strong>${fmtDate(inv.invoice_date)}</strong></p>
-          <p>Due Date: <strong>${fmtDate(inv.due_date)}</strong></p>
-          <p>Status: <span class="badge ${inv.status}">${inv.status.toUpperCase()}</span></p>
+          <p>Due Date: <strong>${fmtDate(inv.due_date) || '—'}</strong></p>
+          <p>Status: <span class="badge ${inv.status}">${(inv.status || 'draft').toUpperCase()}</span></p>
         </div>
       </div>
 
+      <div class="section-title">Invoice Summary</div>
       <table>
         <thead>
           <tr>
-            <th>#</th><th>Item Code</th><th>Description</th><th>HSN</th>
-            <th class="num">Qty</th><th>Unit</th><th class="num">Rate</th>
-            <th class="num">Taxable Amt</th>
-            <th class="num">CGST 9%</th><th class="num">SGST 9%</th>
-            <th class="num">Total</th>
+            <th>Description</th>
+            <th class="num">Taxable Amount (₹)</th>
+            <th class="num">CGST 9% (₹)</th>
+            <th class="num">SGST 9% (₹)</th>
+            <th class="num">Total (₹)</th>
           </tr>
         </thead>
-        <tbody>${linesHTML}</tbody>
-        <tfoot>
+        <tbody>
           <tr>
-            <td colspan="7" class="num">Sub Total</td>
-            <td class="num">Rs ${fmtNum(inv.subtotal)}</td>
-            <td class="num">Rs ${fmtNum(cgst)}</td>
-            <td class="num">Rs ${fmtNum(sgst)}</td>
-            <td class="num">Rs ${fmtNum(inv.total_amount)}</td>
+            <td>As per Dispatch ${inv.dispatch_number || '—'}</td>
+            <td class="num">${fmtNum(inv.subtotal)}</td>
+            <td class="num">${fmtNum(cgst)}</td>
+            <td class="num">${fmtNum(sgst)}</td>
+            <td class="num"><strong>₹${fmtNum(inv.total_amount)}</strong></td>
           </tr>
-        </tfoot>
+        </tbody>
       </table>
 
       <div class="totals-wrap">
         <table class="totals-table">
-          <tr><td class="label">Sub Total (Excl. Tax)</td><td class="value">Rs ${fmtNum(inv.subtotal)}</td></tr>
-          <tr><td class="label">CGST @ 9%</td><td class="value">Rs ${fmtNum(cgst)}</td></tr>
-          <tr><td class="label">SGST @ 9%</td><td class="value">Rs ${fmtNum(sgst)}</td></tr>
-          <tr class="grand"><td>Invoice Total</td><td class="value">Rs ${fmtNum(inv.total_amount)}</td></tr>
-          <tr><td class="label paid">Amount Paid</td><td class="value paid">Rs ${fmtNum(inv.paid_amount)}</td></tr>
-          <tr><td class="label due">Balance Due</td><td class="value due">Rs ${fmtNum(inv.balance_due)}</td></tr>
+          <tr><td class="label">Sub Total (Excl. Tax)</td><td class="value">₹${fmtNum(inv.subtotal)}</td></tr>
+          <tr><td class="label">CGST @ 9%</td><td class="value">₹${fmtNum(cgst)}</td></tr>
+          <tr><td class="label">SGST @ 9%</td><td class="value">₹${fmtNum(sgst)}</td></tr>
+          <tr class="grand"><td>Invoice Total</td><td class="value">₹${fmtNum(inv.total_amount)}</td></tr>
+          <tr><td class="label paid">Amount Paid</td><td class="value paid">₹${fmtNum(inv.paid_amount || 0)}</td></tr>
+          <tr><td class="label due">Balance Due</td><td class="value due">₹${fmtNum(inv.balance_due || 0)}</td></tr>
         </table>
       </div>
 
       <div class="info-row">
         <div class="info-box">
           <h3>Bank Details for Payment</h3>
-          <p>Bank: <strong>HDFC Bank</strong></p>
           <p>Account Name: <strong>${(getActiveCompany() || COMPANY_FALLBACK).name}</strong></p>
-          <p>Account No.: <strong>HDFC123456789</strong></p>
-          <p>IFSC: <strong>HDFC0001234</strong></p>
-          <p>Branch: Tiruppur</p>
+          <p>Please transfer to company bank account on record.</p>
         </div>
         <div class="info-box">
           <h3>Notes</h3>
@@ -585,7 +581,88 @@ export function printInvoice(inv, soLines = []) {
       </div>
       ${pageFooter()}
     </div>`;
-    printDoc(`Invoice ${inv.invoice_number}`, body);
+    printDoc(`Sales Invoice — ${inv.invoice_number}`, body);
+}
+
+// ============================================================
+// 4b. PURCHASE INVOICE (from vendor)
+// ============================================================
+export function printPurchaseInvoice(inv) {
+    const cgst = parseFloat(inv.tax_amount || 0) / 2;
+    const sgst = parseFloat(inv.tax_amount || 0) / 2;
+
+    const body = `
+    <div class="page">
+      ${companyHeader('Purchase Invoice', inv.invoice_number, fmtDate(inv.invoice_date), `Due: ${fmtDate(inv.due_date)}`)}
+
+      <div class="info-row">
+        <div class="info-box">
+          <h3>Vendor / Supplier</h3>
+          <p class="big">${inv.vendor_name}</p>
+          ${inv.vendor_contact ? `<p>Attn: ${inv.vendor_contact}</p>` : ''}
+          ${inv.vendor_address ? `<p>${inv.vendor_address}${inv.vendor_city ? ', ' + inv.vendor_city : ''}${inv.vendor_state ? ', ' + inv.vendor_state : ''}</p>` : ''}
+          ${inv.vendor_gstin ? `<p>GSTIN: <strong>${inv.vendor_gstin}</strong></p>` : ''}
+          ${inv.vendor_phone ? `<p>Tel: ${inv.vendor_phone}</p>` : ''}
+          ${inv.vendor_email ? `<p>Email: ${inv.vendor_email}</p>` : ''}
+        </div>
+        <div class="info-box highlight">
+          <h3>Invoice Details</h3>
+          <p>Invoice #: <strong>${inv.invoice_number}</strong></p>
+          ${inv.grn_number ? `<p>GRN Reference: <strong>${inv.grn_number}</strong></p>` : ''}
+          <p>Invoice Date: <strong>${fmtDate(inv.invoice_date)}</strong></p>
+          <p>Due Date: <strong>${fmtDate(inv.due_date) || '—'}</strong></p>
+          <p>Status: <span class="badge ${inv.status}">${(inv.status || 'draft').toUpperCase()}</span></p>
+        </div>
+      </div>
+
+      <div class="section-title">Invoice Summary</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th class="num">Taxable Amount (₹)</th>
+            <th class="num">CGST 9% (₹)</th>
+            <th class="num">SGST 9% (₹)</th>
+            <th class="num">Total (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>As per GRN ${inv.grn_number || '—'}</td>
+            <td class="num">${fmtNum((parseFloat(inv.total_amount || 0) - parseFloat(inv.tax_amount || 0)).toFixed(2))}</td>
+            <td class="num">${fmtNum(cgst)}</td>
+            <td class="num">${fmtNum(sgst)}</td>
+            <td class="num"><strong>₹${fmtNum(inv.total_amount)}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="totals-wrap">
+        <table class="totals-table">
+          <tr><td class="label">Sub Total (Excl. Tax)</td><td class="value">₹${fmtNum((parseFloat(inv.total_amount || 0) - parseFloat(inv.tax_amount || 0)).toFixed(2))}</td></tr>
+          <tr><td class="label">CGST @ 9%</td><td class="value">₹${fmtNum(cgst)}</td></tr>
+          <tr><td class="label">SGST @ 9%</td><td class="value">₹${fmtNum(sgst)}</td></tr>
+          <tr class="grand"><td>Invoice Total</td><td class="value">₹${fmtNum(inv.total_amount)}</td></tr>
+        </table>
+      </div>
+
+      ${inv.notes ? `<div class="notes-section"><h4>Notes</h4><p>${inv.notes}</p></div>` : ''}
+
+      <div class="sig-row">
+        <div class="sig-box">
+          <div class="sig-space"></div>
+          <div class="title">Verified By</div>
+          <div class="sub">Accounts / Purchase Team</div>
+        </div>
+        <div class="sig-box">
+          <div class="sig-space"></div>
+          <div class="title">Approved By</div>
+          <div class="sub">Finance Manager</div>
+        </div>
+      </div>
+      ${pageFooter()}
+    </div>`;
+    printDoc(`Purchase Invoice — ${inv.invoice_number}`, body);
 }
 
 // ============================================================
@@ -593,17 +670,17 @@ export function printInvoice(inv, soLines = []) {
 // ============================================================
 export function printPurchaseOrder(po) {
     const lines = po.lines || [];
-    const linesHTML = lines.map((l, i) => `
+    const linesHTML = lines.length > 0 ? lines.map((l, i) => `
         <tr>
           <td>${i + 1}</td>
-          <td>${l.item_code}</td>
-          <td>${l.item_name}</td>
+          <td>${l.item_code || l.yarn_code || '—'}</td>
+          <td>${l.material_name || l.item_name || l.yarn_name || '—'}</td>
           <td class="num">${fmtNum(l.ordered_quantity, 3)}</td>
-          <td>${l.unit}</td>
+          <td>${l.uom_name || '—'}</td>
           <td class="num">${fmtNum(l.unit_price)}</td>
-          <td class="num"><strong>${fmtNum(l.total_price)}</strong></td>
+          <td class="num"><strong>₹${fmtNum(l.total_price)}</strong></td>
           <td>${l.notes || ''}</td>
-        </tr>`).join('');
+        </tr>`).join('') : `<tr><td colspan="8" style="text-align:center;color:#888;padding:14px">No line items on record</td></tr>`;
 
     const body = `
     <div class="page">
@@ -611,19 +688,20 @@ export function printPurchaseOrder(po) {
 
       <div class="info-row">
         <div class="info-box">
-          <h3>Supplier</h3>
-          <p class="big">${po.supplier_name}</p>
-          <p>${po.supplier_address || ''}</p>
-          ${po.supplier_gstin ? `<p>GSTIN: ${po.supplier_gstin}</p>` : ''}
-          ${po.supplier_phone ? `<p>Tel: ${po.supplier_phone}</p>` : ''}
-          ${po.supplier_contact ? `<p>Attn: ${po.supplier_contact}</p>` : ''}
+          <h3>Vendor / Supplier</h3>
+          <p class="big">${po.vendor_name}</p>
+          ${po.vendor_contact ? `<p>Attn: ${po.vendor_contact}</p>` : ''}
+          ${po.vendor_address ? `<p>${po.vendor_address}${po.vendor_city ? ', ' + po.vendor_city : ''}${po.vendor_state ? ', ' + po.vendor_state : ''}</p>` : ''}
+          ${po.vendor_gstin ? `<p>GSTIN: ${po.vendor_gstin}</p>` : ''}
+          ${po.vendor_phone ? `<p>Tel: ${po.vendor_phone}</p>` : ''}
+          ${po.vendor_email ? `<p>Email: ${po.vendor_email}</p>` : ''}
         </div>
         <div class="info-box highlight">
-          <h3>Delivery Details</h3>
-          <p>Deliver To: <strong>${po.warehouse_name}</strong></p>
-          <p>${po.delivery_address || ''}</p>
-          <p>Expected Date: <strong>${fmtDate(po.expected_date)}</strong></p>
-          <p>Status: <span class="badge ${po.status}">${po.status.toUpperCase()}</span></p>
+          <h3>Order Details</h3>
+          <p>PO Number: <strong>${po.po_number}</strong></p>
+          <p>Order Date: <strong>${fmtDate(po.order_date)}</strong></p>
+          <p>Expected Date: <strong>${fmtDate(po.expected_date) || '—'}</strong></p>
+          <p>Status: <span class="badge ${po.status}">${(po.status || 'draft').toUpperCase()}</span></p>
         </div>
       </div>
 
@@ -641,7 +719,7 @@ export function printPurchaseOrder(po) {
         <tfoot>
           <tr>
             <td colspan="6" class="num">Total Order Value</td>
-            <td class="num">Rs ${fmtNum(po.total_amount)}</td>
+            <td class="num">₹${fmtNum(po.total_amount)}</td>
             <td></td>
           </tr>
         </tfoot>
@@ -679,14 +757,15 @@ export function printPurchaseOrder(po) {
 // ============================================================
 export function printGRN(grn) {
     const lines = grn.lines || [];
-    const linesHTML = lines.map((l, i) => `
+    const linesHTML = lines.length > 0 ? lines.map((l, i) => `
         <tr>
           <td>${i + 1}</td>
-          <td>${l.item_code}</td>
-          <td>${l.item_name}</td>
-          <td class="num">${fmtNum(l.received_quantity, 3)}</td>
-          <td>${l.notes || ''}</td>
-        </tr>`).join('');
+          <td>${l.material_name || '—'}</td>
+          <td>${l.material_type || '—'}</td>
+          <td class="num">${fmtNum(l.ordered_quantity, 3)}</td>
+          <td class="num"><strong>${fmtNum(l.received_quantity, 3)}</strong></td>
+          <td><span style="color:${l.lot_created ? '#2e7d32' : '#888'}">${l.lot_created ? '✓ Lot Created' : 'Pending'}</span></td>
+        </tr>`).join('') : `<tr><td colspan="6" style="text-align:center;color:#888;padding:14px">No items on record</td></tr>`;
 
     const body = `
     <div class="page">
@@ -694,18 +773,16 @@ export function printGRN(grn) {
 
       <div class="info-row">
         <div class="info-box">
-          <h3>Received From (Supplier)</h3>
-          <p class="big">${grn.supplier_name}</p>
-          <p>${grn.supplier_address || ''}</p>
+          <h3>Received From (Vendor)</h3>
+          <p class="big">${grn.vendor_name || '—'}</p>
         </div>
         <div class="info-box highlight">
           <h3>Receipt Details</h3>
           <p>GRN #: <strong>${grn.grn_number}</strong></p>
           <p>PO Reference: <strong>${grn.po_number}</strong></p>
           <p>Receipt Date: <strong>${fmtDate(grn.receipt_date)}</strong></p>
-          <p>Supplier Invoice: <strong>${grn.supplier_invoice_number || '—'}</strong></p>
-          <p>Received At: <strong>${grn.warehouse_name || '—'}</strong></p>
-          <p>Status: <span class="badge ${grn.status}">${grn.status.toUpperCase()}</span></p>
+          <p>Vendor Invoice: <strong>${grn.vendor_invoice_number || '—'}</strong></p>
+          <p>Status: <span class="badge ${grn.status}">${(grn.status || 'draft').toUpperCase()}</span></p>
         </div>
       </div>
 
@@ -713,8 +790,12 @@ export function printGRN(grn) {
       <table>
         <thead>
           <tr>
-            <th>#</th><th>Item Code</th><th>Item Description</th>
-            <th class="num">Qty Received</th><th>Quality Remarks</th>
+            <th style="width:4%">#</th>
+            <th>Material</th>
+            <th>Type</th>
+            <th class="num">Ordered Qty</th>
+            <th class="num">Received Qty</th>
+            <th>Lot Status</th>
           </tr>
         </thead>
         <tbody>${linesHTML}</tbody>

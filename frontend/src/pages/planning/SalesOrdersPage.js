@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePageTheme } from '../../hooks/usePageTheme';
 import { useSettings } from '../../context/SettingsContext';
+import { printSalesOrder } from '../../utils/printUtils';
 
 const empty = { customer_id:'', product_id:'', order_quantity:'', uom_id:'', required_date:'', priority:'normal', notes:'' };
 
@@ -129,7 +130,10 @@ export default function SalesOrdersPage() {
                         <div style={{ marginTop:24, background: pt.colors.inner, border: `1px solid ${pt.colors.border}`, borderRadius:12, padding:24, maxWidth:700 }}>
                             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
                                 <h3 style={{ margin:0, color:'#3b82f6', fontSize:16 }}>{detail.so_number}</h3>
-                                <button onClick={()=>setDetail(null)} style={smallBtn('#64748b')}>✕ Close</button>
+                                <div style={{ display:'flex', gap:8 }}>
+                                    <button onClick={()=>printSalesOrder(detail)} style={smallBtn('#1a237e')}>🖨 Print SO</button>
+                                    <button onClick={()=>setDetail(null)} style={smallBtn('#64748b')}>✕ Close</button>
+                                </div>
                             </div>
                             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
                                 {[['Customer',detail.customer_name],['Product',detail.product_name],

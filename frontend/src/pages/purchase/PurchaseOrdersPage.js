@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePageTheme } from '../../hooks/usePageTheme';
 import { useSettings } from '../../context/SettingsContext';
+import { printPurchaseOrder } from '../../utils/printUtils';
 
 /* eslint-disable no-undef */
 
@@ -179,6 +180,7 @@ export default function PurchaseOrdersPage() {
                             <div style={{ display: 'flex', gap: 10, marginTop: 16, justifyContent: 'flex-end' }}>
                                 {detail.status === 'draft' && <button onClick={() => confirmPO(detail.id)} style={btn('#10b981')}>Confirm PO</button>}
                                 {!['received', 'cancelled'].includes(detail.status) && <button onClick={() => cancelPO(detail.id)} style={btn('#ef4444')}>Cancel PO</button>}
+                                <button onClick={() => printPurchaseOrder(detail)} style={btn('#1a237e')}>🖨 Print PO</button>
                                 <button onClick={() => setDetail(null)} style={smallBtn('#64748b')}>Close</button>
                             </div>
                         </div>

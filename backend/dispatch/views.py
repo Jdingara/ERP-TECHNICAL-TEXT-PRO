@@ -40,13 +40,21 @@ def dispatch_line_dict(line):
 
 
 def dispatch_dict(dispatch, include_lines=False):
+    c = dispatch.customer
     d = {
         'id': dispatch.id,
         'dispatch_number': dispatch.dispatch_number,
         'sales_order_id': dispatch.sales_order_id,
         'so_number': dispatch.sales_order.so_number if dispatch.sales_order else '',
         'customer_id': dispatch.customer_id,
-        'customer_name': dispatch.customer.customer_name if dispatch.customer else '',
+        'customer_name': c.customer_name if c else '',
+        'customer_phone': c.phone if c else '',
+        'customer_email': c.email if c else '',
+        'customer_address': c.address if c else '',
+        'customer_city': c.city if c else '',
+        'customer_state': c.state if c else '',
+        'customer_gstin': c.gstin if c else '',
+        'customer_contact': c.contact_person if c else '',
         'dispatch_date': str(dispatch.dispatch_date),
         'vehicle_number': dispatch.vehicle_number,
         'driver_name': dispatch.driver_name,
@@ -62,13 +70,21 @@ def dispatch_dict(dispatch, include_lines=False):
 
 
 def invoice_dict(inv):
+    c = inv.customer
     return {
         'id': inv.id,
         'invoice_number': inv.invoice_number,
         'dispatch_id': inv.dispatch_id,
         'dispatch_number': inv.dispatch.dispatch_number if inv.dispatch else '',
         'customer_id': inv.customer_id,
-        'customer_name': inv.customer.customer_name if inv.customer else '',
+        'customer_name': c.customer_name if c else '',
+        'customer_phone': c.phone if c else '',
+        'customer_email': c.email if c else '',
+        'customer_address': c.address if c else '',
+        'customer_city': c.city if c else '',
+        'customer_state': c.state if c else '',
+        'customer_gstin': c.gstin if c else '',
+        'customer_contact': c.contact_person if c else '',
         'invoice_date': str(inv.invoice_date),
         'due_date': str(inv.due_date) if inv.due_date else '',
         'subtotal': str(inv.subtotal),

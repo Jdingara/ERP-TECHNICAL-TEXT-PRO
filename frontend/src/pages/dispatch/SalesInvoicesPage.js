@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePageTheme } from '../../hooks/usePageTheme';
 import { useSettings } from '../../context/SettingsContext';
+import { printSalesInvoice } from '../../utils/printUtils';
 
 const empty = { customer_id:'', dispatch_id:'', invoice_date:new Date().toISOString().slice(0,10), due_date:'', total_amount:'', tax_amount:'0', notes:'' };
 
@@ -101,7 +102,10 @@ export default function SalesInvoicesPage() {
                                     <td style={tdS}>₹{Number(r.tax_amount||0).toLocaleString('en-IN')}</td>
                                     <td style={tdS}><b>₹{totalWithTax(r).toLocaleString('en-IN')}</b></td>
                                     <td style={tdS}><span style={tag(STATUS_COLOR[r.status]||'#64748b')}>{r.status||'draft'}</span></td>
-                                    <td style={tdS}><button onClick={()=>openEdit(r)} style={smallBtn('#3b82f6')}>Edit</button></td>
+                                    <td style={tdS}>
+                                        <button onClick={()=>openEdit(r)} style={smallBtn('#3b82f6')}>Edit</button>
+                                        <button onClick={()=>printSalesInvoice(r)} style={smallBtn('#1a237e')}>🖨 Print</button>
+                                    </td>
                                 </tr>
                             ))}
                             {rows.length===0 && <tr><td colSpan={10} style={emptyTd}>No invoices yet</td></tr>}
