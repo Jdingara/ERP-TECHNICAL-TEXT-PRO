@@ -115,6 +115,49 @@ Please arrange for receipt at your end.
 Regards,
 MEI TEXZ Technologies`,
     },
+    {
+        key: 'report',
+        label: 'Reports',
+        color: '#0ea5e9',
+        placeholders: ['{{report_name}}', '{{period}}', '{{generated_date}}', '{{total_entries}}', '{{summary}}'],
+        defaultSubject: '{{report_name}} — {{period}}',
+        defaultBody:
+`Hi,
+
+Please find the {{report_name}} for the period {{period}}.
+
+  Generated On : {{generated_date}}
+  Summary      : {{summary}}
+
+The full report is attached / available in the ERP system.
+
+Regards,
+MEI TEXZ Technologies`,
+    },
+    {
+        key: 'maintenance',
+        label: 'Maintenance Reminder',
+        color: '#f59e0b',
+        placeholders: ['{{machine_name}}', '{{machine_code}}', '{{task_name}}', '{{frequency}}', '{{last_done_date}}', '{{next_due_date}}', '{{overdue_days}}', '{{status}}', '{{assigned_to}}'],
+        defaultSubject: 'Maintenance Due — {{machine_name}} ({{task_name}})',
+        defaultBody:
+`Dear {{assigned_to}},
+
+This is a reminder that the following maintenance task is due / overdue:
+
+  Machine      : {{machine_name}} ({{machine_code}})
+  Task         : {{task_name}}
+  Frequency    : {{frequency}}
+  Last Done    : {{last_done_date}}
+  Next Due     : {{next_due_date}}
+  Overdue By   : {{overdue_days}} days
+  Status       : {{status}}
+
+Please schedule and complete this maintenance at the earliest to avoid equipment failure.
+
+Regards,
+MEI TEXZ Technologies — Maintenance Team`,
+    },
 ];
 
 const STORAGE_KEY = 'meitexz_email_templates';

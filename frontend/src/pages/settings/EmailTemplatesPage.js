@@ -176,6 +176,9 @@ const SAMPLE_DATA = {
     invoice_number: 'SINV-20260422-001', due_date: '2026-05-22', balance_due: '50,000', dispatch_number: 'DC-20260422-001',
     grn_number: 'GRN-20260422-001', receipt_date: '2026-04-22',
     dispatch_date: '2026-04-22', vehicle_number: 'TN01AB1234', lr_number: 'LR-8891', transporter: 'Fast Cargo',
+    report_name: 'Sales Summary Report', period: 'April 2026', generated_date: '2026-04-22', total_entries: '42', summary: 'Total Sales ₹12,50,000 across 42 orders',
+    machine_name: 'Loom Machine 1', machine_code: 'LM-01', task_name: '6-Month Gear Inspection', frequency: '6 Months',
+    last_done_date: '2025-10-22', next_due_date: '2026-04-22', overdue_days: '5', status: 'Overdue', assigned_to: 'Maintenance Team',
 };
 
 function fillSample(text, _key) {

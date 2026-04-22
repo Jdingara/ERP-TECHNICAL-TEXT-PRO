@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { usePageTheme } from '../../hooks/usePageTheme';
+import { shareEmail, shareWhatsApp } from '../../utils/shareUtils';
 
 const STATUS_COLORS = { pending: '#f59e0b', done: '#10b981', overdue: '#ef4444', skipped: '#64748b' };
 
@@ -150,14 +151,14 @@ export default function MaintenanceLogPage() {
                                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                                     <thead>
                                         <tr>
-                                            {['Pic', 'Machine', 'Task', 'Frequency', 'Due Date', 'Status'].map(h => (
+                                            {['Pic', 'Machine', 'Task', 'Frequency', 'Due Date', 'Status', 'Share'].map(h => (
                                                 <th key={h} style={{ ...th, fontSize: 11, textTransform: 'uppercase' }}>{h}</th>
                                             ))}
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {filteredAlerts.length === 0 && (
-                                            <tr><td colSpan={6} style={{ ...cell, textAlign: 'center', color: pt.colors.muted, padding: 24 }}>No alerts match the filter.</td></tr>
+                                            <tr><td colSpan={7} style={{ ...cell, textAlign: 'center', color: pt.colors.muted, padding: 24 }}>No alerts match the filter.</td></tr>
                                         )}
                                         {filteredAlerts.map(a => (
                                             <tr key={a.id}>
@@ -177,6 +178,12 @@ export default function MaintenanceLogPage() {
                                                         ? <span style={{ backgroundColor: '#ef444422', color: '#ef4444', padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700 }}>Overdue {a.days_overdue}d</span>
                                                         : <span style={{ backgroundColor: '#f59e0b22', color: '#f59e0b', padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700 }}>Due Soon</span>
                                                     }
+                                                </td>
+                                                <td style={cell}>
+                                                    <button onClick={() => shareEmail({ email: '', docType: 'maintenance', data: { machine_name: a.machine_name || a.machine_code, machine_code: a.machine_code, task_name: a.task_name, frequency: FREQ_LABEL[a.frequency] || a.frequency, last_done_date: a.last_done_date || '—', next_due_date: a.due_date, overdue_days: a.days_overdue || '0', status: a.is_overdue ? 'Overdue' : 'Due Soon', assigned_to: 'Team' } })}
+                                                        style={{ padding: '3px 8px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: 5, cursor: 'pointer', fontSize: 11, marginRight: 4 }}>📧</button>
+                                                    <button onClick={() => shareWhatsApp({ phone: a.assigned_phone || '', docType: 'maintenance', data: { machine_name: a.machine_name || a.machine_code, machine_code: a.machine_code, task_name: a.task_name, frequency: FREQ_LABEL[a.frequency] || a.frequency, last_done_date: a.last_done_date || '—', next_due_date: a.due_date, overdue_days: a.days_overdue || '0', status: a.is_overdue ? 'Overdue' : 'Due Soon', assigned_to: 'Team' } })}
+                                                        style={{ padding: '3px 8px', background: '#25d366', color: '#fff', border: 'none', borderRadius: 5, cursor: 'pointer', fontSize: 11 }}>💬</button>
                                                 </td>
                                             </tr>
                                         ))}

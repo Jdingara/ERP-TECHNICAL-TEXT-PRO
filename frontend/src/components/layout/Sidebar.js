@@ -117,6 +117,7 @@ const MENU_ITEMS = [
     { title: 'Settings', icon: <TuneIcon />, children: [
         { title: 'Company Master',     path: '/settings/company-master' },
         { title: 'Format Panel',       path: '/settings/format-panel' },
+        { title: 'Email Templates',    path: '/settings/email-templates' },
         { title: 'Tally Integration',  path: '/settings/tally' },
     ]},
     { title: 'Activity Log', icon: <HistoryIcon />, path: '/audit/activity-log', children: [] },
