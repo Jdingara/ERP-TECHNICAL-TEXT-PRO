@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { usePageTheme } from '../../hooks/usePageTheme';
 import { useSettings } from '../../context/SettingsContext';
 import { printPurchaseInvoice } from '../../utils/printUtils';
+import { shareEmail, shareWhatsApp } from '../../utils/shareUtils';
 
 /* eslint-disable no-undef */
 
@@ -90,7 +91,9 @@ export default function PurchaseInvoicesPage() {
                                     <td style={tdS}><span style={tag(STATUS_COLOR[r.status]||'#64748b')}>{r.status||'draft'}</span></td>
                                     <td style={tdS}>
                                         <button onClick={()=>openEdit(r)} style={smallBtn('#3b82f6')}>Edit</button>
-                                        <button onClick={()=>printPurchaseInvoice(r)} style={smallBtn('#1a237e')}>🖨 Print</button>
+                                        <button onClick={()=>printPurchaseInvoice(r)} style={smallBtn('#1a237e')}>🖨</button>
+                                        <button onClick={()=>shareEmail({ email: r.vendor_email, docType:'purchase_invoice', data:{ invoice_number:r.invoice_number, vendor_name:r.vendor_name, total_amount:r.total_amount, due_date:r.due_date||'—', grn_number:r.grn_number||'—' } })} style={smallBtn('#6366f1')}>📧</button>
+                                        <button onClick={()=>shareWhatsApp({ phone: r.vendor_phone, docType:'purchase_invoice', data:{ invoice_number:r.invoice_number, vendor_name:r.vendor_name, total_amount:r.total_amount, due_date:r.due_date||'—', grn_number:r.grn_number||'—' } })} style={smallBtn('#25d366')}>💬</button>
                                     </td>
                                 </tr>
                             ))}

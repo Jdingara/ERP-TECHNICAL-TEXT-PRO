@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { usePageTheme } from '../../hooks/usePageTheme';
 import { useSettings } from '../../context/SettingsContext';
 import { printDeliveryChallan } from '../../utils/printUtils';
+import { shareEmail, shareWhatsApp } from '../../utils/shareUtils';
 
 const emptyForm = {
     customer_id: '', dispatch_date: new Date().toISOString().slice(0, 10),
@@ -152,8 +153,10 @@ export default function DispatchEntriesPage() {
                         <div style={{ marginTop: 24, background: pt.colors.inner, border: `1px solid ${pt.colors.border}`, borderRadius: 12, padding: 24, maxWidth: 700 }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                                 <h3 style={{ margin: 0, color: '#8b5cf6', fontSize: 16 }}>{detail.dispatch_number}</h3>
-                                <div style={{ display: 'flex', gap: 8 }}>
-                                    <button onClick={() => printDispatch(detail.id)} style={smallBtn('#1a237e')}>🖨 Print Challan</button>
+                                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                                    <button onClick={() => printDispatch(detail.id)} style={smallBtn('#1a237e')}>🖨 Print</button>
+                                    <button onClick={() => shareEmail({ email: detail.customer_email, docType: 'dispatch', data: { dispatch_number: detail.dispatch_number, customer_name: detail.customer_name, dispatch_date: detail.dispatch_date, vehicle_number: detail.vehicle_number || '—', lr_number: detail.lr_number || '—', transporter: detail.transporter || '—' } })} style={smallBtn('#6366f1')}>📧 Email</button>
+                                    <button onClick={() => shareWhatsApp({ phone: detail.customer_phone, docType: 'dispatch', data: { dispatch_number: detail.dispatch_number, customer_name: detail.customer_name, dispatch_date: detail.dispatch_date, vehicle_number: detail.vehicle_number || '—', lr_number: detail.lr_number || '—', transporter: detail.transporter || '—' } })} style={smallBtn('#25d366')}>💬 WhatsApp</button>
                                     <button onClick={() => setDetail(null)} style={smallBtn('#64748b')}>✕ Close</button>
                                 </div>
                             </div>

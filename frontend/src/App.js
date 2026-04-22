@@ -15,6 +15,7 @@ import DashboardPage        from './pages/dashboard/DashboardPage';
 import SettingsPage         from './pages/settings/SettingsPage';
 import CompanyMasterPage    from './pages/settings/CompanyMasterPage';
 import FormatPanelPage      from './pages/settings/FormatPanelPage';
+import EmailTemplatesPage   from './pages/settings/EmailTemplatesPage';
 import ProfilePage          from './pages/profile/ProfilePage';
 import AdminPage            from './pages/admin/AdminPage';
 import ActivityLogPage      from './pages/audit/ActivityLogPage';
@@ -164,8 +165,9 @@ function App() {
                                     <Route path="/profile"    element={<ProfilePage />} />
                                     <Route path="/admin"      element={<AdminPage currentUser={currentUser} />} />
                                     <Route path="/audit/activity-log" element={<ActivityLogPage />} />
-                                    <Route path="/settings/company-master" element={<CompanyMasterPage />} />
-                                    <Route path="/settings/format-panel"   element={<FormatPanelPage />} />
+                                    <Route path="/settings/company-master"    element={<CompanyMasterPage />} />
+                                    <Route path="/settings/format-panel"      element={<FormatPanelPage />} />
+                                    <Route path="/settings/email-templates"   element={<EmailTemplatesPage />} />
 
                                     {/* Masters */}
                                     <Route path="/masters/yarn"      element={<YarnPage />} />

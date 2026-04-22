@@ -8,6 +8,7 @@ import { Box, Typography, Paper, Grid, ToggleButton,
     ToggleButtonGroup, Divider, Button, Tooltip, Chip, Alert } from '@mui/material';
 import { useSettings } from '../../context/SettingsContext';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import LightModeIcon   from '@mui/icons-material/LightMode';
 import DarkModeIcon    from '@mui/icons-material/DarkMode';
 import CheckIcon       from '@mui/icons-material/Check';
@@ -175,6 +176,7 @@ function SettingsPage() {
     const { settings, updateSetting, resetSettings, applyPreset } = useSettings();
     const [layoutResetMsg, setLayoutResetMsg] = useState('');
     const [appliedPreset, setAppliedPreset]   = useState(null);
+    const navigate = useNavigate();
 
     const handleApplyPreset = (preset) => {
         applyPreset(preset.settings);
@@ -564,6 +566,19 @@ function SettingsPage() {
                 onClick={() => { resetSettings(); }}>
                 Reset to Defaults
             </Button>
+
+            <Divider sx={{ my: 3 }} />
+
+            {/* ── Communication Templates ── */}
+            <Section title="📧 Email & WhatsApp Templates"
+                subtitle="Set up message templates for Sales Orders, Purchase Orders, Invoices, Dispatch, and more. Templates are auto-filled with document data when you click Email or WhatsApp on any document.">
+                <Button
+                    variant="contained"
+                    onClick={() => navigate('/settings/email-templates')}
+                    sx={{ textTransform: 'none', fontWeight: 700, background: '#1a237e', '&:hover': { background: '#283593' } }}>
+                    Open Template Builder →
+                </Button>
+            </Section>
         </Box>
     );
 }

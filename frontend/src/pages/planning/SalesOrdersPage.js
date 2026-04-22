@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { usePageTheme } from '../../hooks/usePageTheme';
 import { useSettings } from '../../context/SettingsContext';
 import { printSalesOrder } from '../../utils/printUtils';
+import { shareEmail, shareWhatsApp } from '../../utils/shareUtils';
 
 const empty = { customer_id:'', product_id:'', order_quantity:'', uom_id:'', required_date:'', priority:'normal', notes:'' };
 
@@ -131,7 +132,9 @@ export default function SalesOrdersPage() {
                             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
                                 <h3 style={{ margin:0, color:'#3b82f6', fontSize:16 }}>{detail.so_number}</h3>
                                 <div style={{ display:'flex', gap:8 }}>
-                                    <button onClick={()=>printSalesOrder(detail)} style={smallBtn('#1a237e')}>🖨 Print SO</button>
+                                    <button onClick={()=>printSalesOrder(detail)} style={smallBtn('#1a237e')}>🖨 Print</button>
+                                    <button onClick={()=>shareEmail({ email: detail.customer_email, docType:'so', data:{ so_number:detail.so_number, customer_name:detail.customer_name, product_name:detail.product_name, order_quantity:`${detail.order_quantity} ${detail.uom_name||''}`, required_date:detail.required_date||'—', total_amount:detail.total_amount||'—' } })} style={smallBtn('#6366f1')}>📧 Email</button>
+                                    <button onClick={()=>shareWhatsApp({ phone: detail.customer_phone, docType:'so', data:{ so_number:detail.so_number, customer_name:detail.customer_name, product_name:detail.product_name, order_quantity:`${detail.order_quantity} ${detail.uom_name||''}`, required_date:detail.required_date||'—', total_amount:detail.total_amount||'—' } })} style={smallBtn('#25d366')}>💬 WhatsApp</button>
                                     <button onClick={()=>setDetail(null)} style={smallBtn('#64748b')}>✕ Close</button>
                                 </div>
                             </div>

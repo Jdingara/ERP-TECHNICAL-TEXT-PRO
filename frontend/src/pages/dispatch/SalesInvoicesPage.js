@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { usePageTheme } from '../../hooks/usePageTheme';
 import { useSettings } from '../../context/SettingsContext';
 import { printSalesInvoice } from '../../utils/printUtils';
+import { shareEmail, shareWhatsApp } from '../../utils/shareUtils';
 
 const empty = { customer_id:'', dispatch_id:'', invoice_date:new Date().toISOString().slice(0,10), due_date:'', total_amount:'', tax_amount:'0', notes:'' };
 
@@ -104,7 +105,9 @@ export default function SalesInvoicesPage() {
                                     <td style={tdS}><span style={tag(STATUS_COLOR[r.status]||'#64748b')}>{r.status||'draft'}</span></td>
                                     <td style={tdS}>
                                         <button onClick={()=>openEdit(r)} style={smallBtn('#3b82f6')}>Edit</button>
-                                        <button onClick={()=>printSalesInvoice(r)} style={smallBtn('#1a237e')}>🖨 Print</button>
+                                        <button onClick={()=>printSalesInvoice(r)} style={smallBtn('#1a237e')}>🖨</button>
+                                        <button onClick={()=>shareEmail({ email: r.customer_email, docType:'sales_invoice', data:{ invoice_number:r.invoice_number, customer_name:r.customer_name, total_amount:r.total_amount, due_date:r.due_date||'—', balance_due:r.balance_due||r.total_amount, dispatch_number:r.dispatch_number||'—' } })} style={smallBtn('#6366f1')}>📧</button>
+                                        <button onClick={()=>shareWhatsApp({ phone: r.customer_phone, docType:'sales_invoice', data:{ invoice_number:r.invoice_number, customer_name:r.customer_name, total_amount:r.total_amount, due_date:r.due_date||'—', balance_due:r.balance_due||r.total_amount, dispatch_number:r.dispatch_number||'—' } })} style={smallBtn('#25d366')}>💬</button>
                                     </td>
                                 </tr>
                             ))}

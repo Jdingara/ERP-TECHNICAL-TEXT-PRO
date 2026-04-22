@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { usePageTheme } from '../../hooks/usePageTheme';
 import { useSettings } from '../../context/SettingsContext';
 import { printPurchaseOrder } from '../../utils/printUtils';
+import { shareEmail, shareWhatsApp } from '../../utils/shareUtils';
 
 /* eslint-disable no-undef */
 
@@ -177,10 +178,12 @@ export default function PurchaseOrdersPage() {
                                     </tr>
                                 ))}
                             </tbody></table>
-                            <div style={{ display: 'flex', gap: 10, marginTop: 16, justifyContent: 'flex-end' }}>
+                            <div style={{ display: 'flex', gap: 10, marginTop: 16, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                                 {detail.status === 'draft' && <button onClick={() => confirmPO(detail.id)} style={btn('#10b981')}>Confirm PO</button>}
                                 {!['received', 'cancelled'].includes(detail.status) && <button onClick={() => cancelPO(detail.id)} style={btn('#ef4444')}>Cancel PO</button>}
                                 <button onClick={() => printPurchaseOrder(detail)} style={btn('#1a237e')}>🖨 Print PO</button>
+                                <button onClick={() => shareEmail({ email: detail.vendor_email, docType: 'po', data: { po_number: detail.po_number, vendor_name: detail.vendor_name, total_amount: detail.total_amount, expected_date: detail.expected_date || '—', order_date: detail.order_date } })} style={btn('#6366f1')}>📧 Email</button>
+                                <button onClick={() => shareWhatsApp({ phone: detail.vendor_phone, docType: 'po', data: { po_number: detail.po_number, vendor_name: detail.vendor_name, total_amount: detail.total_amount, expected_date: detail.expected_date || '—', order_date: detail.order_date } })} style={btn('#25d366')}>💬 WhatsApp</button>
                                 <button onClick={() => setDetail(null)} style={smallBtn('#64748b')}>Close</button>
                             </div>
                         </div>
