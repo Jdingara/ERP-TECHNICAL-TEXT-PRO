@@ -1,5 +1,6 @@
 // PAGE: Inventory Report — Lot stock levels and movement summary
 import { useState, useEffect, useCallback } from 'react';
+import { printReport, exportCSV } from '../../utils/reportUtils';
 
 export default function InventoryReportPage() {
     const [rows,    setRows]    = useState([]);
@@ -29,7 +30,7 @@ export default function InventoryReportPage() {
                 <p style={{ margin: 0, color: '#64748b', fontSize: 13 }}>Current lot inventory with balance quantities</p>
             </div>
 
-            <div style={{ display: 'flex', gap: 12, marginBottom: 24, background: '#f8fafc', borderRadius: 10, padding: '12px 18px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 12, marginBottom: 24, background: '#f8fafc', borderRadius: 10, padding: '12px 18px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <input placeholder="Search lot / material…" value={search}
                     onChange={e => setSearch(e.target.value)}
                     style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13, width: 240 }} />
@@ -43,6 +44,33 @@ export default function InventoryReportPage() {
                 <button onClick={load} disabled={loading} style={btn('#3b82f6')}>
                     {loading ? 'Loading…' : '📊 Generate'}
                 </button>
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+                    <button onClick={() => printReport({
+                        title: 'Lot Stock Report',
+                        subtitle: 'Current lot inventory with balance quantities',
+                        summaryCards: [
+                            { label: 'Total Lots',         val: summary.total_lots      || 0, color: '#3b82f6' },
+                            { label: 'Available Lots',     val: summary.available_lots  || 0, color: '#10b981' },
+                            { label: 'Total Received Qty', val: summary.total_received  || 0, color: '#f97316' },
+                            { label: 'Total Balance Qty',  val: summary.total_balance   || 0, color: '#8b5cf6' },
+                        ],
+                        headers: ['LOT Number', 'Material', 'Color', 'Vendor', 'GRN', 'Received Qty', 'Balance Qty', 'Location', 'Status'],
+                        rows: rows.map(r => [r.lot_number, r.material_name, `${r.color_code || ''} ${r.color_name || ''}`.trim() || '—', r.vendor_name, r.grn_number, `${r.received_qty} ${r.uom}`, r.balance_qty, r.location_name || '—', r.status]),
+                    })} style={btn('#1a237e')}>🖨 Print</button>
+                    <button onClick={() => exportCSV({
+                        filename: 'Lot_Stock_Report',
+                        summaryRows: [
+                            ['Report', 'Lot Stock Report'],
+                            ['Generated', new Date().toLocaleDateString('en-IN')],
+                            ['Total Lots', summary.total_lots || 0],
+                            ['Available Lots', summary.available_lots || 0],
+                            ['Total Received Qty', summary.total_received || 0],
+                            ['Total Balance Qty', summary.total_balance || 0],
+                        ],
+                        headers: ['LOT Number', 'Material', 'Color Code', 'Color Name', 'Vendor', 'GRN', 'Received Qty', 'UOM', 'Balance Qty', 'Location', 'Status'],
+                        rows: rows.map(r => [r.lot_number, r.material_name, r.color_code || '', r.color_name || '', r.vendor_name, r.grn_number, r.received_qty, r.uom, r.balance_qty, r.location_name || '', r.status]),
+                    })} style={btn('#10b981')}>⬇ Excel</button>
+                </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>

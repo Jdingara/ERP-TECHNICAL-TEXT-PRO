@@ -1,5 +1,6 @@
 // PAGE: Reconciliation Report — Yarn Issued vs Output vs Rejection vs Variance
 import { useState, useEffect, useCallback } from 'react';
+import { printReport, exportCSV } from '../../utils/reportUtils';
 
 export default function ReconciliationReportPage() {
     const [rows,    setRows]    = useState([]);
@@ -35,7 +36,7 @@ export default function ReconciliationReportPage() {
                 </p>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24, background: '#f8fafc', borderRadius: 10, padding: '12px 18px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24, background: '#f8fafc', borderRadius: 10, padding: '12px 18px', flexWrap: 'wrap' }}>
                 <span style={{ fontWeight: 600, fontSize: 13, color: '#475569' }}>From:</span>
                 <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)}
                     style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13 }} />
@@ -45,6 +46,37 @@ export default function ReconciliationReportPage() {
                 <button onClick={load} disabled={loading} style={btn('#8b5cf6')}>
                     {loading ? 'Loading…' : '📊 Generate'}
                 </button>
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+                    <button onClick={() => printReport({
+                        title: 'Reconciliation Report',
+                        subtitle: 'Production Order × Yarn Issued → Output → Rejection → Variance',
+                        fromDate, toDate,
+                        summaryCards: rows.length > 0 ? [
+                            { label: 'Total Planned',   val: totals.planned.toFixed(2),   color: '#3b82f6' },
+                            { label: 'Total Issued',    val: totals.issued.toFixed(2),    color: '#f97316' },
+                            { label: 'Total Output',    val: totals.output.toFixed(2),    color: '#10b981' },
+                            { label: 'Total Rejection', val: totals.rejection.toFixed(2), color: '#ef4444' },
+                            { label: 'Total Variance',  val: (totals.variance > 0 ? '+' : '') + totals.variance.toFixed(3), color: totals.variance > 0 ? '#f59e0b' : '#10b981' },
+                        ] : [],
+                        headers: ['Production Order', 'Product', 'Status', 'Planned Qty', 'Yarn Issued', 'Output Qty', 'Rejection', 'Variance'],
+                        rows: rows.map(r => [r.prod_order_number, r.product_name, r.status, r.planned_qty, r.issued_qty, r.output_qty, r.rejection_qty, (Number(r.variance || 0) > 0 ? '+' : '') + Number(r.variance || 0).toFixed(3)]),
+                        footerRow: rows.length > 0 ? ['TOTAL', '', '', totals.planned.toFixed(2), totals.issued.toFixed(2), totals.output.toFixed(2), totals.rejection.toFixed(2), (totals.variance > 0 ? '+' : '') + totals.variance.toFixed(3)] : null,
+                    })} style={btn('#1a237e')}>🖨 Print</button>
+                    <button onClick={() => exportCSV({
+                        filename: 'Reconciliation_Report',
+                        summaryRows: [
+                            ['Report', 'Reconciliation Report'],
+                            ['Period', `${fromDate} to ${toDate}`],
+                            ['Total Planned', totals.planned.toFixed(2)],
+                            ['Total Issued', totals.issued.toFixed(2)],
+                            ['Total Output', totals.output.toFixed(2)],
+                            ['Total Rejection', totals.rejection.toFixed(2)],
+                            ['Total Variance', totals.variance.toFixed(3)],
+                        ],
+                        headers: ['Production Order', 'Product', 'Status', 'Planned Qty', 'Yarn Issued', 'Output Qty', 'Rejection', 'Variance'],
+                        rows: rows.map(r => [r.prod_order_number, r.product_name, r.status, r.planned_qty, r.issued_qty, r.output_qty, r.rejection_qty, Number(r.variance || 0).toFixed(3)]),
+                    })} style={btn('#10b981')}>⬇ Excel</button>
+                </div>
             </div>
 
             {/* Summary Totals */}

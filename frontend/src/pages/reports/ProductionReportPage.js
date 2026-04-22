@@ -1,5 +1,6 @@
 // PAGE: Production Report — process entries, output, rejection analysis
 import { useState, useEffect, useCallback } from 'react';
+import { printReport, exportCSV } from '../../utils/reportUtils';
 
 export default function ProductionReportPage() {
     const [rows,    setRows]    = useState([]);
@@ -27,7 +28,7 @@ export default function ProductionReportPage() {
                 <p style={{ margin: 0, color: '#64748b', fontSize: 13 }}>Process entries, output quantities, and rejection analysis</p>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24, background: '#f8fafc', borderRadius: 10, padding: '12px 18px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24, background: '#f8fafc', borderRadius: 10, padding: '12px 18px', flexWrap: 'wrap' }}>
                 <span style={{ fontWeight: 600, fontSize: 13, color: '#475569' }}>From:</span>
                 <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)}
                     style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13 }} />
@@ -37,6 +38,34 @@ export default function ProductionReportPage() {
                 <button onClick={load} disabled={loading} style={btn('#f97316')}>
                     {loading ? 'Loading…' : '📊 Generate'}
                 </button>
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+                    <button onClick={() => printReport({
+                        title: 'Production Report',
+                        subtitle: 'Process entries, output quantities and rejection analysis',
+                        fromDate, toDate,
+                        summaryCards: [
+                            { label: 'Total Entries',    val: summary.total_entries  || 0, color: '#3b82f6' },
+                            { label: 'Total Output',     val: summary.total_output   || 0, color: '#10b981' },
+                            { label: 'Total Rejection',  val: summary.total_rejection|| 0, color: '#ef4444' },
+                            { label: 'Rejection %',      val: `${summary.rejection_pct || 0}%`, color: '#f59e0b' },
+                        ],
+                        headers: ['Entry No', 'Date', 'Prod. Order', 'Process', 'Machine', 'Operator', 'Shift', 'Output Qty', 'Rejection', 'Batch'],
+                        rows: rows.map(r => [r.process_entry_number, r.entry_date, r.prod_order_number || '—', r.process_name || '—', r.machine_code, r.operator || '—', r.shift, r.output_qty, r.rejection_qty || 0, r.batch_number || '—']),
+                    })} style={btn('#1a237e')}>🖨 Print</button>
+                    <button onClick={() => exportCSV({
+                        filename: 'Production_Report',
+                        summaryRows: [
+                            ['Report', 'Production Report'],
+                            ['Period', `${fromDate} to ${toDate}`],
+                            ['Total Entries', summary.total_entries || 0],
+                            ['Total Output', summary.total_output || 0],
+                            ['Total Rejection', summary.total_rejection || 0],
+                            ['Rejection %', `${summary.rejection_pct || 0}%`],
+                        ],
+                        headers: ['Entry No', 'Date', 'Prod. Order', 'Process', 'Machine', 'Operator', 'Shift', 'Output Qty', 'Rejection', 'Batch'],
+                        rows: rows.map(r => [r.process_entry_number, r.entry_date, r.prod_order_number || '', r.process_name || '', r.machine_code, r.operator || '', r.shift, r.output_qty, r.rejection_qty || 0, r.batch_number || '']),
+                    })} style={btn('#10b981')}>⬇ Excel</button>
+                </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>

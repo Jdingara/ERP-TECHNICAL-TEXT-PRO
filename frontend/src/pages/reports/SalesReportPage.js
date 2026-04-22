@@ -1,5 +1,6 @@
 // PAGE: Quality Report (mapped to /reports/quality in App.js)
 import { useState, useEffect, useCallback } from 'react';
+import { printReport, exportCSV } from '../../utils/reportUtils';
 
 export default function SalesReportPage() {
     const [rows,    setRows]    = useState([]);
@@ -29,7 +30,7 @@ export default function SalesReportPage() {
                 <p style={{ margin: 0, color: '#64748b', fontSize: 13 }}>Inspection results, rejection rates, and defect analysis</p>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24, background: '#f8fafc', borderRadius: 10, padding: '12px 18px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24, background: '#f8fafc', borderRadius: 10, padding: '12px 18px', flexWrap: 'wrap' }}>
                 <span style={{ fontWeight: 600, fontSize: 13, color: '#475569' }}>From:</span>
                 <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)}
                     style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13 }} />
@@ -39,6 +40,36 @@ export default function SalesReportPage() {
                 <button onClick={load} disabled={loading} style={btn('#10b981')}>
                     {loading ? 'Loading…' : '📊 Generate'}
                 </button>
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+                    <button onClick={() => printReport({
+                        title: 'Quality Report',
+                        subtitle: 'Inspection results, rejection rates and defect analysis',
+                        fromDate, toDate,
+                        summaryCards: [
+                            { label: 'Total Inspected', val: summary.total_inspected || 0, color: '#3b82f6' },
+                            { label: 'Passed',          val: summary.passed          || 0, color: '#10b981' },
+                            { label: 'Failed',          val: summary.failed          || 0, color: '#ef4444' },
+                            { label: 'Rework',          val: summary.rework          || 0, color: '#8b5cf6' },
+                            { label: 'Pass Rate',       val: `${summary.pass_rate    || 0}%`, color: '#f59e0b' },
+                        ],
+                        headers: ['Date', 'Batch', 'Product', 'Inspector', 'Result', 'Defect Type', 'Defect Count', 'Remarks'],
+                        rows: rows.map(r => [r.inspection_date, r.batch_number, r.product_name, r.inspector || '—', (r.result || '').replace('_', ' '), r.defect_name || '—', r.defect_count || '—', r.remarks || '']),
+                    })} style={btn('#1a237e')}>🖨 Print</button>
+                    <button onClick={() => exportCSV({
+                        filename: 'Quality_Report',
+                        summaryRows: [
+                            ['Report', 'Quality Report'],
+                            ['Period', `${fromDate} to ${toDate}`],
+                            ['Total Inspected', summary.total_inspected || 0],
+                            ['Passed', summary.passed || 0],
+                            ['Failed', summary.failed || 0],
+                            ['Rework', summary.rework || 0],
+                            ['Pass Rate', `${summary.pass_rate || 0}%`],
+                        ],
+                        headers: ['Date', 'Batch', 'Product', 'Inspector', 'Result', 'Defect Type', 'Defect Count', 'Remarks'],
+                        rows: rows.map(r => [r.inspection_date, r.batch_number, r.product_name, r.inspector || '', (r.result || '').replace('_', ' '), r.defect_name || '', r.defect_count || '', r.remarks || '']),
+                    })} style={btn('#10b981')}>⬇ Excel</button>
+                </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 24 }}>
