@@ -15,12 +15,14 @@ export default function EscalationPage() {
     const formPage = { ...pt.formPage, maxWidth: 900 };
     const formHeader = pt.formHeader;
     const backBtnS = pt.backBtn;
-    const [escalations, setEscalations] = useState([]);
-    const [machines,    setMachines]    = useState([]);
-    const [showForm,    setShowForm]    = useState(false);
-    const [editId,      setEditId]      = useState(null);
-    const [loading,     setLoading]     = useState(false);
-    const [msg,         setMsg]         = useState('');
+    const [escalations,  setEscalations]  = useState([]);
+    const [machines,     setMachines]     = useState([]);
+    const [showForm,     setShowForm]     = useState(false);
+    const [editId,       setEditId]       = useState(null);
+    const [loading,      setLoading]      = useState(false);
+    const [msg,          setMsg]          = useState('');
+    const [sending,      setSending]      = useState(false);
+    const [sendResult,   setSendResult]   = useState(null);
 
     const blank = {
         machine_id: '', reminder_days: '1',
@@ -31,6 +33,20 @@ export default function EscalationPage() {
     };
     const [form, setForm] = useState(blank);
     const flash = (m) => { setMsg(m); setTimeout(() => setMsg(''), 3500); };
+
+    const sendReminders = async () => {
+        setSending(true);
+        setSendResult(null);
+        try {
+            const r = await fetch('/api/maintenance/send-reminders/', { method: 'POST', credentials: 'include' });
+            const d = await r.json();
+            setSendResult(d);
+        } catch (e) {
+            setSendResult({ success: false, error: 'Network error' });
+        } finally {
+            setSending(false);
+        }
+    };
 
     const load = useCallback(() => {
         fetch('/api/maintenance/escalation/', { credentials: 'include' })
@@ -129,13 +145,32 @@ export default function EscalationPage() {
                             <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Escalation Settings</h2>
                             <p style={{ margin: '4px 0 0', color: pt.colors.dimText, fontSize: 13 }}>Configure email / WhatsApp alerts per machine</p>
                         </div>
-                        <button onClick={openAdd}
-                            style={{ padding: '9px 20px', borderRadius: 8, border: 'none', backgroundColor: '#8b5cf6', color: '#fff', fontWeight: 600, cursor: 'pointer', fontSize: 13 }}>
-                            + Configure Machine
-                        </button>
+                        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                            <button onClick={sendReminders} disabled={sending}
+                                style={{ padding: '9px 20px', borderRadius: 8, border: 'none', backgroundColor: sending ? '#64748b' : '#10b981', color: '#fff', fontWeight: 600, cursor: sending ? 'not-allowed' : 'pointer', fontSize: 13 }}>
+                                {sending ? 'Sending…' : '📧 Send Reminders Now'}
+                            </button>
+                            <button onClick={openAdd}
+                                style={{ padding: '9px 20px', borderRadius: 8, border: 'none', backgroundColor: '#8b5cf6', color: '#fff', fontWeight: 600, cursor: 'pointer', fontSize: 13 }}>
+                                + Configure Machine
+                            </button>
+                        </div>
                     </div>
 
                     {msg && <div style={{ padding: '10px 16px', borderRadius: 8, backgroundColor: msg.includes('Error') ? '#7f1d1d' : '#14532d', color: '#fff', marginBottom: 16, fontSize: 13 }}>{msg}</div>}
+
+                    {sendResult && (
+                        <div style={{ padding: '14px 18px', borderRadius: 10, marginBottom: 16, fontSize: 13,
+                            backgroundColor: sendResult.success ? (pt.dark ? '#14532d' : '#f0fdf4') : (pt.dark ? '#7f1d1d' : '#fee2e2'),
+                            border: `1px solid ${sendResult.success ? '#86efac' : '#fca5a5'}`,
+                            color: sendResult.success ? (pt.dark ? '#86efac' : '#166534') : (pt.dark ? '#fca5a5' : '#991b1b') }}>
+                            {sendResult.success
+                                ? <>📧 <b>{sendResult.sent}</b> reminder email{sendResult.sent !== 1 ? 's' : ''} sent · {sendResult.skipped} skipped (no config or not due yet)
+                                    {sendResult.errors?.length > 0 && <div style={{ marginTop: 6, fontSize: 12 }}>⚠ Send errors: {sendResult.errors.join('; ')}</div>}
+                                  </>
+                                : `Error: ${sendResult.error || 'Failed to send reminders'}`}
+                        </div>
+                    )}
 
                     <div style={{ backgroundColor: pt.colors.card, borderRadius: 12, overflow: 'hidden' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>

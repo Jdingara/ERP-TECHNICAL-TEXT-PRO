@@ -189,3 +189,23 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'    # Uploaded files (documents, images)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# ============================================================
+# EMAIL — Gmail SMTP
+# Set EMAIL_HOST_USER and EMAIL_HOST_PASSWORD in .env
+# Use a Gmail App Password (not your regular Gmail password)
+# ============================================================
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER', 'noreply@meitexz.com')
+
+# Base URL of this server — used in confirmation links sent by email
+SITE_BASE_URL = os.getenv('SITE_BASE_URL', 'http://localhost:8000')
+
+# Secret key for calling send-reminders from Windows Task Scheduler (no login)
+REMINDER_API_KEY = os.getenv('REMINDER_API_KEY', '')

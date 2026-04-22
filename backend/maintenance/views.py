@@ -4,11 +4,14 @@
 # ============================================================
 
 import json
-from datetime import date, timedelta
-from django.http import JsonResponse
+from datetime import date, timedelta, datetime, timezone
+from django.conf import settings as django_settings
+from django.core.mail import send_mail
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from master_data.company_utils import get_active_company
+from master_data.models import Company
 from .models import MaintenanceTask, MaintenanceEscalation, MaintenanceLog
 from masters.models import Machine
 
@@ -332,3 +335,249 @@ def escalation_detail(request, pk):
     if request.method == 'DELETE':
         e.delete()
         return JsonResponse({'success': True})
+
+
+# ── Send Reminders ────────────────────────────────────────────
+
+def _reminder_email_html(log, esc, level, confirm_url, level_name):
+    """Build branded HTML email body for a maintenance reminder."""
+    overdue_days = (date.today() - log.due_date).days
+    status_text = f'OVERDUE by {overdue_days} day{"s" if overdue_days != 1 else ""}' if overdue_days > 0 else 'DUE TODAY'
+    status_color = '#ef4444' if overdue_days > 0 else '#f59e0b'
+    freq_labels = {
+        'daily': 'Daily', 'weekly': 'Weekly', '15_days': 'Every 15 Days',
+        'monthly': 'Monthly', '3_monthly': 'Every 3 Months',
+        '6_monthly': 'Every 6 Months', 'yearly': 'Yearly', 'beam_change': 'Every Beam Change',
+    }
+    freq = freq_labels.get(log.task.frequency, log.task.frequency)
+    level_labels = {1: 'Primary Responsible', 2: 'Assistant Manager (Escalated)', 3: 'Maintenance Manager (Final Escalation)'}
+
+    return f"""<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:Inter,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);">
+
+        <!-- Header -->
+        <tr><td style="background:#1e293b;padding:24px 32px;">
+          <p style="margin:0;color:#fff;font-size:20px;font-weight:700;">MEI TEXZ Technologies</p>
+          <p style="margin:4px 0 0;color:#94a3b8;font-size:13px;">Maintenance Reminder — Level {level} ({level_labels.get(level, '')})</p>
+        </td></tr>
+
+        <!-- Status banner -->
+        <tr><td style="background:{status_color};padding:14px 32px;">
+          <p style="margin:0;color:#fff;font-size:15px;font-weight:700;text-align:center;">⚠ {status_text}</p>
+        </td></tr>
+
+        <!-- Body -->
+        <tr><td style="padding:32px;">
+          <p style="margin:0 0 8px;color:#475569;font-size:14px;">Dear {level_name},</p>
+          <p style="margin:0 0 24px;color:#475569;font-size:14px;">
+            The following maintenance task requires your attention and confirmation:
+          </p>
+
+          <!-- Details card -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:28px;">
+            <tr><td style="padding:20px 24px;">
+              {''.join(f'<tr><td style="padding:5px 0;color:#64748b;font-size:13px;width:140px;">{k}</td><td style="padding:5px 0;color:#1e293b;font-size:13px;font-weight:600;">{v}</td></tr>' for k, v in [
+                  ('Machine', f"{log.task.machine.machine_code} — {log.task.machine.machine_name}"),
+                  ('Task', log.task.task_name),
+                  ('Frequency', freq),
+                  ('Due Date', str(log.due_date)),
+                  ('Status', status_text),
+              ])}
+            </td></tr>
+          </table>
+
+          <!-- Confirm button -->
+          <table cellpadding="0" cellspacing="0" style="margin:0 auto 28px;">
+            <tr><td style="background:#10b981;border-radius:8px;text-align:center;">
+              <a href="{confirm_url}" style="display:inline-block;padding:14px 40px;color:#fff;font-size:15px;font-weight:700;text-decoration:none;">
+                ✓ Confirm Task Done
+              </a>
+            </td></tr>
+          </table>
+
+          <p style="margin:0;color:#94a3b8;font-size:12px;text-align:center;">
+            Clicking the button above will mark this task as completed and stop further reminders.
+          </p>
+        </td></tr>
+
+        <!-- Footer -->
+        <tr><td style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:16px 32px;text-align:center;">
+          <p style="margin:0;color:#94a3b8;font-size:11px;">
+            MEI TEXZ Technologies — Maintenance System · This is an automated reminder.
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>"""
+
+
+@csrf_exempt
+def send_reminders(request):
+    """
+    Send maintenance reminder emails based on escalation config.
+    Called by:
+      - Frontend "Send Reminders Now" button (session auth)
+      - Windows Task Scheduler via X-Reminder-Key header (key auth)
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+
+    # Auth: session login OR API key
+    api_key = request.headers.get('X-Reminder-Key', '')
+    use_all_companies = False
+    if api_key:
+        if api_key != django_settings.REMINDER_API_KEY or not django_settings.REMINDER_API_KEY:
+            return JsonResponse({'error': 'Invalid key'}, status=403)
+        use_all_companies = True
+    elif not request.user.is_authenticated:
+        return JsonResponse({'error': 'Login required'}, status=401)
+
+    base_url = django_settings.SITE_BASE_URL.rstrip('/')
+    today = date.today()
+    now = datetime.now(timezone.utc)
+    sent_count = 0
+    skipped_count = 0
+    errors = []
+
+    # Determine which companies to process
+    if use_all_companies:
+        companies = list(Company.objects.filter(is_active=True))
+    else:
+        company = get_active_company(request)
+        companies = [company] if company else []
+
+    for company in companies:
+        # Get all pending/overdue logs that are due within reminder window
+        escalations = {e.machine_id: e for e in MaintenanceEscalation.objects.filter(company=company, enable_email=True)}
+        if not escalations:
+            continue
+
+        logs = MaintenanceLog.objects.filter(
+            company=company,
+            status__in=['pending', 'overdue'],
+        ).select_related('task', 'task__machine')
+
+        for log in logs:
+            esc = escalations.get(log.task.machine_id)
+            if not esc:
+                skipped_count += 1
+                continue
+
+            # Only process if due_date is within reminder window
+            days_until_due = (log.due_date - today).days
+            if days_until_due > esc.reminder_days:
+                skipped_count += 1
+                continue
+
+            # Determine escalation level
+            current_level = log.escalation_level
+            if current_level == 0:
+                # First notification → Level 1
+                target_level = 1
+            elif current_level == 1:
+                # Check if L1 grace period has passed
+                if log.notified_at and (now - log.notified_at).total_seconds() / 3600 >= esc.level1_grace_hours:
+                    target_level = 2
+                else:
+                    target_level = 1  # Re-send to L1 (not yet time to escalate)
+            elif current_level == 2:
+                if log.notified_at and (now - log.notified_at).total_seconds() / 3600 >= esc.level2_grace_hours:
+                    target_level = 3
+                else:
+                    target_level = 2
+            else:
+                target_level = 3  # Max level — keep notifying L3
+
+            # Get contact for this level
+            email_map = {
+                1: (esc.level1_name, esc.level1_email),
+                2: (esc.level2_name, esc.level2_email),
+                3: (esc.level3_name, esc.level3_email),
+            }
+            level_name, level_email = email_map.get(target_level, ('', ''))
+            if not level_email:
+                skipped_count += 1
+                continue
+
+            confirm_url = f"{base_url}/api/maintenance/confirm/{log.confirm_token}/"
+            overdue_days = (today - log.due_date).days
+            status_text = f'OVERDUE by {overdue_days} day{"s" if overdue_days != 1 else ""}' if overdue_days > 0 else 'DUE TODAY'
+            subject = f"[MEI TEXZ] Maintenance Due — {log.task.machine.machine_code} · {log.task.task_name} ({status_text})"
+
+            try:
+                send_mail(
+                    subject=subject,
+                    message=f"Maintenance task {log.task.task_name} on {log.task.machine.machine_code} is {status_text}. Confirm done: {confirm_url}",
+                    html_message=_reminder_email_html(log, esc, target_level, confirm_url, level_name),
+                    from_email=django_settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[level_email],
+                    fail_silently=False,
+                )
+                log.escalation_level = target_level
+                log.notified_at = now
+                log.save(update_fields=['escalation_level', 'notified_at'])
+                sent_count += 1
+            except Exception as exc:
+                errors.append(f"{log.task.machine.machine_code}/{log.task.task_name}: {exc}")
+
+    return JsonResponse({
+        'success': True,
+        'sent': sent_count,
+        'skipped': skipped_count,
+        'errors': errors,
+    })
+
+
+def confirm_by_token(request, token):
+    """Public endpoint — one-click confirm from email link. Returns HTML page."""
+    try:
+        log = MaintenanceLog.objects.select_related('task', 'task__machine').get(confirm_token=token)
+    except MaintenanceLog.DoesNotExist:
+        return HttpResponse(_confirm_page(False, 'Invalid or expired confirmation link.'), content_type='text/html')
+
+    if log.status == 'done':
+        return HttpResponse(_confirm_page(True, f'This task was already confirmed on {log.completed_date}.', already_done=True), content_type='text/html')
+
+    log.status = 'done'
+    log.completed_date = date.today()
+    log.completed_by = 'Email Confirmation'
+    log.save(update_fields=['status', 'completed_date', 'completed_by'])
+
+    # Auto-create next due log
+    next_due = _next_due(log.task.frequency, log.completed_date)
+    MaintenanceLog.objects.create(
+        company=log.company,
+        task=log.task,
+        due_date=next_due,
+    )
+
+    machine_label = f"{log.task.machine.machine_code} — {log.task.machine.machine_name}"
+    return HttpResponse(_confirm_page(True, f'Task confirmed. Next due: {next_due}', machine=machine_label, task=log.task.task_name), content_type='text/html')
+
+
+def _confirm_page(success, message, already_done=False, machine='', task=''):
+    icon = '✓' if success else '✗'
+    color = '#10b981' if success else '#ef4444'
+    title = 'Already Done' if already_done else ('Task Confirmed!' if success else 'Error')
+    details = ''
+    if machine:
+        details = f'<p style="color:#475569;font-size:14px;margin:4px 0 0;">{machine} · {task}</p>'
+    return f"""<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{title} — MEI TEXZ Maintenance</title></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:Inter,Arial,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+  <div style="background:#fff;border-radius:16px;padding:48px 40px;text-align:center;max-width:420px;box-shadow:0 4px 16px rgba(0,0,0,.08);">
+    <div style="width:72px;height:72px;border-radius:50%;background:{color}18;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:36px;line-height:72px;">{icon}</div>
+    <h1 style="margin:0 0 8px;font-size:24px;font-weight:700;color:#1e293b;">{title}</h1>
+    {details}
+    <p style="color:#64748b;font-size:14px;margin:16px 0 0;">{message}</p>
+    <p style="color:#94a3b8;font-size:12px;margin:32px 0 0;">MEI TEXZ Technologies — Maintenance System</p>
+  </div>
+</body></html>"""

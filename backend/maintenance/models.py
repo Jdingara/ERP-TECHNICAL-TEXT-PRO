@@ -3,6 +3,7 @@
 # PURPOSE: Machine maintenance schedules, logs, escalation
 # ============================================================
 
+import uuid
 from django.db import models
 from master_data.models import Company
 from masters.models import Machine
@@ -94,6 +95,7 @@ class MaintenanceLog(models.Model):
     remarks        = models.TextField(blank=True)
     escalation_level = models.PositiveIntegerField(default=0)
     notified_at    = models.DateTimeField(null=True, blank=True)
+    confirm_token  = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     created_at     = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

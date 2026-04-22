@@ -17,4 +17,8 @@ urlpatterns = [
     # Escalation config
     path('escalation/',           views.escalation_list,   name='maintenance_escalation_list'),
     path('escalation/<int:pk>/',  views.escalation_detail, name='maintenance_escalation_detail'),
+
+    # Automated reminders
+    path('send-reminders/',             views.send_reminders,    name='maintenance_send_reminders'),
+    path('confirm/<uuid:token>/',       views.confirm_by_token,  name='maintenance_confirm_token'),
 ]
