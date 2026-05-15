@@ -8,7 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import (
     UOM, Location, YarnMaster, ItemMaster, Machine,
-    Process, ProductDesign, BOM, BOMLine, Vendor, Customer
+    Process, ProductDesign, BOM, BOMLine, Vendor, Customer,
+    Brand, Category, FabricType, TestingParameter,
 )
 from master_data.company_utils import get_active_company
 
@@ -93,17 +94,49 @@ def vendor_dict(o):
         'id': o.id, 'vendor_code': o.vendor_code, 'vendor_name': o.vendor_name,
         'vendor_type': o.vendor_type, 'contact_person': o.contact_person,
         'phone': o.phone, 'email': o.email, 'address': o.address,
-        'city': o.city, 'state': o.state, 'gstin': o.gstin,
+        'city': o.city, 'state': o.state, 'country': o.country,
+        'currency': o.currency, 'gstin': o.gstin,
         'pan_number': o.pan_number, 'credit_days': o.credit_days, 'is_active': o.is_active,
     }
 
 def customer_dict(o):
     return {
         'id': o.id, 'customer_code': o.customer_code, 'customer_name': o.customer_name,
+        'customer_type': o.customer_type,
         'contact_person': o.contact_person, 'phone': o.phone, 'email': o.email,
         'address': o.address, 'city': o.city, 'state': o.state,
+        'country': o.country, 'currency': o.currency,
         'gstin': o.gstin, 'credit_days': o.credit_days,
         'credit_limit': str(o.credit_limit), 'is_active': o.is_active,
+    }
+
+def brand_dict(o):
+    return {
+        'id': o.id, 'brand_code': o.brand_code, 'brand_name': o.brand_name,
+        'customer_id': o.customer_id,
+        'customer_name': o.customer.customer_name if o.customer else '',
+        'description': o.description, 'is_active': o.is_active,
+    }
+
+def category_dict(o):
+    return {
+        'id': o.id, 'category_code': o.category_code, 'category_name': o.category_name,
+        'parent_id': o.parent_id,
+        'parent_name': o.parent.category_name if o.parent else '',
+        'description': o.description, 'is_active': o.is_active,
+    }
+
+def fabric_dict(o):
+    return {
+        'id': o.id, 'fabric_code': o.fabric_code, 'fabric_name': o.fabric_name,
+        'construction': o.construction, 'fiber_content': o.fiber_content, 'is_active': o.is_active,
+    }
+
+def testing_param_dict(o):
+    return {
+        'id': o.id, 'parameter_code': o.parameter_code, 'parameter_name': o.parameter_name,
+        'test_standard': o.test_standard, 'acceptance_criteria': o.acceptance_criteria,
+        'unit': o.unit, 'is_active': o.is_active,
     }
 
 
@@ -451,10 +484,11 @@ def vendor_list(request):
             o = Vendor.objects.create(
                 company=company,
                 vendor_code=data['vendor_code'], vendor_name=data['vendor_name'],
-                vendor_type=data.get('vendor_type', 'raw_material'),
+                vendor_type=data.get('vendor_type', 'manufacturer'),
                 contact_person=data.get('contact_person', ''), phone=data.get('phone', ''),
                 email=data.get('email', ''), address=data.get('address', ''),
                 city=data.get('city', ''), state=data.get('state', ''),
+                country=data.get('country', ''), currency=data.get('currency', 'INR'),
                 gstin=data.get('gstin', ''), pan_number=data.get('pan_number', ''),
                 credit_days=data.get('credit_days', 30),
             )
@@ -473,7 +507,7 @@ def vendor_detail(request, pk):
     if request.method == 'PUT':
         data = json.loads(request.body)
         for f in ['vendor_name', 'vendor_type', 'contact_person', 'phone', 'email',
-                  'address', 'city', 'state', 'gstin', 'pan_number', 'credit_days']:
+                  'address', 'city', 'state', 'country', 'currency', 'gstin', 'pan_number', 'credit_days']:
             if f in data: setattr(o, f, data[f])
         o.save()
         return JsonResponse({'message': 'Updated.', 'vendor': vendor_dict(o)})
@@ -498,9 +532,11 @@ def customer_list(request):
             o = Customer.objects.create(
                 company=company,
                 customer_code=data['customer_code'], customer_name=data['customer_name'],
+                customer_type=data.get('customer_type', 'brand'),
                 contact_person=data.get('contact_person', ''), phone=data.get('phone', ''),
                 email=data.get('email', ''), address=data.get('address', ''),
                 city=data.get('city', ''), state=data.get('state', ''),
+                country=data.get('country', ''), currency=data.get('currency', 'USD'),
                 gstin=data.get('gstin', ''), credit_days=data.get('credit_days', 30),
                 credit_limit=data.get('credit_limit', 0),
             )
@@ -518,11 +554,175 @@ def customer_detail(request, pk):
         return JsonResponse({'customer': customer_dict(o)})
     if request.method == 'PUT':
         data = json.loads(request.body)
-        for f in ['customer_name', 'contact_person', 'phone', 'email',
-                  'address', 'city', 'state', 'gstin', 'credit_days', 'credit_limit']:
+        for f in ['customer_name', 'customer_type', 'contact_person', 'phone', 'email',
+                  'address', 'city', 'state', 'country', 'currency',
+                  'gstin', 'credit_days', 'credit_limit']:
             if f in data: setattr(o, f, data[f])
         o.save()
         return JsonResponse({'message': 'Updated.', 'customer': customer_dict(o)})
+    if request.method == 'DELETE':
+        o.is_active = False; o.save()
+        return JsonResponse({'message': 'Deleted.'})
+
+
+# ── Brand ─────────────────────────────────────────────────────
+@csrf_exempt
+def brand_list(request):
+    company = get_active_company(request)
+    if request.method == 'GET':
+        qs = Brand.objects.select_related('customer').filter(is_active=True)
+        if company: qs = qs.filter(company=company)
+        search = request.GET.get('search', '')
+        if search: qs = qs.filter(brand_name__icontains=search) | qs.filter(brand_code__icontains=search)
+        return JsonResponse({'brands': [brand_dict(o) for o in qs], 'total': qs.count()})
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        try:
+            o = Brand.objects.create(
+                company=company,
+                brand_code=data['brand_code'], brand_name=data['brand_name'],
+                customer_id=data.get('customer_id') or None,
+                description=data.get('description', ''),
+            )
+            return JsonResponse({'message': 'Brand created.', 'brand': brand_dict(o)}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+@csrf_exempt
+def brand_detail(request, pk):
+    try:
+        o = Brand.objects.select_related('customer').get(pk=pk)
+    except Brand.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        for f in ['brand_name', 'description']:
+            if f in data: setattr(o, f, data[f])
+        if 'customer_id' in data: o.customer_id = data['customer_id'] or None
+        o.save()
+        return JsonResponse({'message': 'Updated.', 'brand': brand_dict(o)})
+    if request.method == 'DELETE':
+        o.is_active = False; o.save()
+        return JsonResponse({'message': 'Deleted.'})
+
+
+# ── Category ──────────────────────────────────────────────────
+@csrf_exempt
+def category_list(request):
+    company = get_active_company(request)
+    if request.method == 'GET':
+        qs = Category.objects.select_related('parent').filter(is_active=True)
+        if company: qs = qs.filter(company=company)
+        search = request.GET.get('search', '')
+        if search: qs = qs.filter(category_name__icontains=search) | qs.filter(category_code__icontains=search)
+        return JsonResponse({'categories': [category_dict(o) for o in qs], 'total': qs.count()})
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        try:
+            o = Category.objects.create(
+                company=company,
+                category_code=data['category_code'], category_name=data['category_name'],
+                parent_id=data.get('parent_id') or None,
+                description=data.get('description', ''),
+            )
+            return JsonResponse({'message': 'Category created.', 'category': category_dict(o)}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+@csrf_exempt
+def category_detail(request, pk):
+    try:
+        o = Category.objects.select_related('parent').get(pk=pk)
+    except Category.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        for f in ['category_name', 'description']:
+            if f in data: setattr(o, f, data[f])
+        if 'parent_id' in data: o.parent_id = data['parent_id'] or None
+        o.save()
+        return JsonResponse({'message': 'Updated.', 'category': category_dict(o)})
+    if request.method == 'DELETE':
+        o.is_active = False; o.save()
+        return JsonResponse({'message': 'Deleted.'})
+
+
+# ── Fabric Type ───────────────────────────────────────────────
+@csrf_exempt
+def fabric_list(request):
+    company = get_active_company(request)
+    if request.method == 'GET':
+        qs = FabricType.objects.filter(is_active=True)
+        if company: qs = qs.filter(company=company)
+        search = request.GET.get('search', '')
+        if search: qs = qs.filter(fabric_name__icontains=search) | qs.filter(fabric_code__icontains=search)
+        return JsonResponse({'fabrics': [fabric_dict(o) for o in qs], 'total': qs.count()})
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        try:
+            o = FabricType.objects.create(
+                company=company,
+                fabric_code=data['fabric_code'], fabric_name=data['fabric_name'],
+                construction=data.get('construction', ''),
+                fiber_content=data.get('fiber_content', ''),
+            )
+            return JsonResponse({'message': 'Fabric type created.', 'fabric': fabric_dict(o)}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+@csrf_exempt
+def fabric_detail(request, pk):
+    try:
+        o = FabricType.objects.get(pk=pk)
+    except FabricType.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        for f in ['fabric_name', 'construction', 'fiber_content']:
+            if f in data: setattr(o, f, data[f])
+        o.save()
+        return JsonResponse({'message': 'Updated.', 'fabric': fabric_dict(o)})
+    if request.method == 'DELETE':
+        o.is_active = False; o.save()
+        return JsonResponse({'message': 'Deleted.'})
+
+
+# ── Testing Parameters ────────────────────────────────────────
+@csrf_exempt
+def testing_param_list(request):
+    company = get_active_company(request)
+    if request.method == 'GET':
+        qs = TestingParameter.objects.filter(is_active=True)
+        if company: qs = qs.filter(company=company)
+        search = request.GET.get('search', '')
+        if search: qs = qs.filter(parameter_name__icontains=search) | qs.filter(parameter_code__icontains=search)
+        return JsonResponse({'parameters': [testing_param_dict(o) for o in qs], 'total': qs.count()})
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        try:
+            o = TestingParameter.objects.create(
+                company=company,
+                parameter_code=data['parameter_code'], parameter_name=data['parameter_name'],
+                test_standard=data.get('test_standard', ''),
+                acceptance_criteria=data.get('acceptance_criteria', ''),
+                unit=data.get('unit', ''),
+            )
+            return JsonResponse({'message': 'Parameter created.', 'parameter': testing_param_dict(o)}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+@csrf_exempt
+def testing_param_detail(request, pk):
+    try:
+        o = TestingParameter.objects.get(pk=pk)
+    except TestingParameter.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        for f in ['parameter_name', 'test_standard', 'acceptance_criteria', 'unit']:
+            if f in data: setattr(o, f, data[f])
+        o.save()
+        return JsonResponse({'message': 'Updated.', 'parameter': testing_param_dict(o)})
     if request.method == 'DELETE':
         o.is_active = False; o.save()
         return JsonResponse({'message': 'Deleted.'})

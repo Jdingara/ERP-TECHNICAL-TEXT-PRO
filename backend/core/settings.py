@@ -58,6 +58,12 @@ INSTALLED_APPS = [
     'traceability',          # Traceability Search (USP)
     'reports',               # All reports
     'maintenance',           # Machine Maintenance Schedules + Escalation
+
+    # Buying House specific apps
+    'product_development',   # Product Development (PD) — Request, Tech Spec, Vendor Assignment, Sampling
+    'order_management',      # Customer Orders + Factory Orders + T&A Calendar
+    'shipment',              # Pre-Shipment Inspection, Shipments, Costing Sheet
+    'bh_finance',            # Sales Invoices, Purchase Invoices, Payments
 ]
 
 
@@ -184,6 +190,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # React frontend build — served by Django in production
 FRONTEND_BUILD_DIR = BASE_DIR / 'frontend_build'
+
+# Include the React build's static folder so collectstatic picks it up
+STATICFILES_DIRS = [BASE_DIR / 'frontend_build' / 'static']
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'    # Uploaded files (documents, images)

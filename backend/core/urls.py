@@ -31,6 +31,12 @@ urlpatterns = [
     path('api/reports/',        include('reports.urls')),
     path('api/maintenance/',    include('maintenance.urls')),
 
+    # Buying House modules
+    path('api/pd/',             include('product_development.urls')),
+    path('api/orders/',         include('order_management.urls')),
+    path('api/shipment/',       include('shipment.urls')),
+    path('api/finance/',        include('bh_finance.urls')),
+
     # Media files (uploaded images, documents)
     re_path(r'^media/(?P<path>.*)$', media_serve, {'document_root': settings.MEDIA_ROOT}),
 ]
