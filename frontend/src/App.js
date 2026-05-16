@@ -84,6 +84,28 @@ import ReconciliationReportPage from './pages/reports/ReconciliationReportPage';
 
 // ── Settings Extra ─────────────────────────────────────────────
 import TallyIntegrationPage    from './pages/settings/TallyIntegrationPage';
+import CompanySettingsPage     from './pages/settings/CompanySettingsPage';
+
+// ── Finance (Accounting) ───────────────────────────────────────
+import ChartOfAccountsPage     from './pages/finance/ChartOfAccountsPage';
+import JournalEntriesPage      from './pages/finance/JournalEntriesPage';
+import PaymentsPage            from './pages/finance/PaymentsPage';
+import ReceiptsPage            from './pages/finance/ReceiptsPage';
+import FinanceDashboardPage    from './pages/finance/FinanceDashboardPage';
+import FiscalYearsPage         from './pages/finance/FiscalYearsPage';
+
+// ── GST ────────────────────────────────────────────────────────
+import GSTCenterPage           from './pages/gst/GSTCenterPage';
+
+// ── Banking ────────────────────────────────────────────────────
+import BankAccountsPage        from './pages/banking/BankAccountsPage';
+
+// ── HR & Payroll ───────────────────────────────────────────────
+import EmployeeHRPage          from './pages/payroll/EmployeeHRPage';
+import PayrollPeriodsPage      from './pages/payroll/PayrollPeriodsPage';
+
+// ── TDS / TCS ──────────────────────────────────────────────────
+import TDSCenterPage           from './pages/tds/TDSCenterPage';
 
 // ── Analytics, Feed, Inventory ─────────────────────────────────
 import AnalyticsPage           from './pages/analytics/AnalyticsPage';
@@ -237,7 +259,29 @@ function App() {
                                     <Route path="/reports/reconciliation" element={<ReconciliationReportPage />} />
 
                                     {/* Settings Extra */}
-                                    <Route path="/settings/tally" element={<TallyIntegrationPage />} />
+                                    <Route path="/settings/tally"            element={<TallyIntegrationPage />} />
+                                    <Route path="/settings/company-settings" element={<CompanySettingsPage />} />
+
+                                    {/* Finance / Accounting */}
+                                    <Route path="/finance/dashboard"         element={<FinanceDashboardPage />} />
+                                    <Route path="/finance/accounts"          element={<ChartOfAccountsPage />} />
+                                    <Route path="/finance/journal-entries"   element={<JournalEntriesPage />} />
+                                    <Route path="/finance/payments"          element={<PaymentsPage />} />
+                                    <Route path="/finance/receipts"          element={<ReceiptsPage />} />
+                                    <Route path="/finance/fiscal-years"      element={<FiscalYearsPage />} />
+
+                                    {/* GST */}
+                                    <Route path="/gst/center"               element={<GSTCenterPage />} />
+
+                                    {/* Banking */}
+                                    <Route path="/banking/accounts"         element={<BankAccountsPage />} />
+
+                                    {/* HR & Payroll */}
+                                    <Route path="/payroll/employees"        element={<EmployeeHRPage />} />
+                                    <Route path="/payroll/periods"          element={<PayrollPeriodsPage />} />
+
+                                    {/* TDS / TCS */}
+                                    <Route path="/tds/center"               element={<TDSCenterPage />} />
 
                                     {/* Analytics, Feed, Inventory */}
                                     <Route path="/analytics"       element={<AnalyticsPage />} />

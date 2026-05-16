@@ -31,6 +31,10 @@ import BuildIcon             from '@mui/icons-material/Build';
 import ExpandLess            from '@mui/icons-material/ExpandLess';
 import ExpandMore            from '@mui/icons-material/ExpandMore';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import AccountBalanceIcon    from '@mui/icons-material/AccountBalance';
+import ReceiptLongIcon       from '@mui/icons-material/ReceiptLong';
+import PeopleIcon            from '@mui/icons-material/People';
+import PercentIcon           from '@mui/icons-material/Percent';
 
 // Static constants that don't change with theme
 const BG_HOVER  = 'rgba(255,255,255,0.06)';
@@ -116,9 +120,31 @@ const MENU_ITEMS = [
     { title: 'Daily Feed', icon: <DashboardIcon />, path: '/feed', children: [] },
     { title: 'Settings', icon: <TuneIcon />, children: [
         { title: 'Company Master',     path: '/settings/company-master' },
+        { title: 'Company Settings',   path: '/settings/company-settings' },
         { title: 'Format Panel',       path: '/settings/format-panel' },
         { title: 'Email Templates',    path: '/settings/email-templates' },
         { title: 'Tally Integration',  path: '/settings/tally' },
+    ]},
+    { title: 'Finance', icon: <AccountBalanceIcon />, children: [
+        { title: 'Finance Dashboard',   path: '/finance/dashboard' },
+        { title: 'Chart of Accounts',   path: '/finance/accounts' },
+        { title: 'Journal Entries',     path: '/finance/journal-entries' },
+        { title: 'Payments (AP)',        path: '/finance/payments' },
+        { title: 'Receipts (AR)',        path: '/finance/receipts' },
+        { title: 'Fiscal Years',        path: '/finance/fiscal-years' },
+    ]},
+    { title: 'GST', icon: <ReceiptLongIcon />, children: [
+        { title: 'GST Center',          path: '/gst/center' },
+    ]},
+    { title: 'Banking', icon: <AccountBalanceIcon />, children: [
+        { title: 'Bank Accounts',       path: '/banking/accounts' },
+    ]},
+    { title: 'HR & Payroll', icon: <PeopleIcon />, children: [
+        { title: 'Employees',           path: '/payroll/employees' },
+        { title: 'Payroll Periods',     path: '/payroll/periods' },
+    ]},
+    { title: 'TDS / TCS', icon: <PercentIcon />, children: [
+        { title: 'TDS / TCS Center',    path: '/tds/center' },
     ]},
     { title: 'Activity Log', icon: <HistoryIcon />, path: '/audit/activity-log', children: [] },
 ];
@@ -137,6 +163,11 @@ const MODULE_COLORS = {
     'Reports':        '#a78bfa',
     'Analytics':      '#f97316',
     'Daily Feed':     '#10b981',
+    'Finance':        '#0ea5e9',
+    'GST':            '#10b981',
+    'Banking':        '#3b82f6',
+    'HR & Payroll':   '#8b5cf6',
+    'TDS / TCS':      '#f59e0b',
     'Settings':       '#64748b',
     'Activity Log':   '#0ea5e9',
 };

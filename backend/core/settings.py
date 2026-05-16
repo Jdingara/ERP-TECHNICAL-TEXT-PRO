@@ -58,6 +58,13 @@ INSTALLED_APPS = [
     'traceability',          # Traceability Search (USP)
     'reports',               # All reports
     'maintenance',           # Machine Maintenance Schedules + Escalation
+
+    # ── Accounting & Finance (India ERP extension) ────────────
+    'finance',               # Chart of Accounts, Journal Entries, FiscalYear, Payments, Receipts
+    'gst',                   # GST rates, HSN/SAC codes, GSTR-1/3B, e-Invoice stub, e-Way Bill stub
+    'banking',               # Bank accounts, transactions, cheques, reconciliation
+    'tds_tcs',               # TDS sections/deductions, TCS sections/collections
+    'hr_payroll',            # Employees, attendance, payroll (PF/ESI/PT/TDS), payslips
 ]
 
 

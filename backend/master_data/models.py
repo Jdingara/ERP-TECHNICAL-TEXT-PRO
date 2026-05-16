@@ -361,6 +361,19 @@ class DocumentSeries(models.Model):
         ('tds',              'Technical Data Sheet'),
         ('test_report',      'Test Report'),
         ('rd_project',       'R&D Project'),
+        # ── Accounting & Finance ──────────────────────────────
+        ('journal_entry',    'Journal Entry'),
+        ('payment_voucher',  'Payment Voucher'),
+        ('receipt_voucher',  'Receipt Voucher'),
+        ('contra_voucher',   'Contra / Fund Transfer'),
+        ('credit_note',      'Credit Note'),
+        ('debit_note',       'Debit Note'),
+        # ── Banking ───────────────────────────────────────────
+        ('cheque',           'Cheque'),
+        ('bank_deposit',     'Bank Deposit'),
+        # ── Payroll ───────────────────────────────────────────
+        ('payroll_run',      'Payroll Run'),
+        ('payslip',          'Pay Slip'),
     ]
 
     PADDING_CHOICES = [
@@ -427,4 +440,82 @@ class MessageTemplate(models.Model):
 
     def __str__(self):
         return f"MessageTemplate — {self.get_document_type_display()}"
+
+
+# ============================================================
+# COMPANY SETTINGS
+# Per-company configuration: financial year, statutory numbers,
+# module feature flags, document prefix preferences.
+# One row per company.
+# ============================================================
+class CompanySettings(models.Model):
+
+    FY_START_CHOICES = [
+        (4,  'April 1  (India standard)'),
+        (1,  'January 1 (Calendar year / USA)'),
+        (7,  'July 1'),
+        (10, 'October 1'),
+    ]
+
+    company             = models.OneToOneField(Company, on_delete=models.CASCADE, related_name='settings')
+
+    # Financial year configuration
+    fy_start_month      = models.IntegerField(default=4, choices=FY_START_CHOICES)
+    fy_start_day        = models.IntegerField(default=1)
+
+    # Statutory registration numbers
+    tan_number          = models.CharField(max_length=20, blank=True)    # Tax Deduction Account Number
+    cin_number          = models.CharField(max_length=25, blank=True)    # Company Identification Number
+    msme_number         = models.CharField(max_length=50, blank=True)    # MSME registration
+    udyam_number        = models.CharField(max_length=30, blank=True)    # Udyam / MSME portal number
+    esic_code           = models.CharField(max_length=20, blank=True)    # ESIC employer code
+    pf_establishment    = models.CharField(max_length=30, blank=True)    # PF establishment code
+
+    # Module feature flags — disable modules not needed by customer
+    module_gst          = models.BooleanField(default=True)
+    module_tds          = models.BooleanField(default=True)
+    module_tcs          = models.BooleanField(default=False)
+    module_payroll      = models.BooleanField(default=True)
+    module_banking      = models.BooleanField(default=True)
+    module_budget       = models.BooleanField(default=False)
+    module_fixed_assets = models.BooleanField(default=False)
+    module_multi_currency = models.BooleanField(default=False)
+
+    # Default currency
+    default_currency    = models.CharField(max_length=3, default='INR')
+
+    # Accounting preferences
+    narration_on_journals = models.BooleanField(default=True)
+    round_off_limit     = models.DecimalField(max_digits=5, decimal_places=2, default=0.50)
+
+    created_at          = models.DateTimeField(auto_now_add=True)
+    updated_at          = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'master_company_settings'
+        verbose_name = 'Company Settings'
+        verbose_name_plural = 'Company Settings'
+
+    def __str__(self):
+        return f"Settings — {self.company.name}"
+
+
+# ============================================================
+# COMPANY GROUP
+# Group multiple companies for consolidated financial reporting.
+# E.g., a holding company can see combined P&L across subsidiaries.
+# ============================================================
+class CompanyGroup(models.Model):
+    name        = models.CharField(max_length=200, unique=True)
+    description = models.TextField(blank=True)
+    companies   = models.ManyToManyField(Company, blank=True, related_name='groups')
+    is_active   = models.BooleanField(default=True)
+    created_at  = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'master_company_group'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
 

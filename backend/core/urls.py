@@ -31,6 +31,13 @@ urlpatterns = [
     path('api/reports/',        include('reports.urls')),
     path('api/maintenance/',    include('maintenance.urls')),
 
+    # ── India ERP Extension — Accounting, GST, Banking, Payroll ─
+    path('api/finance/',       include('finance.urls')),
+    path('api/gst/',           include('gst.urls')),
+    path('api/banking/',       include('banking.urls')),
+    path('api/tds-tcs/',       include('tds_tcs.urls')),
+    path('api/payroll/',       include('hr_payroll.urls')),
+
     # Media files (uploaded images, documents)
     re_path(r'^media/(?P<path>.*)$', media_serve, {'document_root': settings.MEDIA_ROOT}),
 ]
