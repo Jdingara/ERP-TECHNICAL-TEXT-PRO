@@ -41,4 +41,20 @@ urlpatterns = [
     # Customers
     path('customers/',              views.customer_list,       name='customer_list'),
     path('customers/<int:pk>/',     views.customer_detail,     name='customer_detail'),
+
+    # Brands
+    path('brands/',                 views.brand_list,          name='brand_list'),
+    path('brands/<int:pk>/',        views.brand_detail,        name='brand_detail'),
+
+    # Categories
+    path('categories/',             views.category_list,       name='category_list'),
+    path('categories/<int:pk>/',    views.category_detail,     name='category_detail'),
+
+    # Fabric Types
+    path('fabric-types/',           views.fabric_list,         name='fabric_list'),
+    path('fabric-types/<int:pk>/',  views.fabric_detail,       name='fabric_detail'),
+
+    # Testing Parameters
+    path('testing-params/',         views.testing_param_list,  name='testing_param_list'),
+    path('testing-params/<int:pk>/',views.testing_param_detail,name='testing_param_detail'),
 ]

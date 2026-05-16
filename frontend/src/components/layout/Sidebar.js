@@ -28,6 +28,8 @@ import AssessmentIcon        from '@mui/icons-material/Assessment';
 import TuneIcon              from '@mui/icons-material/Tune';
 import HistoryIcon           from '@mui/icons-material/History';
 import BuildIcon             from '@mui/icons-material/Build';
+import ScienceIcon           from '@mui/icons-material/Science';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ExpandLess            from '@mui/icons-material/ExpandLess';
 import ExpandMore            from '@mui/icons-material/ExpandMore';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
@@ -48,73 +50,39 @@ const makeFs = (fontSizeSetting) => (base) => Math.round(base * (FONT_SCALE[font
 
 const MENU_ITEMS = [
     { title: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard', children: [] },
+    { title: 'Product Development', icon: <ScienceIcon />, children: [
+        { title: 'PD Requests',      path: '/product-development' },
+    ]},
     { title: 'Masters', icon: <CategoryIcon />, children: [
-        { title: 'Yarn Master',      path: '/masters/yarn' },
-        { title: 'Item Master',      path: '/masters/items' },
-        { title: 'Machines',         path: '/masters/machines' },
-        { title: 'Processes',        path: '/masters/processes' },
-        { title: 'Products / Design',path: '/masters/products' },
-        { title: 'BOM',              path: '/masters/bom' },
-        { title: 'Vendors',          path: '/masters/vendors' },
         { title: 'Customers',        path: '/masters/customers' },
-        { title: 'Locations',        path: '/masters/locations' },
+        { title: 'Vendors',          path: '/masters/vendors' },
+        { title: 'Brands',           path: '/masters/brands' },
+        { title: 'Categories',       path: '/masters/categories' },
+        { title: 'Fabric Types',     path: '/masters/fabric-types' },
+        { title: 'Testing Params',   path: '/masters/testing-params' },
         { title: 'UOM',              path: '/masters/uom' },
     ]},
-    { title: 'Purchase', icon: <ShoppingCartIcon />, children: [
-        { title: 'Purchase Orders', path: '/purchase/orders' },
-        { title: 'GRN',             path: '/purchase/grn' },
-        { title: 'Lot Stock',       path: '/purchase/lots' },
-        { title: 'Invoices (AP)',   path: '/purchase/invoices' },
-    ]},
-    { title: 'Lot Inventory', icon: <WarehouseIcon />, children: [
-        { title: 'Stock Dashboard', path: '/lot-inventory/dashboard' },
-        { title: 'Movements',       path: '/lot-inventory/movements' },
-        { title: 'Adjustments',     path: '/lot-inventory/adjustments' },
-    ]},
-    { title: 'Planning', icon: <EventNoteIcon />, children: [
-        { title: 'Customer Forecasts', path: '/planning/forecasts' },
-        { title: 'Sales Orders',       path: '/planning/sales-orders' },
-        { title: 'Production Orders',  path: '/planning/production-orders' },
-        { title: 'Daily Plan',         path: '/planning/daily-plan' },
-    ]},
-    { title: 'Production', icon: <FactoryIcon />, children: [
-        { title: 'Yarn Issue',      path: '/production/yarn-issues' },
-        { title: 'Process Entries', path: '/production/entries' },
-        { title: 'Batches',         path: '/production/batches' },
-        { title: 'Beam Outward',    path: '/production/beams' },
-        { title: '— Stage Screens —', path: '' },
-        { title: 'Warping',         path: '/production/stages/warping' },
-        { title: 'Weaving',         path: '/production/stages/weaving' },
-        { title: 'Stenter',         path: '/production/stages/stenter' },
-        { title: 'Tumbler',         path: '/production/stages/tumbler' },
-        { title: 'Lamination',      path: '/production/stages/lamination' },
-        { title: 'Embossing',       path: '/production/stages/embossing' },
+    { title: 'Orders', icon: <ShoppingCartIcon />, children: [
+        { title: 'Buyer Inquiries',  path: '/orders/inquiries' },
+        { title: 'Customer Orders',  path: '/orders/co' },
     ]},
     { title: 'Quality', icon: <TaskAltIcon />, children: [
-        { title: 'QC Dashboard',   path: '/quality/dashboard' },
-        { title: 'Inspections',    path: '/quality/inspections' },
-        { title: 'Defect Types',   path: '/quality/defect-types' },
-        { title: 'Sample Testing', path: '/quality/sample-testing' },
+        { title: 'Pre-Shipment Inspection', path: '/shipment/psi' },
+        { title: 'Sample Testing',          path: '/quality/sample-testing' },
     ]},
-    { title: 'Dispatch', icon: <LocalShippingIcon />, children: [
-        { title: 'Dispatch Entries',    path: '/dispatch/entries' },
-        { title: 'Delivery Challans',   path: '/dispatch/delivery-challans' },
-        { title: 'Sales Invoices',      path: '/dispatch/invoices' },
+    { title: 'Shipment', icon: <LocalShippingIcon />, children: [
+        { title: 'Shipments',               path: '/shipment/shipments' },
     ]},
-    { title: 'Maintenance', icon: <BuildIcon />, children: [
-        { title: 'Schedule Master',    path: '/maintenance/schedule' },
-        { title: 'Maintenance Log',    path: '/maintenance/log' },
-        { title: 'Escalation Config',  path: '/maintenance/escalation' },
-    ]},
-    { title: 'Traceability', icon: <AccountTreeIcon />, path: '/traceability', children: [] },
-    { title: 'Inventory', icon: <WarehouseIcon />, children: [
-        { title: 'Finished Goods', path: '/inventory/finished-goods' },
+    { title: 'Finance', icon: <AccountBalanceWalletIcon />, children: [
+        { title: 'Sales Invoices',          path: '/finance/sales-invoices' },
+        { title: 'Purchase Invoices',       path: '/finance/purchase-invoices' },
+        { title: 'Payments',               path: '/finance/payments' },
     ]},
     { title: 'Reports', icon: <AssessmentIcon />, children: [
-        { title: 'Production Report',  path: '/reports/production' },
-        { title: 'Lot Stock Report',   path: '/reports/lot-stock' },
-        { title: 'Quality Report',     path: '/reports/quality' },
-        { title: 'Reconciliation',     path: '/reports/reconciliation' },
+        { title: 'Order Summary',        path: '/reports/orders' },
+        { title: 'PD Pipeline',          path: '/reports/pd' },
+        { title: 'Vendor Performance',   path: '/reports/vendors' },
+        { title: 'Shipment Tracker',     path: '/reports/shipments' },
     ]},
     { title: 'Analytics', icon: <AssessmentIcon />, path: '/analytics', children: [] },
     { title: 'Daily Feed', icon: <DashboardIcon />, path: '/feed', children: [] },
@@ -151,13 +119,16 @@ const MENU_ITEMS = [
 
 const MODULE_COLORS = {
     'Dashboard':      '#6366f1',
+    'Product Development': '#8b5cf6',
+    'Orders':         '#10b981',
     'Masters':        '#06b6d4',
     'Purchase':       '#10b981',
     'Lot Inventory':  '#3b82f6',
     'Planning':       '#f59e0b',
     'Production':     '#f97316',
     'Quality':        '#14b8a6',
-    'Dispatch':       '#8b5cf6',
+    'Shipment':       '#06b6d4',
+    'Finance':        '#a855f7',
     'Traceability':   '#ec4899',
     'Inventory':      '#06b6d4',
     'Reports':        '#a78bfa',

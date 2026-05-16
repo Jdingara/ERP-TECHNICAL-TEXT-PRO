@@ -34,3 +34,10 @@ desktop.ini
 *.pem
 *.key
 secrets.json
+
+# ── Generated SOP / screenshots (regenerate with: node generate_sop.js) ──────
+sop_screenshots/
+BHF_India_ERP_SOP.html
+MEI_TEXZ_ERP_SOP.html
+debug_login.png
+*.drawio.png

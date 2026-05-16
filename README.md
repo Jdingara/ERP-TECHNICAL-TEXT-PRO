@@ -1,49 +1,64 @@
-# ERP TECHNICAL TEXT — PRO
+# BHF India — Buying House ERP
 
-> A complete, production-ready Enterprise Resource Planning system built specifically for **Technical & Medical Textile manufacturers**.
-> Built with React.js · Django · PostgreSQL · Material UI · Claude AI
+> A complete, production-ready ERP system built specifically for **Garment Buying Houses**.
+> Built with React.js · Django · PostgreSQL · Material UI
 
 ---
 
 ## Overview
 
-Most ERP systems are generic. This one is purpose-built for textile companies.
+Purpose-built for buying houses that source garments from Indian factories and supply global brands. Covers the **entire buying house workflow** — from the first buyer inquiry through costing, vendor sourcing, sampling, order management, shipment, and finance.
 
-It covers the **entire business operation** — from raw material purchasing to customer invoicing, from machine work orders to payroll — all in one system. With built-in AI features, smart analytics, a floating chatbot, and fully customizable UI themes.
-
-**Live deployment:** Hosted on [Render](https://render.com) with PostgreSQL cloud database.
+**End-to-end workflow:**
+```
+Buyer Inquiry → Cost Sheet → Vendor RFQ → PD / Sampling → Customer Order → Factory Order → T&A → PSI → Shipment → Invoice → Payment
+```
 
 ---
 
 ## Modules
 
-### Core Business
+### Core Workflow
 
-| Module | Pages | What it covers |
-|---|---|---|
-| **Dashboard** | 1 | Live KPIs, revenue charts, alerts, production predictions |
-| **Master Data** | 8 | Items & Products, Suppliers, Customers, Warehouses |
-| **Inventory** | 2 | Stock levels, Stock movements (IN / OUT / TRANSFER / ADJUSTMENT) |
-| **Purchasing** | 3 | Purchase Orders, Goods Receipt (GRN), Supplier management |
-| **Sales** | 6 | Inquiries, Quotations, Sales Orders, Order Journey, Invoices |
-| **Finance** | 3 | Chart of Accounts, Journal Entries, Trial Balance |
-| **HR & Payroll** | 3 | Employees, Attendance, Salary Processing |
-| **Production** | 6 | Bill of Materials, Work Orders, Machines, Quality Checks, Batch Tracking |
+| Module | What it covers |
+|---|---|
+| **Dashboard** | Live KPIs: active inquiries, orders in production, shipments in transit, receivables, T&A overdue |
+| **Buyer Inquiries** | Capture buyer requirements → build cost sheet (FOB price build-up) → send RFQ to multiple vendors → compare quotes → convert to Customer Order |
+| **Product Development** | PD requests, tech specs, vendor assignment, sample shipment tracking, testing, approval |
+| **Customer Orders** | Confirmed POs from brands/retailers — items, delivery dates, status tracking |
+| **Factory Orders** | Production orders placed to factories — items, unit cost, ex-factory date |
+| **T&A Milestones** | Time & Action calendar: fabric booking, bulk cutting, sewing, finishing, shipment milestones |
+| **Pre-Shipment Inspection** | PSI checklists with pass/fail/NA items, AQL levels, inspector, result |
+| **Shipments** | Booking number, vessel, ETD/ETA, BL number, port-to-port tracking |
 
-### Industry-Specific
+### Finance
 
-| Module | Pages | What it covers |
-|---|---|---|
-| **Technical Textile** | 6 | Product Categories, Performance Specs, Sample Management, Technical Data Sheets, Testing Lab, R&D Projects |
-| **Medical Textile** | 6 | Regulatory Compliance (ISO 13485 / FDA / CE), Batch Traceability, Sterility Records, CAPA Management, Audit Trail, Shelf Life Tracking |
+| Module | What it covers |
+|---|---|
+| **Sales Invoices** | Invoice to buyer — linked to shipment, items, tax, payment tracking |
+| **Purchase Invoices** | Vendor bill — linked to factory order, items, approval workflow |
+| **Payments** | Received from buyers (LC, TT, cheque) and made to vendors — auto-updates invoice balance |
 
-### Intelligence & Analytics
+### Reports
 
-| Module | Pages | What it covers |
-|---|---|---|
-| **Customer Intelligence** | 6 tabs | RFM Segmentation, Churn Prediction, Sales Forecasting, Product Analytics, What-If Simulator |
-| **Smart Business Feed** | 1 | Daily AI-curated business insights, alerts, books, courses, market news |
-| **Reports** | 7 | Production, Inventory, Sales, Finance, HR reports + custom Report Maker |
+| Report | What it shows |
+|---|---|
+| **Order Summary** | All COs with qty, value, FO count, status — filterable, printable |
+| **PD Pipeline** | Product development funnel by status and customer |
+| **Vendor Performance** | On-time delivery rate, PSI pass rate per factory |
+| **Shipment Tracker** | All active shipments with ETD, ETA, days to arrival |
+
+### Masters & Settings
+
+| Module | What it covers |
+|---|---|
+| **Customers** | Brands/retailers — country, currency, payment terms |
+| **Vendors** | Factories — location, type, capacity |
+| **Brands** | Brand master linked to orders and PDs |
+| **Categories** | Product category master |
+| **Fabric Types** | Fabric construction reference |
+| **Testing Params** | Lab test standards and limits |
+| **Settings** | Company master, format panel (doc numbering), email templates |
 
 ### Platform Features
 
@@ -93,53 +108,47 @@ It covers the **entire business operation** — from raw material purchasing to 
 ## Project Structure
 
 ```
-ERP-TECHNICAL-TEXT-PRO/
+Buying House/
 │
-├── backend/                        # Django backend
-│   ├── core/                       # Settings, main URL router, WSGI
-│   ├── authentication/             # Login, logout, session, roles, permissions
-│   ├── master_data/                # Items, suppliers, customers, warehouses
-│   ├── inventory/                  # Stock management, movements
-│   ├── purchasing/                 # Purchase orders, GRN
-│   ├── sales/                      # Inquiries, quotations, sales orders, invoices
-│   ├── finance/                    # Chart of accounts, journal entries, trial balance
-│   ├── hr_payroll/                 # Employees, attendance, salary
-│   ├── production/                 # BOM, work orders, machines, quality, batches
-│   ├── technical_textile/          # Performance specs, samples, testing lab, R&D
-│   ├── medical_textile/            # Compliance, CAPA, traceability, shelf life
-│   ├── dashboard/                  # KPI aggregation, alerts
-│   ├── analytics/                  # RFM, churn, forecast, product intelligence
-│   ├── feed/                       # Smart Business Feed + content library
-│   ├── chatbot/                    # NLP query engine + Claude AI fallback
-│   ├── reports/                    # All report APIs
+├── backend/                          # Django backend
+│   ├── core/                         # Settings, main URL router, WSGI
+│   ├── authentication/               # Login, logout, session, roles, permissions
+│   ├── master_data/                  # Company master
+│   ├── masters/                      # Customers, Vendors, Brands, Categories, Fabric, Testing Params
+│   ├── order_management/             # BuyerInquiry, InquiryCostSheet, VendorQuotation
+│   │                                 # CustomerOrder, FactoryOrder, TAMilestone
+│   ├── product_development/          # PDRequest, TechSpec, VendorAssignment, SampleShipment
+│   ├── shipment/                     # PSI, PSIChecklistItem, Shipment
+│   ├── bh_finance/                   # SalesInvoice, PurchaseInvoice, Payment
+│   ├── reports/                      # All report + dashboard APIs
+│   ├── dashboard/                    # BI Dashboard KPIs
+│   ├── maintenance/                  # Machine maintenance schedules
+│   ├── chatbot/                      # ERP chatbot
+│   ├── seed_test_data.py             # Creates 10 complete test entries
+│   ├── test_apis.py                  # Automated API smoke tests
 │   ├── requirements.txt
 │   └── manage.py
 │
-├── frontend/                       # React frontend
-│   ├── public/
-│   │   └── index.html              # Google Fonts loaded here
+├── frontend/                         # React frontend
 │   └── src/
-│       ├── App.js                  # All routes (50+ pages)
-│       ├── index.js                # MUI theme builder (dynamic from settings)
-│       ├── context/
-│       │   ├── SettingsContext.js  # Global UI settings + theme presets
-│       │   └── ErrorContext.js
-│       ├── components/
-│       │   ├── layout/
-│       │   │   ├── MainLayout.js   # App shell, header, user menu
-│       │   │   └── Sidebar.js      # Navigation sidebar
-│       │   └── common/
-│       │       ├── ChatBot.js      # Floating AI chatbot + voice input
-│       │       ├── ResizableChartPanel.js
-│       │       ├── ResizablePanelRow.js
-│       │       ├── useColumnResize.js
-│       │       └── ReportToolbar.js
-│       └── pages/                  # 50+ page components across all modules
+│       ├── App.js                    # All routes
+│       ├── components/layout/
+│       │   ├── MainLayout.js
+│       │   └── Sidebar.js
+│       └── pages/
+│           ├── order_management/     # InquiryListPage, InquiryDetailPage
+│           │                         # CustomerOrdersPage, CustomerOrderDetailPage
+│           ├── product_development/  # ProductDevelopmentPage, PDRequestDetailPage
+│           ├── shipment/             # PSIPage, ShipmentsPage
+│           ├── finance/              # SalesInvoicesPage, PurchaseInvoicesPage, PaymentsPage
+│           ├── reports/              # OrderSummaryReport, PDPipelineReport, etc.
+│           ├── masters/              # CustomerPage, VendorPage, BrandPage, etc.
+│           └── settings/             # SettingsPage, CompanyMasterPage, EmailTemplatesPage
 │
-├── docker-compose.yml              # PostgreSQL local container
-├── render.yaml                     # Render deployment config
-├── build.sh                        # Production build script
-├── .gitignore
+├── sop_screenshots/                  # 32 screenshots for SOP document
+├── BHF_India_ERP_SOP.html            # Full SOP document (self-contained, 3.5 MB)
+├── take_screenshots.js               # Playwright script — retake all screenshots
+├── generate_sop.js                   # SOP HTML generator
 └── README.md
 ```
 
@@ -266,23 +275,30 @@ All APIs are under `http://127.0.0.1:8000/api/`
 |---|---|---|
 | `/api/authentication/login/` | POST | Login |
 | `/api/authentication/logout/` | POST | Logout |
-| `/api/authentication/current-user/` | GET | Logged-in user info |
-| `/api/master-data/items/` | GET, POST | Items list & create |
-| `/api/inventory/stock/` | GET | Stock levels |
-| `/api/inventory/movements/` | GET, POST | Stock movements |
-| `/api/purchasing/purchase-orders/` | GET, POST | Purchase orders |
-| `/api/sales/sales-orders/` | GET, POST | Sales orders |
-| `/api/sales/invoices/` | GET, POST | Sales invoices |
-| `/api/finance/journal-entries/` | GET, POST | Journal entries |
-| `/api/hr/employees/` | GET, POST | Employee records |
-| `/api/production/work-orders/` | GET, POST | Work orders |
-| `/api/analytics/rfm/` | GET | RFM segmentation data |
-| `/api/analytics/churn/` | GET | Churn risk data |
-| `/api/analytics/forecast/` | GET | Sales forecast |
-| `/api/feed/` | GET | Smart Business Feed |
-| `/api/chat/` | POST | Chatbot query |
-| `/api/reports/sales/` | GET | Sales report |
-| `/api/dashboard/` | GET | Dashboard KPIs |
+| `/api/orders/inquiries/` | GET, POST | Buyer inquiries list & create |
+| `/api/orders/inquiries/<id>/` | GET, PUT | Inquiry detail & update |
+| `/api/orders/inquiries/<id>/cost-sheet/` | GET, PUT | Inquiry cost sheet (FOB build-up) |
+| `/api/orders/inquiries/<id>/quotations/` | GET, POST | Vendor quotations for an inquiry |
+| `/api/orders/inquiries/<id>/convert-to-co/` | POST | Convert inquiry to Customer Order |
+| `/api/pd/requests/` | GET, POST | PD requests |
+| `/api/pd/requests/<id>/vendors/` | GET, POST | Vendor assignments |
+| `/api/pd/requests/<id>/shipments/` | GET, POST | Sample shipments |
+| `/api/orders/co/` | GET, POST | Customer orders |
+| `/api/orders/co/<id>/` | GET, PUT | CO detail & update |
+| `/api/orders/fo/` | GET, POST | Factory orders |
+| `/api/orders/ta-milestones/` | GET, POST | T&A milestones |
+| `/api/shipment/psi/` | GET, POST | Pre-shipment inspections |
+| `/api/shipment/shipments/` | GET, POST | Shipments |
+| `/api/finance/sales-invoices/` | GET, POST | Sales invoices |
+| `/api/finance/purchase-invoices/` | GET, POST | Purchase invoices |
+| `/api/finance/payments/` | GET, POST | Payments |
+| `/api/reports/bh-dashboard/` | GET | Dashboard KPIs |
+| `/api/reports/order-summary/` | GET | Order summary report |
+| `/api/reports/pd-pipeline/` | GET | PD pipeline report |
+| `/api/reports/vendor-performance/` | GET | Vendor performance report |
+| `/api/reports/shipment-tracker/` | GET | Shipment tracker |
+| `/api/masters/customers/` | GET, POST | Customers |
+| `/api/masters/vendors/` | GET, POST | Vendors |
 
 ---
 

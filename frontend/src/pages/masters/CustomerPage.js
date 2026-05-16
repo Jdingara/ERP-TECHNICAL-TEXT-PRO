@@ -1,10 +1,39 @@
-// PAGE: Customer Master
+// PAGE: Customer Master — Buying House ERP
 import { useState, useEffect, useCallback } from 'react';
 import { usePageTheme } from '../../hooks/usePageTheme';
 import { useSettings } from '../../context/SettingsContext';
 
-const empty = { customer_code:'', customer_name:'', contact_person:'', phone:'', email:'',
-    address:'', city:'', state:'', gstin:'', credit_days:'30', credit_limit:'0' };
+const CUSTOMER_TYPES = [
+    { value: 'brand',       label: 'Brand' },
+    { value: 'retailer',    label: 'Retailer' },
+    { value: 'agent',       label: 'Buying Agent' },
+    { value: 'importer',    label: 'Importer' },
+    { value: 'distributor', label: 'Distributor' },
+    { value: 'other',       label: 'Other' },
+];
+
+const CURRENCIES = [
+    { value: 'USD', label: 'USD — US Dollar' },
+    { value: 'EUR', label: 'EUR — Euro' },
+    { value: 'GBP', label: 'GBP — British Pound' },
+    { value: 'AUD', label: 'AUD — Australian Dollar' },
+    { value: 'CAD', label: 'CAD — Canadian Dollar' },
+    { value: 'INR', label: 'INR — Indian Rupee' },
+    { value: 'JPY', label: 'JPY — Japanese Yen' },
+    { value: 'OTHER', label: 'Other' },
+];
+
+const TYPE_COLOR = {
+    brand: '#8b5cf6', retailer: '#3b82f6', agent: '#f59e0b',
+    importer: '#10b981', distributor: '#06b6d4', other: '#64748b',
+};
+
+const empty = {
+    customer_code: '', customer_name: '', customer_type: 'brand',
+    contact_person: '', phone: '', email: '',
+    address: '', city: '', state: '', country: '',
+    currency: 'USD', gstin: '', credit_days: '30', credit_limit: '0',
+};
 
 export default function CustomerPage() {
     const pt = usePageTheme();
@@ -12,103 +41,139 @@ export default function CustomerPage() {
     const tdS      = { ...pt.cell, verticalAlign: 'middle' };
     const inpS     = { ...pt.inp };
     const searchS  = { ...pt.inp, width: 280, outline: 'none' };
-    const formPage = { ...pt.formPage, maxWidth: 900 };
+    const formPage = { ...pt.formPage, maxWidth: 960 };
     const formHeader = pt.formHeader;
     const backBtnS = pt.backBtn;
-    const [rows, setRows] = useState([]);
+
+    const [rows, setRows]     = useState([]);
     const [search, setSearch] = useState('');
-    const [modal, setModal] = useState(false);
-    const [form, setForm] = useState(empty);
+    const [modal, setModal]   = useState(false);
+    const [form, setForm]     = useState(empty);
     const [editId, setEditId] = useState(null);
     const [saving, setSaving] = useState(false);
-    const [msg, setMsg] = useState('');
+    const [msg, setMsg]       = useState('');
 
     const load = useCallback(async () => {
-        const p = new URLSearchParams(); if (search) p.set('search', search);
+        const p = new URLSearchParams();
+        if (search) p.set('search', search);
         const res = await fetch(`/api/masters/customers/?${p}`, { credentials: 'include' });
-        const d = await res.json(); setRows(d.customers || []);
+        const d = await res.json();
+        setRows(d.customers || []);
     }, [search]);
 
     useEffect(() => { load(); }, [load]);
 
-    const openAdd  = () => { setForm(empty); setEditId(null); setMsg(''); setModal(true); };
-    const openEdit = (r) => { setForm({ customer_code:r.customer_code, customer_name:r.customer_name,
-        contact_person:r.contact_person, phone:r.phone, email:r.email, address:r.address,
-        city:r.city, state:r.state, gstin:r.gstin, credit_days:r.credit_days, credit_limit:r.credit_limit });
-        setEditId(r.id); setMsg(''); setModal(true); };
+    const openAdd = () => { setForm(empty); setEditId(null); setMsg(''); setModal(true); };
+    const openEdit = (r) => {
+        setForm({
+            customer_code: r.customer_code, customer_name: r.customer_name,
+            customer_type: r.customer_type || 'brand',
+            contact_person: r.contact_person, phone: r.phone, email: r.email,
+            address: r.address, city: r.city, state: r.state,
+            country: r.country || '', currency: r.currency || 'USD',
+            gstin: r.gstin, credit_days: r.credit_days, credit_limit: r.credit_limit,
+        });
+        setEditId(r.id); setMsg(''); setModal(true);
+    };
 
     const save = async () => {
         setSaving(true);
         const url = editId ? `/api/masters/customers/${editId}/` : '/api/masters/customers/';
-        const res = await fetch(url, { method: editId?'PUT':'POST', credentials:'include',
-            headers: {'Content-Type':'application/json'}, body: JSON.stringify(form) });
+        const res = await fetch(url, {
+            method: editId ? 'PUT' : 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form),
+        });
         setSaving(false);
-        if (res.ok) { setModal(false); load(); } else { const d = await res.json(); setMsg(d.error||'Error'); }
+        if (res.ok) { setModal(false); load(); }
+        else { const d = await res.json(); setMsg(d.error || d.message || 'Error'); }
     };
-    const del = async (id) => { if(!window.confirm('Deactivate?')) return; await fetch(`/api/masters/customers/${id}/`, {method:'DELETE',credentials:'include'}); load(); };
-    const inp = (f) => ({ value: form[f], onChange: e => setForm(p => ({...p, [f]: e.target.value})) });
+
+    const del = async (id) => {
+        if (!window.confirm('Deactivate this customer?')) return;
+        await fetch(`/api/masters/customers/${id}/`, { method: 'DELETE', credentials: 'include' });
+        load();
+    };
+
+    const inp = (f) => ({ value: form[f], onChange: e => setForm(p => ({ ...p, [f]: e.target.value })) });
 
     return (
-        <div style={{ padding:'24px 28px', fontFamily:'Inter, sans-serif', color: pt.colors.text, minHeight:'100vh', backgroundColor: pt.colors.outer }}>
+        <div style={{ padding: '24px 28px', fontFamily: 'Inter, sans-serif', color: pt.colors.text, minHeight: '100vh', backgroundColor: pt.colors.outer }}>
             {!modal ? (
                 <>
-                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:24 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                         <div>
-                            <h2 style={{ margin:0, fontSize:22, fontWeight:700 }}>Customers</h2>
-                            <p style={{ margin:'4px 0 0', color: pt.colors.dimText, fontSize:13 }}>Customer master with credit terms</p>
+                            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Customers</h2>
+                            <p style={{ margin: '4px 0 0', color: pt.colors.dimText, fontSize: 13 }}>Brands, retailers, importers and buying agents</p>
                         </div>
                         <button onClick={openAdd} style={btn('#10b981')}>+ Add Customer</button>
                     </div>
-                    <div style={{ marginBottom:16 }}>
-                        <input placeholder="Search code / name…" value={search} onChange={e=>setSearch(e.target.value)} style={searchS} />
+                    <div style={{ marginBottom: 16 }}>
+                        <input placeholder="Search code / name / country…" value={search} onChange={e => setSearch(e.target.value)} style={searchS} />
                     </div>
-                    <div style={{ backgroundColor: pt.colors.card, borderRadius:12, overflow:'hidden', overflowX:'auto' }}>
+                    <div style={{ backgroundColor: pt.colors.card, borderRadius: 12, overflow: 'hidden', overflowX: 'auto' }}>
                         <table style={tableS}><thead><tr>
-                            {['Code','Name','Contact','Phone','GSTIN','City','Credit Days','Credit Limit','Actions'].map(h=><th key={h} style={thS}>{h}</th>)}
+                            {['Code', 'Name', 'Type', 'Country', 'Currency', 'Contact', 'Phone', 'Credit Days', 'Actions'].map(h => <th key={h} style={thS}>{h}</th>)}
                         </tr></thead><tbody>
-                            {rows.map(r=>(
+                            {rows.map(r => (
                                 <tr key={r.id}>
-                                    <td style={{ ...tdS, fontWeight:600 }}>{r.customer_code}</td>
+                                    <td style={{ ...tdS, fontWeight: 600 }}>{r.customer_code}</td>
                                     <td style={tdS}>{r.customer_name}</td>
+                                    <td style={tdS}>
+                                        <span style={tag(TYPE_COLOR[r.customer_type] || '#64748b')}>
+                                            {CUSTOMER_TYPES.find(t => t.value === r.customer_type)?.label || r.customer_type}
+                                        </span>
+                                    </td>
+                                    <td style={tdS}>{r.country || '—'}</td>
+                                    <td style={tdS}><span style={tag('#0ea5e9')}>{r.currency}</span></td>
                                     <td style={tdS}>{r.contact_person}</td>
                                     <td style={tdS}>{r.phone}</td>
-                                    <td style={tdS}>{r.gstin}</td>
-                                    <td style={tdS}>{r.city}</td>
                                     <td style={tdS}>{r.credit_days}d</td>
-                                    <td style={tdS}>₹{r.credit_limit}</td>
                                     <td style={tdS}>
-                                        <button onClick={()=>openEdit(r)} style={smallBtn('#3b82f6')}>Edit</button>
-                                        <button onClick={()=>del(r.id)} style={smallBtn('#ef4444')}>Del</button>
+                                        <button onClick={() => openEdit(r)} style={smallBtn('#3b82f6')}>Edit</button>
+                                        <button onClick={() => del(r.id)} style={smallBtn('#ef4444')}>Del</button>
                                     </td>
                                 </tr>
                             ))}
-                            {rows.length===0 && <tr><td colSpan={9} style={{ textAlign:'center',padding:40,color: pt.colors.muted }}>No customers</td></tr>}
+                            {rows.length === 0 && <tr><td colSpan={9} style={{ textAlign: 'center', padding: 40, color: pt.colors.muted }}>No customers</td></tr>}
                         </tbody></table>
                     </div>
                 </>
             ) : (
                 <div style={formPage}>
                     <div style={formHeader}>
-                        <button onClick={()=>setModal(false)} style={backBtnS}>← Back to Customers</button>
-                        <h3 style={{ margin:0, fontSize:20, fontWeight:700 }}>{editId?'Edit Customer':'Add Customer'}</h3>
+                        <button onClick={() => setModal(false)} style={backBtnS}>← Back to Customers</button>
+                        <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>{editId ? 'Edit Customer' : 'Add Customer'}</h3>
                     </div>
                     <div style={grid2}>
-                        <F label="Code *"><input style={inpS} {...inp('customer_code')} /></F>
-                        <F label="Name *"><input style={inpS} {...inp('customer_name')} /></F>
+                        <F label="Customer Code *"><input style={inpS} {...inp('customer_code')} /></F>
+                        <F label="Customer Name *"><input style={inpS} {...inp('customer_name')} /></F>
+                        <F label="Customer Type">
+                            <select style={inpS} {...inp('customer_type')}>
+                                {CUSTOMER_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                            </select>
+                        </F>
+                        <F label="Currency">
+                            <select style={inpS} {...inp('currency')}>
+                                {CURRENCIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                            </select>
+                        </F>
                         <F label="Contact Person"><input style={inpS} {...inp('contact_person')} /></F>
                         <F label="Phone"><input style={inpS} {...inp('phone')} /></F>
                         <F label="Email"><input style={inpS} {...inp('email')} /></F>
-                        <F label="GSTIN"><input style={inpS} {...inp('gstin')} /></F>
+                        <F label="Country"><input style={inpS} placeholder="e.g. USA, UK, Germany" {...inp('country')} /></F>
                         <F label="City"><input style={inpS} {...inp('city')} /></F>
-                        <F label="State"><input style={inpS} {...inp('state')} /></F>
+                        <F label="State / Region"><input style={inpS} {...inp('state')} /></F>
                         <F label="Credit Days"><input style={inpS} type="number" {...inp('credit_days')} /></F>
-                        <F label="Credit Limit (₹)"><input style={inpS} type="number" {...inp('credit_limit')} /></F>
+                        <F label="Credit Limit"><input style={inpS} type="number" {...inp('credit_limit')} /></F>
                     </div>
-                    <F label="Address"><textarea style={{ ...inpS, height:70, resize:'vertical' }} {...inp('address')} /></F>
-                    {msg && <div style={{ color:'#ef4444', marginTop:8, fontSize:13 }}>{msg}</div>}
-                    <div style={{ display:'flex', gap:10, marginTop:24, justifyContent:'flex-end' }}>
-                        <button onClick={()=>setModal(false)} style={smallBtn('#64748b')}>Cancel</button>
-                        <button onClick={save} disabled={saving} style={btn('#10b981')}>{saving?'Saving…':'Save'}</button>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+                        <F label="GSTIN (if applicable)"><input style={inpS} {...inp('gstin')} /></F>
+                    </div>
+                    <F label="Address"><textarea style={{ ...inpS, height: 70, resize: 'vertical' }} {...inp('address')} /></F>
+                    {msg && <div style={{ color: '#ef4444', marginTop: 8, fontSize: 13 }}>{msg}</div>}
+                    <div style={{ display: 'flex', gap: 10, marginTop: 24, justifyContent: 'flex-end' }}>
+                        <button onClick={() => setModal(false)} style={smallBtn('#64748b')}>Cancel</button>
+                        <button onClick={save} disabled={saving} style={btn('#10b981')}>{saving ? 'Saving…' : 'Save'}</button>
                     </div>
                 </div>
             )}
@@ -124,4 +189,5 @@ function F({ label, children }) {
 const btn      = (bg) => ({ padding: '8px 18px', background: bg, color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 });
 const smallBtn = (bg) => ({ padding: '4px 10px', background: bg, color: '#fff', border: 'none', borderRadius: 5, cursor: 'pointer', fontSize: 12, marginRight: 4 });
 const tableS   = { width: '100%', borderCollapse: 'collapse', fontSize: 13 };
+const tag      = (bg) => ({ display: 'inline-block', padding: '2px 8px', borderRadius: 12, background: `${bg}20`, color: bg, fontSize: 11, fontWeight: 600 });
 const grid2    = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 };

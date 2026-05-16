@@ -1,6 +1,6 @@
 // ============================================================
 // FILE: src/App.js
-// PURPOSE: Root routing for Technical Textile ERP
+// PURPOSE: Root routing for Buying House ERP
 // ============================================================
 
 import { useState, useEffect } from 'react';
@@ -31,6 +31,20 @@ import VendorPage           from './pages/masters/VendorPage';
 import CustomerPage         from './pages/masters/CustomerPage';
 import LocationPage         from './pages/masters/LocationPage';
 import UOMPage              from './pages/masters/UOMPage';
+import BrandPage            from './pages/masters/BrandPage';
+import CategoryPage         from './pages/masters/CategoryPage';
+import FabricTypePage       from './pages/masters/FabricTypePage';
+import TestingParamsPage    from './pages/masters/TestingParamsPage';
+
+// ── Product Development ────────────────────────────────────────
+import ProductDevelopmentPage  from './pages/product_development/ProductDevelopmentPage';
+import PDRequestDetailPage     from './pages/product_development/PDRequestDetailPage';
+
+// ── Order Management ───────────────────────────────────────────
+import CustomerOrdersPage      from './pages/order_management/CustomerOrdersPage';
+import CustomerOrderDetailPage from './pages/order_management/CustomerOrderDetailPage';
+import InquiryListPage         from './pages/order_management/InquiryListPage';
+import InquiryDetailPage       from './pages/order_management/InquiryDetailPage';
 
 // ── Purchase ───────────────────────────────────────────────────
 import PurchaseOrdersPage   from './pages/purchase/PurchaseOrdersPage';
@@ -82,6 +96,12 @@ import InventoryReportPage     from './pages/reports/InventoryReportPage';
 import SalesReportPage         from './pages/reports/SalesReportPage';
 import ReconciliationReportPage from './pages/reports/ReconciliationReportPage';
 
+// ── BH Reports ─────────────────────────────────────────────────
+import OrderSummaryReport      from './pages/reports/OrderSummaryReport';
+import PDPipelineReport        from './pages/reports/PDPipelineReport';
+import VendorPerformanceReport from './pages/reports/VendorPerformanceReport';
+import ShipmentTrackerReport   from './pages/reports/ShipmentTrackerReport';
+
 // ── Settings Extra ─────────────────────────────────────────────
 import TallyIntegrationPage    from './pages/settings/TallyIntegrationPage';
 import CompanySettingsPage     from './pages/settings/CompanySettingsPage';
@@ -116,6 +136,15 @@ import FinishedGoodsPage       from './pages/inventory/FinishedGoodsPage';
 import MaintenanceSchedulePage from './pages/maintenance/MaintenanceSchedulePage';
 import MaintenanceLogPage      from './pages/maintenance/MaintenanceLogPage';
 import EscalationPage          from './pages/maintenance/EscalationPage';
+
+// ── Shipment / Quality ─────────────────────────────────────────
+import PSIPage                 from './pages/shipment/PSIPage';
+import ShipmentsPage           from './pages/shipment/ShipmentsPage';
+
+// ── Finance ───────────────────────────────────────────────────
+import BHSalesInvoicesPage     from './pages/finance/SalesInvoicesPage';
+import BHPurchaseInvoicesPage  from './pages/finance/PurchaseInvoicesPage';
+import PaymentsPage            from './pages/finance/PaymentsPage';
 
 
 function App() {
@@ -198,10 +227,24 @@ function App() {
                                     <Route path="/masters/processes" element={<ProcessPage />} />
                                     <Route path="/masters/products"  element={<ProductPage />} />
                                     <Route path="/masters/bom"       element={<BOMPage />} />
-                                    <Route path="/masters/vendors"   element={<VendorPage />} />
-                                    <Route path="/masters/customers" element={<CustomerPage />} />
-                                    <Route path="/masters/locations" element={<LocationPage />} />
-                                    <Route path="/masters/uom"       element={<UOMPage />} />
+                                    <Route path="/masters/vendors"          element={<VendorPage />} />
+                                    <Route path="/masters/customers"        element={<CustomerPage />} />
+                                    <Route path="/masters/locations"        element={<LocationPage />} />
+                                    <Route path="/masters/uom"              element={<UOMPage />} />
+                                    <Route path="/masters/brands"           element={<BrandPage />} />
+                                    <Route path="/masters/categories"       element={<CategoryPage />} />
+                                    <Route path="/masters/fabric-types"     element={<FabricTypePage />} />
+                                    <Route path="/masters/testing-params"   element={<TestingParamsPage />} />
+
+                                    {/* Product Development */}
+                                    <Route path="/product-development"      element={<ProductDevelopmentPage />} />
+                                    <Route path="/product-development/:id"  element={<PDRequestDetailPage />} />
+
+                                    {/* Order Management */}
+                                    <Route path="/orders/inquiries"         element={<InquiryListPage />} />
+                                    <Route path="/orders/inquiries/:id"     element={<InquiryDetailPage />} />
+                                    <Route path="/orders/co"                element={<CustomerOrdersPage />} />
+                                    <Route path="/orders/co/:id"            element={<CustomerOrderDetailPage />} />
 
                                     {/* Purchase */}
                                     <Route path="/purchase/orders"   element={<PurchaseOrdersPage />} />
@@ -244,6 +287,15 @@ function App() {
                                     <Route path="/maintenance/log"        element={<MaintenanceLogPage />} />
                                     <Route path="/maintenance/escalation" element={<EscalationPage />} />
 
+                                    {/* Shipment / Quality */}
+                                    <Route path="/shipment/psi"       element={<PSIPage />} />
+                                    <Route path="/shipment/shipments" element={<ShipmentsPage />} />
+
+                                    {/* Finance */}
+                                    <Route path="/finance/sales-invoices"    element={<BHSalesInvoicesPage />} />
+                                    <Route path="/finance/purchase-invoices" element={<BHPurchaseInvoicesPage />} />
+                                    <Route path="/finance/payments"          element={<PaymentsPage />} />
+
                                     {/* Dispatch */}
                                     <Route path="/dispatch/entries"          element={<DispatchEntriesPage />} />
                                     <Route path="/dispatch/invoices"         element={<SalesInvoicesPage />} />
@@ -257,6 +309,12 @@ function App() {
                                     <Route path="/reports/lot-stock"      element={<InventoryReportPage />} />
                                     <Route path="/reports/quality"        element={<SalesReportPage />} />
                                     <Route path="/reports/reconciliation" element={<ReconciliationReportPage />} />
+
+                                    {/* BH Reports */}
+                                    <Route path="/reports/orders"         element={<OrderSummaryReport />} />
+                                    <Route path="/reports/pd"             element={<PDPipelineReport />} />
+                                    <Route path="/reports/vendors"        element={<VendorPerformanceReport />} />
+                                    <Route path="/reports/shipments"      element={<ShipmentTrackerReport />} />
 
                                     {/* Settings Extra */}
                                     <Route path="/settings/tally"            element={<TallyIntegrationPage />} />
