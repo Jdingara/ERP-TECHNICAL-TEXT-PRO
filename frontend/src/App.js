@@ -144,7 +144,6 @@ import ShipmentsPage           from './pages/shipment/ShipmentsPage';
 // ── Finance ───────────────────────────────────────────────────
 import BHSalesInvoicesPage     from './pages/finance/SalesInvoicesPage';
 import BHPurchaseInvoicesPage  from './pages/finance/PurchaseInvoicesPage';
-import PaymentsPage            from './pages/finance/PaymentsPage';
 
 
 function App() {
@@ -324,7 +323,6 @@ function App() {
                                     <Route path="/finance/dashboard"         element={<FinanceDashboardPage />} />
                                     <Route path="/finance/accounts"          element={<ChartOfAccountsPage />} />
                                     <Route path="/finance/journal-entries"   element={<JournalEntriesPage />} />
-                                    <Route path="/finance/payments"          element={<PaymentsPage />} />
                                     <Route path="/finance/receipts"          element={<ReceiptsPage />} />
                                     <Route path="/finance/fiscal-years"      element={<FiscalYearsPage />} />
 
